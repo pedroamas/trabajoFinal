@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TrabajoFinal</string>
+    <string name="action_settings">Iniciar sesión</string>
+    <string name="title_activity_login">Sign in</string>
+
+
+</resources>

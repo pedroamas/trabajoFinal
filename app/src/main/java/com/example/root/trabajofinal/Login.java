@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -54,6 +55,12 @@ public class Login extends AppCompatActivity implements IRespuesta{
 
             }
         });
+
+        ImageView imageView=(ImageView)findViewById(R.id.imageView);
+
+        imageView.setImageBitmap(GestorImagenes.obtenerGestorImagenes(getApplicationContext()).cargarImagen(
+                "/data/data/com.example.root.trabajofinal/app_imageDir/foto01.jpg"
+        ));
     }
 
     @Override

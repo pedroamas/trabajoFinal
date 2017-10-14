@@ -86,6 +86,14 @@ public class MainActivity extends AppCompatActivity {
                 gestorBD.borrarPuntos();
             }
         });
+        Button btnLista=(Button)findViewById(R.id.btnLista);
+        btnLista.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ListaMaterialDesign.class);
+                startActivity(intent);
+            }
+        });
 
     }
 

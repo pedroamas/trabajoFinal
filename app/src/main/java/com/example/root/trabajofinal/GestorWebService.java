@@ -179,7 +179,7 @@ public class GestorWebService {
                                                         puntoJSON.getString(1),     //titulo
                                                         Double.parseDouble(puntoJSON.getString(2)),       //latitud
                                                         Double.parseDouble(puntoJSON.getString(3)),       //longitud
-                                                        "/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName()
+                                                        "//data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName()
                                                 );
                                                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
                                                 gestorImagenes.descargarImagen(puntoJSON.getString(4),file.getName());

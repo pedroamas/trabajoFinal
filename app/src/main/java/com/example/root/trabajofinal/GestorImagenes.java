@@ -65,12 +65,13 @@ public class GestorImagenes {
         return directory.getAbsolutePath();
     }
 
-    public static Bitmap cargarImagen(String nombreImagen)
+    public Bitmap cargarImagen(String nombreImagen)
     {
-        String path="/data/data/com.example.root.apptesis/app_imageDir";
+        String path=nombreImagen;
+
         Bitmap bitmap=null;
         try {
-            File f=new File(path, nombreImagen);
+            File f=new File("", nombreImagen);
             bitmap = BitmapFactory.decodeStream(new FileInputStream(f));
         }
         catch (FileNotFoundException e)

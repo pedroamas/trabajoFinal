@@ -27,6 +27,7 @@ public class GestorDePuntos {
         puntos=new ArrayList<Punto>();
         this.context=context;
         this.vistas=new ArrayList<IRespuesta>();
+        puntos=GestorBD.getGestorBD(context).getPuntos();
     }
 
     public void registerView(IRespuesta vista){
@@ -93,6 +94,35 @@ public class GestorDePuntos {
     public ArrayList<Punto> getPuntos(){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
         return gestorBD.getPuntos();
+    }
+
+    public Punto getPunto(int id){
+
+        Punto p;
+        Iterator<Punto> iterator=puntos.iterator();
+        while (iterator.hasNext()){
+
+            p=iterator.next();
+            Log.e("ID","IDDDDDDDDDDD: "+p.getId());
+            if(id==p.getId()){
+                Log.e("ID","IDDDDDDDDDDD: "+id);
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public Punto getPunto(String titulo){
+        int i=0;
+        Punto p;
+        Iterator<Punto> iterator=puntos.iterator();
+        while (iterator.hasNext()){
+            p=iterator.next();
+            if(titulo.equals(p.getTitulo())){
+                return p;
+            }
+        }
+        return null;
     }
 
 }

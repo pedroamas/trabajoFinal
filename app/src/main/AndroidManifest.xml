@@ -52,7 +52,16 @@
         <activity android:name=".MenuAdmin" />
         <activity android:name=".MenuEditarPunto" />
         <activity android:name=".RealidadAumentada" />
+        <activity
+            android:name=".Detalle"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity android:name=".VistaSatelital"></activity>
+        <activity android:name=".ListaMaterialDesign" />
     </application>
 
 </manifest>

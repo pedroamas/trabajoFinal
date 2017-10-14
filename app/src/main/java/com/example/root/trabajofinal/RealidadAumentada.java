@@ -76,7 +76,8 @@ public class RealidadAumentada extends FragmentActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-
+        BeyondarLocationManager
+                .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
 
 
         // Hide the window title.
@@ -93,8 +94,20 @@ public class RealidadAumentada extends FragmentActivity implements View.OnClickL
         mWorld = gestorDePuntos.generarMundo(this);
 
         mBeyondarFragment.setWorld(mWorld);
-        enableLocationUpdates();
+
+        //enableLocationUpdates();          //habilita la localizacion
         mBeyondarFragment.setOnClickBeyondarObjectListener(this);
+
+        BeyondarLocationManager.addWorldLocationUpdate(mWorld);
+        // Lets add the user position to the map
+        GeoObject user = new GeoObject(1000l);
+        user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
+        txtInfo.setText(mWorld.getLatitude()+" "+mWorld.getLongitude());
+        user.setImageResource(R.drawable.flag);
+        user.setName("Posición actual");
+        mWorld.addBeyondarObject(user);
+
+        BeyondarLocationManager.addGeoObjectLocationUpdate(user);
 
 
     }
@@ -108,6 +121,22 @@ public class RealidadAumentada extends FragmentActivity implements View.OnClickL
         mShowMap = (Button) findViewById(R.id.showMapButton);
         mShowMap.setOnClickListener(this);
         txtInfo=(TextView)findViewById(R.id.txtInfo);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // When the activity is resumed it is time to enable the
+        // BeyondarLocationManager
+        BeyondarLocationManager.enable();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // To avoid unnecessary battery usage disable BeyondarLocationManager
+        // when the activity goes on pause.
+        BeyondarLocationManager.disable();
     }
 
     @Override
@@ -292,8 +321,11 @@ public class RealidadAumentada extends FragmentActivity implements View.OnClickL
     @Override
     public void onClickBeyondarObject(ArrayList<BeyondarObject> beyondarObjects) {
         if (beyondarObjects.size() > 0) {
-            Toast.makeText(this, "Clicked on: " + beyondarObjects.get(0).getName(),
-                    Toast.LENGTH_LONG).show();
+            GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+            Punto punto=gestorDePuntos.getPunto(beyondarObjects.get(0).getName());
+            Intent intent = new Intent(getApplicationContext(), Detalle.class);
+            intent.putExtra(Detalle.EXTRA_POSITION, punto.getId());
+            startActivity(intent);
 
         }
     }

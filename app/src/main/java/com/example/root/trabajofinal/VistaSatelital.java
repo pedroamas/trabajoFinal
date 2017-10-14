@@ -1,6 +1,7 @@
 package com.example.root.trabajofinal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -49,9 +50,12 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         // method:
         GeoObject geoObject = mGoogleMapPlugin.getGeoObjectOwner(marker);
         if (geoObject != null) {
-            Toast.makeText(this,
-                    "Click on a marker owned by a GeoOject with the name: " + geoObject.getName(),
-                    Toast.LENGTH_SHORT).show();
+            GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+            Punto punto=gestorDePuntos.getPunto(geoObject.getName());
+            Intent intent = new Intent(getApplicationContext(), Detalle.class);
+            intent.putExtra(Detalle.EXTRA_POSITION, punto.getId());
+            startActivity(intent);
+
         }
         return false;
     }

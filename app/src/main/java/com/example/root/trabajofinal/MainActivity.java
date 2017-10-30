@@ -95,6 +95,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnProbar=(Button)findViewById(R.id.btnProbar);
+        btnProbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
 }

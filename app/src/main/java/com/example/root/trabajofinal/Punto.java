@@ -1,11 +1,15 @@
 package com.example.root.trabajofinal;
 
+import android.widget.TextView;
+
 public class Punto {
     private int id;
     private String titulo;
     private double latitud;
     private double longitud;
     private String foto;
+    private String foto_web;
+    private int estado_foto;
 
     public Punto(int id, String titulo, double latitud, double longitud, String foto) {
         this.id = id;
@@ -13,6 +17,17 @@ public class Punto {
         this.latitud = latitud;
         this.longitud = longitud;
         this.foto = foto;
+
+    }
+
+    public Punto(int id, String titulo, double latitud, double longitud, String foto,String foto_web, int estado_foto) {
+        this.id = id;
+        this.titulo = titulo;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.foto = foto;
+        this.foto_web=foto_web;
+        this.estado_foto=estado_foto;
 
     }
 
@@ -43,7 +58,6 @@ public class Punto {
         return foto;
     }
 
-    public String getDescripcion(){return "Deberia ser la descripcion de internet";}
 
     public boolean equals(Punto puntoComp){
         if(id!=puntoComp.getId()) return false;

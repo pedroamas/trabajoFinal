@@ -54,14 +54,15 @@
         <activity android:name=".RealidadAumentada" />
         <activity
             android:name=".Detalle"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".VistaSatelital"></activity>
+        <activity android:name=".VistaSatelital" />
         <activity android:name=".ListaMaterialDesign" />
+        <activity android:name=".SubirPuntoAdmin"></activity>
     </application>
 
 </manifest>

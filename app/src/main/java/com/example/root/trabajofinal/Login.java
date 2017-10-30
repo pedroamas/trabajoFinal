@@ -56,11 +56,7 @@ public class Login extends AppCompatActivity implements IRespuesta{
             }
         });
 
-        ImageView imageView=(ImageView)findViewById(R.id.imageView);
 
-        imageView.setImageBitmap(GestorImagenes.obtenerGestorImagenes(getApplicationContext()).cargarImagen(
-                "/data/data/com.example.root.trabajofinal/app_imageDir/foto01.jpg"
-        ));
     }
 
     @Override

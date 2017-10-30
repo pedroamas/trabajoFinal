@@ -63,7 +63,9 @@ public class Detalle extends AppCompatActivity {
 
         //String[] placeDetails = resources.getStringArray(R.array.place_details);
         TextView placeDetail = (TextView) findViewById(R.id.place_detail);
-        placeDetail.setText(punto.getDescripcion());
+        //placeDetail.setText(punto.getDescripcion());
+        //GestorWebService.getGestorWebService(getApplicationContext()).obtenerDescripcion(punto.getId(),placeDetail);
+        gestorDePuntos.getDescripcion(punto.getId(),placeDetail);
 
         //String[] placeLocations = resources.getStringArray(R.array.place_locations);
         TextView placeLocation =  (TextView) findViewById(R.id.place_location);

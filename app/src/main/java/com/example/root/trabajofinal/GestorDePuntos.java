@@ -2,6 +2,7 @@ package com.example.root.trabajofinal;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
@@ -124,5 +125,11 @@ public class GestorDePuntos {
         }
         return null;
     }
+
+    public void getDescripcion(int idPunto, TextView textView){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.obtenerDescripcion(idPunto,textView);
+    }
+
 
 }

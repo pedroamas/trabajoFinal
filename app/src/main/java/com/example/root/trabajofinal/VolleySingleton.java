@@ -56,9 +56,7 @@ public final class VolleySingleton {
      */
     public <T> void addToRequestQueue(Request<T> req) {
 
-        Log.e("Volley","Entro");
         getRequestQueue().add(req);
-        Log.e("Volley","Salio");
     }
 
 }

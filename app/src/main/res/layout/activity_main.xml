@@ -63,4 +63,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnProbar" />
 
+    <Button
+        android:text="Enviar imagen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnEnviarImagen" />
+
 </LinearLayout>

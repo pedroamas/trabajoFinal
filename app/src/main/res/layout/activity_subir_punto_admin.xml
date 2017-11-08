@@ -28,7 +28,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="Título"
         android:ems="10"
         android:id="@+id/edTitulo" />
 
@@ -74,9 +73,22 @@
 
         <Button
             android:id="@+id/show_options_button"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
             android:text="Foto"/>
+
+        <TextView
+            android:text="Fecha de captura"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView9" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:ems="10"
+            android:id="@+id/edFechaCaptura" />
 
         <ImageView
             android:id="@+id/set_picture"

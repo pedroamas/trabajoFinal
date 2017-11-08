@@ -103,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        Button btnEnviarImagen=(Button)findViewById(R.id.btnEnviarImagen);
+        btnEnviarImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
 
     }

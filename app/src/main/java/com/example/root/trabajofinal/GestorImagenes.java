@@ -5,25 +5,37 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Created by root on 30/06/17.
@@ -37,7 +49,7 @@ public class GestorImagenes {
     private int count,countDescargados;
     private static GestorImagenes gestorImagenes;
     private Context context;
-
+    public static String TAG="<GestorImagenes>";
     private GestorImagenes(Context context) {
         nombreDescargas=new String[400];
         count=-1;
@@ -115,112 +127,25 @@ public class GestorImagenes {
 
     }
 
-    public String enviar_imagen(String imagenURL, String urlString){
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;
-        DataInputStream inStream = null;
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary = "*****";
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1*1024*1024*1024;
-        try
-        {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitmap = BitmapFactory.decodeFile(imagenURL, options);
-/**/
-            ExifInterface ei = new ExifInterface(imagenURL);
-            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+    public void enviarImagen(String pathImage){
+        Bitmap image=cargarImagen(pathImage);
+        String imagenBase64=getStringImage(image);
+        Log.e(TAG,imagenBase64);
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.enviarImagen(imagenBase64,getNombreArchivo(pathImage));
+    }
 
-            switch(orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
+    private String getNombreArchivo(String path){
+        String file = path.substring(path.lastIndexOf('/') + 1);
+        return file;
+    }
 
-                    bitmap=RotateBitmap(bitmap, 90);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    bitmap=RotateBitmap(bitmap, 180);
-                    break;
-// etc.
-            }
-/**/
-            OutputStream os = new FileOutputStream(imagenURL);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
-            os.flush();
-            os.close();
-/**/
-            FileInputStream fileInputStream = new FileInputStream(new File(imagenURL));
-/**/
-            java.net.URL url = new java.net.URL(urlString);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setUseCaches(false);
-            String post="POST";
-            conn.setRequestMethod(post);
-            String keep="Keep-Alive";
-            String connection="Connection";
-            conn.setRequestProperty(connection, keep);
-            String multipart="multipart/form-data;boundary="+boundary;
-            String imagen = "Content-Disposition: form-data; name=\"imagen\";filename=\"" + imagenURL + "\"" + lineEnd+"Content-type: image/"+MimeTypeMap.getFileExtensionFromUrl(imagenURL.toLowerCase())+";"+lineEnd;
-/**/
-            long contentLength = fileInputStream.available();
-            int longitud = Integer.parseInt(String.valueOf(contentLength));
-/**/
-            conn.setChunkedStreamingMode(longitud);
-            conn.setRequestProperty("Content-Type", multipart);
-            dos = new DataOutputStream( conn.getOutputStream() );
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes(imagen);
-            dos.writeBytes(lineEnd);
-/**/
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            buffer = new byte[bufferSize];
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-            fileInputStream.close();
-/**/
-            int totalRead = 0;
-/**/
-            int buffersend=bytesRead/100;
-/**/
-            dos.flush();
-            while (bytesRead > 0)
-            {
-                if(bytesRead-buffersend<0)
-                    buffersend=bytesRead;
-                dos.write(buffer, totalRead, buffersend);
-                dos.flush();
-                bytesRead-=buffersend;
-                totalRead += buffersend;
-                int progress = (int) (totalRead * (100/(double) contentLength));
-                MainActivity.config.progreso.setProgress(progress);
-            }
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-            dos.flush();
-            dos.close();
-        }
-        catch(SocketException ex)
-        {}
-        catch (MalformedURLException ex)
-        {}
-        catch (IOException ioe)
-        {}
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
 
-        String str="NOT OK";
-        try {
-            inStream = new DataInputStream ( conn.getInputStream() );
-            String test="";
-            while (( test = inStream.readLine()) != null)
-            {
-                str=test;
-            }
-            inStream.close();
-        }
-        catch (IOException ioex)
-        {}
-        return str;
     }
 }

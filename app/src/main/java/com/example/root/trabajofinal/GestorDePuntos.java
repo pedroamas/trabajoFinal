@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -94,6 +95,7 @@ public class GestorDePuntos {
 
     public ArrayList<Punto> getPuntos(){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
+
         return gestorBD.getPuntos();
     }
 
@@ -102,11 +104,8 @@ public class GestorDePuntos {
         Punto p;
         Iterator<Punto> iterator=puntos.iterator();
         while (iterator.hasNext()){
-
             p=iterator.next();
-            Log.e("ID","IDDDDDDDDDDD: "+p.getId());
             if(id==p.getId()){
-                Log.e("ID","IDDDDDDDDDDD: "+id);
                 return p;
             }
         }
@@ -129,6 +128,19 @@ public class GestorDePuntos {
     public void getDescripcion(int idPunto, TextView textView){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
         gestorWebService.obtenerDescripcion(idPunto,textView);
+    }
+
+    public void puntosMalDescargados(){
+        GestorBD gestorBD=GestorBD.getGestorBD(context);
+        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+        ArrayList<Punto> puntosMalDescargados=gestorBD.puntosMalDescargados();
+        Iterator<Punto> ite=puntosMalDescargados.iterator();
+        while (ite.hasNext()){
+            Punto punto=ite.next();
+            File file=new File(punto.getFotoWeb());
+            gestorImagenes.descargarImagen(punto.getFotoWeb(), file.getName(), punto.getId());
+            Log.e("<puntosMalDescargados>","Punto "+punto.getId()+" url: "+punto.getFotoWeb());
+        }
     }
 
 

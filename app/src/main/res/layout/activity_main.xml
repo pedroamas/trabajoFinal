@@ -69,4 +69,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnEnviarImagen" />
 
+    <Button
+        android:text="Puntos Mal Descargados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnMalDescargados" />
+
 </LinearLayout>

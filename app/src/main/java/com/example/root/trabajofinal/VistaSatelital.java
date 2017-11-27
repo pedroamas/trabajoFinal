@@ -29,6 +29,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private GoogleMapWorldPlugin mGoogleMapPlugin;
     private World mWorld;
     private TextView txtInfo;
+    private GestorDePuntos gestorDePuntos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,8 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         txtInfo=(TextView)findViewById(R.id.txtInfo);
         BeyondarLocationManager
                 .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
+        gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+        gestorDePuntos.getPuntos();
 
     }
 
@@ -50,7 +53,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         // method:
         GeoObject geoObject = mGoogleMapPlugin.getGeoObjectOwner(marker);
         if (geoObject != null) {
-            GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+
             Punto punto=gestorDePuntos.getPunto(geoObject.getName());
             Intent intent = new Intent(getApplicationContext(), Detalle.class);
             intent.putExtra(Detalle.EXTRA_POSITION, punto.getId());

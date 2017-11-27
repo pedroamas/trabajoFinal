@@ -115,7 +115,7 @@ public class GestorImagenes {
                     public void onResponse(Bitmap bitmap) {
                         Log.e("",url);
                         guardarImagen(context,bitmap,nombreImagen);
-                        }
+                    }
                 }, 0, 0, null,null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
@@ -127,18 +127,48 @@ public class GestorImagenes {
 
     }
 
-    public void enviarImagen(String pathImage){
-        Bitmap image=cargarImagen(pathImage);
+    public void descargarImagen(final String url, final String nombreImagen, final int idPunto){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+
+        nombreDescargas[++count]=nombreImagen;
+        Log.e("DescargaIMG","Descargame esta capo: "+nombreImagen);
+
+        ImageRequest request = new ImageRequest(
+                url ,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        Log.e("",url);
+                        guardarImagen(context,bitmap,nombreImagen);
+                        GestorBD gestorBD=GestorBD.getGestorBD(context);
+                        gestorBD.setEstadoPunto(idPunto,1);
+                    }
+                }, 0, 0, null,null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        //imagenPost.setImageResource(R.drawable.illia);
+                        Log.d("<Error>", "Error en respuesta Bitmap: "+ error.getMessage());
+                    }
+                });
+        requestQueue.add(request);
+
+    }
+
+    public void enviarImagen(Multimedia multimedia){
+        Bitmap image=cargarImagen(multimedia.getPath());
         String imagenBase64=getStringImage(image);
         Log.e(TAG,imagenBase64);
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.enviarImagen(imagenBase64,getNombreArchivo(pathImage));
+        gestorWebService.enviarImagen(imagenBase64,multimedia);
     }
 
-    private String getNombreArchivo(String path){
-        String file = path.substring(path.lastIndexOf('/') + 1);
-        return file;
+    public String getImagenBase64(String path){
+        Bitmap image=cargarImagen(path);
+        return getStringImage(image);
     }
+
+
 
     public String getStringImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

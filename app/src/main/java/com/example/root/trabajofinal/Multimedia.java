@@ -89,4 +89,9 @@ public class Multimedia {
     public int getIdPunto() {
         return idPunto;
     }
+
+    public String getNombreArchivo(){
+        String file = path.substring(path.lastIndexOf('/') + 1);
+        return file;
+    }
 }

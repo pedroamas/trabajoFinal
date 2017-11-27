@@ -99,19 +99,30 @@ public class SubirPuntoAdmin extends AppCompatActivity {
                 Double longitud=Double.parseDouble(((EditText)findViewById(R.id.edLongitud)).getEditableText().toString());
                 SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd");
 
-                Date fechaCaptura;
+                Date fechaCaptura=null;
                 try {
                     fechaCaptura = formatoDelTexto.parse(((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString());
                 } catch (ParseException ex) {
                     ex.printStackTrace();
                 }
 
-                Punto punto=new Punto(titulo,latitud,longitud,"");
+                Punto punto=new Punto(titulo,descripcion,latitud,longitud,"");
                 GestorWebService gestorWebService=GestorWebService.getGestorWebService(getApplicationContext());
-                gestorWebService.setPunto(null);
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
+
+                Log.e("Paso x aca","Paso x aca");
+                //GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
+                Multimedia multimedia=new Multimedia(
+                        "",
+                        pathImagen,
+                        "",
+                        fechaCaptura,
+                        null,
+                        0);
                 Log.e("envIMG",pathImagen+"- Nombre"+nombreImagen);
-                gestorImagenes.enviarImagen(pathImagen);
+
+                punto.setImagen(multimedia);
+                gestorWebService.setPunto(punto);
+                //gestorImagenes.enviarImagen(multimedia);
             }
         });
     }

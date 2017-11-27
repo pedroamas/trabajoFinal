@@ -23,6 +23,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
         db.execSQL("create table puntos(" +
                 "id integer primary key, " +
+                "descripcion text, "+
                 "latitud varchar(15), " +
                 "longitud varchar(15), " +
                 "foto text," +
@@ -30,7 +31,6 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "estado_foto integer,"+
                 "titulo text)");
     }
-
     @Override
 
     public void onUpgrade(SQLiteDatabase db, int version1, int version2) {
@@ -39,6 +39,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists puntos");
         db.execSQL("create table puntos(" +
                 "id integer primary key, " +
+                "descripcion text, "+
                 "latitud varchar(15), " +
                 "longitud varchar(15), " +
                 "foto text," +

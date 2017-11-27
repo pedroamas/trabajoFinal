@@ -110,6 +110,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        Button btnMalDescargados=(Button)findViewById(R.id.btnMalDescargados);
+        btnMalDescargados.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+                gestorDePuntos.puntosMalDescargados();
+
+            }
+        });
 
 
     }

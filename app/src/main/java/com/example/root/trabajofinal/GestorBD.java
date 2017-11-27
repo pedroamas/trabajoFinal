@@ -18,6 +18,7 @@ public class GestorBD {
     Context context;
     private static GestorBD gestorBD;
     private ArrayList<Punto> puntosBD;
+    public static String TAG="<GestorBD>";
 
     private GestorBD(Context context) {
         this.context = context;
@@ -32,10 +33,13 @@ public class GestorBD {
     }
 
     public void actualizarPuntos(ArrayList<Punto> puntos){
+        String listaPuntosEliminar="";
         leerPuntos();
         Iterator<Punto> ite=puntos.iterator();
         while (ite.hasNext()){
             Punto puntoIn=ite.next();
+            listaPuntosEliminar+=puntoIn.getId()+",";
+
             Punto puntoOut=localizacion(puntoIn.getId());
 
             //El punto no fue encontrado, entonces agregarlo
@@ -49,6 +53,16 @@ public class GestorBD {
 
         }
 
+        //Eliminación de puntos sobrantes
+        if(!listaPuntosEliminar.isEmpty()){
+            //Elimino la última coma que sobra
+            listaPuntosEliminar = listaPuntosEliminar.substring(0, listaPuntosEliminar.length() - 1);
+            eliminarPuntos(listaPuntosEliminar);
+        }
+
+
+        leerPuntos();
+
 
     }
 
@@ -61,18 +75,23 @@ public class GestorBD {
         ContentValues registro = new ContentValues();
         registro.put("id", punto.getId());
         registro.put("titulo", punto.getTitulo());
+        registro.put("descripcion", punto.getDescripcion());
         registro.put("latitud", punto.getLatitud());
         registro.put("longitud", punto.getLongitud());
         registro.put("foto", punto.getFoto());
+        registro.put("foto_web", punto.getFotoWeb());
+        registro.put("estado_foto", 0);
 
         bd.insert("puntos", null, registro);
         bd.close();
     }
-    public void eliminarPunto(Punto punto){
+    public void eliminarPuntos(String listaPuntosEliminar){
         AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
                 "administracion", null, versionDB);
         SQLiteDatabase bd = admin.getWritableDatabase();
-        bd.execSQL("DELETE FROM puntos WHERE id="+punto.getId());
+        bd.execSQL("DELETE FROM puntos WHERE id not in ("+listaPuntosEliminar+")");
+
+        Log.e(TAG,"DELETE FROM puntos WHERE id not in ("+listaPuntosEliminar+")");
         bd.close();
     }
 
@@ -90,9 +109,11 @@ public class GestorBD {
         bd.execSQL("UPDATE puntos " +
                 "SET "+
                     " titulo='"+punto.getTitulo()+"'"+
+                    " ,descripcion='"+punto.getDescripcion()+"'"+
                     " ,longitud='"+punto.getLongitud()+"'"+
                     " ,latitud='"+punto.getLatitud()+"'"+
                     " ,foto='"+punto.getFoto()+"'"+
+                    " ,foto_web='"+punto.getFotoWeb()+"'"+
                 " WHERE id="+punto.getId()
         );
         bd.close();
@@ -115,7 +136,8 @@ public class GestorBD {
                 "administracion", null, versionDB);
         SQLiteDatabase bd = admin.getWritableDatabase();
         Cursor fila = bd.rawQuery(
-                "select id,latitud, longitud, titulo,foto from puntos", null);
+                "select id,latitud, longitud, titulo,foto,descripcion,foto_web from puntos " +
+                        "WHERE estado_foto=1", null);
 
         puntosBD=new ArrayList<Punto>();
         if (fila.moveToFirst()) {
@@ -123,9 +145,12 @@ public class GestorBD {
                 Punto puntoBD=new Punto(
                         Integer.parseInt(fila.getString(0)),        //id
                         fila.getString(3),                          //titulo
+                        fila.getString(5),                          //descripcion
                         Double.parseDouble(fila.getString(1)),      //latitud
                         Double.parseDouble(fila.getString(2)),      //longitud
-                        fila.getString(4)                           //foto
+                        fila.getString(4),                          //foto
+                        fila.getString(6),                          //foto_web
+                        1                                           //estado_foto
                 );
                 puntosBD.add(puntoBD);
             }while (fila.moveToNext());
@@ -140,10 +165,13 @@ public class GestorBD {
         while (ite.hasNext()){
             Punto punto = ite.next();
             Log.e("<MostrarPunto>",punto.getId()+" - "+
-                punto.getTitulo()+" - "+
-                punto.getLatitud()+" - "+
-                punto.getLongitud()+" - "+
-                punto.getFoto());
+                    punto.getTitulo()+" - "+
+                    punto.getDescripcion()+" - "+
+                    punto.getLatitud()+" - "+
+                    punto.getLongitud()+" - "+
+                    punto.getFoto()+" - "+
+                    punto.getFotoWeb()
+            );
         }
     }
 
@@ -159,6 +187,46 @@ public class GestorBD {
 
         bd.delete("puntos","",null);
         bd.close();
+    }
+
+    public void setEstadoPunto(int idPunto, int estado){
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
+                "administracion", null, versionDB);
+        SQLiteDatabase bd = admin.getWritableDatabase();
+        bd.execSQL("UPDATE puntos " +
+                "SET "+
+                " estado_foto="+estado+
+                " WHERE id="+idPunto
+        );
+        bd.close();
+    }
+
+    public ArrayList<Punto> puntosMalDescargados(){
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
+                "administracion", null, versionDB);
+        SQLiteDatabase bd = admin.getWritableDatabase();
+        Cursor fila = bd.rawQuery(
+                "select id,latitud, longitud, titulo,foto,descripcion,foto_web from puntos " +
+                        "WHERE estado_foto=0", null);
+
+        ArrayList<Punto> puntosMalCargados=new ArrayList<Punto>();
+        if (fila.moveToFirst()) {
+            do{
+                Punto puntoBD=new Punto(
+                        Integer.parseInt(fila.getString(0)),        //id
+                        fila.getString(3),                          //titulo
+                        fila.getString(5),                          //descripcion
+                        Double.parseDouble(fila.getString(1)),      //latitud
+                        Double.parseDouble(fila.getString(2)),      //longitud
+                        fila.getString(4),                          //foto
+                        fila.getString(6),                          //fotoWeb
+                        0
+                );
+                puntosMalCargados.add(puntoBD);
+            }while (fila.moveToNext());
+        }
+        bd.close();
+        return puntosMalCargados;
     }
 
 }

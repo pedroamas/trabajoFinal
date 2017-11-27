@@ -223,25 +223,23 @@ public class GestorWebService {
                                             for(i=0;i<response.length();i++){
 
                                                 JSONArray puntoJSON=response.getJSONArray(i);
-                                                File file=new File(puntoJSON.getString(4));
+                                                File file=new File(puntoJSON.getString(5));
                                                 Punto puntoWB=new Punto(
                                                         puntoJSON.getInt(0),        //id
                                                         puntoJSON.getString(1),     //titulo
-                                                        Double.parseDouble(puntoJSON.getString(2)),       //latitud
-                                                        Double.parseDouble(puntoJSON.getString(3)),       //longitud
+                                                        puntoJSON.getString(2),     //descripcion
+                                                        Double.parseDouble(puntoJSON.getString(3)),       //latitud
+                                                        Double.parseDouble(puntoJSON.getString(4)),       //longitud
                                                         "/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName(),
-                                                        puntoJSON.getString(4),             //foto_web
+                                                        puntoJSON.getString(5),             //foto_web
                                                         0                                 //estado_foto
                                                 );
                                                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                                                gestorImagenes.descargarImagen(puntoJSON.getString(4),file.getName());
-                                                Log.e("<archivo>",file.getName());
+                                                gestorImagenes.descargarImagen(puntoJSON.getString(5),file.getName(),puntoJSON.getInt(0));
                                                 puntos.add(puntoWB);
-                                                Log.e("<WEBSER>","Lat - Long: "+puntoJSON.getString(1)+" "+ Double.parseDouble(puntoJSON.getString(2))+ " "+Double.parseDouble(puntoJSON.getString(3)));
+
                                             }
                                             gestorDePuntos.respActualizarPuntos(puntos);
-
-
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -252,7 +250,7 @@ public class GestorWebService {
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        Log.d(TAG, "Error Volley(ActualizarPuntos): " + error.getMessage());
 
                                     }
                                 }
@@ -261,12 +259,12 @@ public class GestorWebService {
                 );
     }
 
-    public int setPunto(final Punto punto){
-        final int idPunto=0;
+    public void setPunto(final Punto punto){
         RequestQueue requestQueue;
         requestQueue= Volley.newRequestQueue(context);
         Log.e("SetPunto","Entro por lo menos");
         String url = "https://apptesis.000webhostapp.com/set_punto.php";
+
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
@@ -275,8 +273,7 @@ public class GestorWebService {
                     public void onResponse(String response) {
                         // response
                         Log.e("Response", response);
-                        idPunto=1;
-                        idPunto= Integer.parseInt(response);
+                        Toast.makeText(context, "El punto se agregó con éxito", Toast.LENGTH_LONG).show();
                     }
                 },
                 new Response.ErrorListener()
@@ -292,29 +289,39 @@ public class GestorWebService {
             protected Map<String, String> getParams()
             {
                 Map<String, String>  params = new HashMap<String, String>();
+
                 params.put("titulo", punto.getTitulo());
-                params.put("latitud", Double.toString(punto.getLatitud()));
-                params.put("longitud", Double.toString(punto.getLongitud()));
+                params.put("latitud", ""+punto.getLatitud());
+                params.put("longitud", ""+punto.getLongitud());
+                Log.e("LatLong","latidud: "+punto.getLatitud()+" Longitud: "+punto.getLongitud());
                 params.put("descripcion", "l");
 
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+
+                params.put("base64Img", gestorImagenes.getImagenBase64(punto.getImagen().getPath()));
+                params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
+                params.put("tituloImg", punto.getImagen().getTitulo());
+                params.put("descripcionImg", punto.getImagen().getDescripcion());
+                params.put("fecha_capturaImg", ""+punto.getImagen().getFechaCaptura());
+                params.put("fecha_subidaImg", ""+punto.getImagen().getFechaSubida());
                 return params;
             }
 
         };
         requestQueue.add(postRequest);
 
-        return idPunto;
-
     }
 
-    public void enviarImagen(final String image, final String nombreImagen) {
-        Log.e("<GestorWebService>",nombreImagen);
+    public void enviarImagen(final String image, final Multimedia multimedia) {
+
+        Log.e("<GestorWebService>",multimedia.getPath());
         final StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 "https://apptesis.000webhostapp.com/subir_imagen.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.e("enviarImagen",response);
+                        Toast.makeText(context, "La imagen se envió con éxito", Toast.LENGTH_LONG).show();
                     }
                 },
                 new Response.ErrorListener() {
@@ -329,7 +336,12 @@ public class GestorWebService {
                 Map<String, String> params = new Hashtable<String, String>();
 
                 params.put("base64", image);
-                params.put("nombre_imagen",nombreImagen);
+                params.put("nombre_imagen",multimedia.getNombreArchivo());
+                params.put("titulo", multimedia.getTitulo());
+                params.put("descripcion", multimedia.getDescripcion());
+                params.put("fecha_captura", ""+multimedia.getFechaCaptura());
+                params.put("fecha_subida", ""+multimedia.getFechaSubida());
+
                 return params;
             }
         };

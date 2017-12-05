@@ -178,4 +178,12 @@ public class GestorImagenes {
         return encodedImage;
 
     }
+    public void borrarImagen(String url){
+        File fichero = new File(url);
+        if (fichero.delete()){
+            Log.e(TAG,"Borrado: "+url);
+        }else{
+            Log.e(TAG,"Error en Borrado: "+url);
+        }
+    }
 }

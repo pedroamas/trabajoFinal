@@ -60,7 +60,7 @@ public class GestorWebService {
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "https://apptesis.000webhostapp.com/get_usuario.php?" +
+                                "http://www.pedroamas.xyz/get_usuario.php?" +
                                         "username="+usuario.getUsername()+
                                         "&contrasena="+usuario.getContrasena(),
                                 new Response.Listener<JSONArray>() {
@@ -118,7 +118,7 @@ public class GestorWebService {
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "https://apptesis.000webhostapp.com/get_puntos.php?" ,
+                                "http://www.pedroamas.xyz/get_puntos.php?" ,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
@@ -166,23 +166,25 @@ public class GestorWebService {
 
     }
 
-    public void obtenerDescripcion(int idPunto, final TextView textView){
+    public void eliminarPunto(int idPunto){
         GestorUsuarios.getGestorUsuarios(context);
 
         VolleySingleton.
                 getInstance(context).
                 addToRequestQueue(
-                        new JsonArrayRequest(
+                        new StringRequest(
                                 Request.Method.GET,
-                                "https://apptesis.000webhostapp.com/get_descripcion.php?id=" + idPunto ,
-                                new Response.Listener<JSONArray>() {
+                                "http://www.pedroamas.xyz/eliminar_punto.php?id_punto=" + idPunto ,
+                                new Response.Listener<String>() {
 
                                     @Override
-                                    public void onResponse(JSONArray response) {
+                                    public void onResponse(String response) {
 
                                         try {
-                                            Log.e("Descripcion",response.getString(0));
-                                            textView.setText(response.getString(0));
+                                            Log.e(TAG,response);
+                                            Toast.makeText(context,
+                                                    "Punto eliminado", Toast.LENGTH_SHORT).show();
+
 
                                         }catch (Exception e){
                                             Log.d(TAG, "Error Volley: " );
@@ -195,7 +197,6 @@ public class GestorWebService {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
-                                        gestorUsuarios.notifyViews(null);
                                     }
                                 }
 
@@ -210,7 +211,7 @@ public class GestorWebService {
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "https://apptesis.000webhostapp.com/get_puntos.php?" ,
+                                "http://www.pedroamas.xyz/get_puntos.php?" ,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
@@ -263,7 +264,7 @@ public class GestorWebService {
         RequestQueue requestQueue;
         requestQueue= Volley.newRequestQueue(context);
         Log.e("SetPunto","Entro por lo menos");
-        String url = "https://apptesis.000webhostapp.com/set_punto.php";
+        String url = "http://www.pedroamas.xyz/set_punto.php";
 
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
@@ -316,7 +317,7 @@ public class GestorWebService {
 
         Log.e("<GestorWebService>",multimedia.getPath());
         final StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                "https://apptesis.000webhostapp.com/subir_imagen.php",
+                "http://www.pedroamas.xyz/subir_imagen.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

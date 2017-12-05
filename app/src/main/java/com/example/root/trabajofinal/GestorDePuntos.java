@@ -95,24 +95,27 @@ public class GestorDePuntos {
 
     public ArrayList<Punto> getPuntos(){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
-
-        return gestorBD.getPuntos();
+        puntos=gestorBD.getPuntos();
+        return puntos;
     }
 
     public Punto getPunto(int id){
-
-        Punto p;
+        GestorBD gestorBD=GestorBD.getGestorBD(context);
+        puntos=gestorBD.getPuntos();
+        Punto punto;
         Iterator<Punto> iterator=puntos.iterator();
         while (iterator.hasNext()){
-            p=iterator.next();
-            if(id==p.getId()){
-                return p;
+            punto=iterator.next();
+            if(id==punto.getId()){
+                return punto;
             }
         }
         return null;
     }
 
     public Punto getPunto(String titulo){
+        GestorBD gestorBD=GestorBD.getGestorBD(context);
+        gestorBD.leerPuntos();
         int i=0;
         Punto p;
         Iterator<Punto> iterator=puntos.iterator();
@@ -123,11 +126,6 @@ public class GestorDePuntos {
             }
         }
         return null;
-    }
-
-    public void getDescripcion(int idPunto, TextView textView){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.obtenerDescripcion(idPunto,textView);
     }
 
     public void puntosMalDescargados(){
@@ -141,6 +139,11 @@ public class GestorDePuntos {
             gestorImagenes.descargarImagen(punto.getFotoWeb(), file.getName(), punto.getId());
             Log.e("<puntosMalDescargados>","Punto "+punto.getId()+" url: "+punto.getFotoWeb());
         }
+    }
+
+    public void eliminarPunto(int idPunto) {
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.eliminarPunto(idPunto);
     }
 
 

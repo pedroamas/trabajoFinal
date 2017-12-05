@@ -69,6 +69,7 @@ public class Punto {
     public boolean equals(Punto puntoComp){
         if(id!=puntoComp.getId()) return false;
         if(!titulo.equals(puntoComp.getTitulo())) return false;
+        if(!descripcion.equals(puntoComp.getDescripcion())) return false;
         if(latitud!=puntoComp.getLatitud()) return false;
         if(longitud!=puntoComp.getLongitud()) return false;
         if(!foto.equals(puntoComp.getFoto())) return false;

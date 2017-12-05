@@ -1,27 +1,33 @@
 package com.example.root.trabajofinal;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.example.root.trabajofinal.Dialogos.DialogoEliminarPunto;
+
 import java.util.Iterator;
 
-public class ContenidoLista extends Fragment {
+/**
+ * Created by root on 30/11/17.
+ */
+
+public class ContenidoListaEliminar extends Fragment {
 
     private GestorDePuntos gestorDePuntos;
     private GestorImagenes gestorImagenes;
@@ -32,14 +38,13 @@ public class ContenidoLista extends Fragment {
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
         gestorDePuntos=GestorDePuntos.getGestorDePuntos(getActivity().getApplicationContext());
-
         gestorDePuntos.getPuntos();
         //if(gestorDePuntos.size()>0) {
-            ContenidoLista.ContentAdapter adapter = new ContenidoLista.ContentAdapter(recyclerView.getContext());
-            recyclerView.setAdapter(adapter);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //}
+        ContenidoListaEliminar.ContentAdapter adapter = new ContenidoListaEliminar.ContentAdapter(recyclerView.getContext());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         return recyclerView;
     }
 
@@ -50,9 +55,11 @@ public class ContenidoLista extends Fragment {
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.item_list, parent, false));
 
+
             avator = (ImageView) itemView.findViewById(R.id.list_avatar);
             name = (TextView) itemView.findViewById(R.id.list_title);
             //description = (TextView) itemView.findViewById(R.id.list_desc);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -66,10 +73,11 @@ public class ContenidoLista extends Fragment {
                         idPunto=iterator.next().getId();
                         i++;
                     }
-                    intent = new Intent(context, Detalle.class);
+                    intent = new Intent(context, DetalleEliminarPunto.class);
 
                     intent.putExtra("id",idPunto);
                     context.startActivity(intent);
+
 
 
                 }
@@ -79,12 +87,12 @@ public class ContenidoLista extends Fragment {
     /**
      * Adapter to display recycler view.
      */
-    public static class ContentAdapter extends RecyclerView.Adapter<ContenidoLista.ViewHolder> {
+    public static class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEliminar.ViewHolder> {
         // Set numbers of List in RecyclerView.
         private final int LENGTH ;
         private final String[] mPlaces;
         //private final String[] mPlaceDesc;
-         private final String[] mPlaceAvators;
+        private final String[] mPlaceAvators;
         private GestorImagenes gestorImagenes;
         public ContentAdapter(Context context) {
 
@@ -106,28 +114,17 @@ public class ContenidoLista extends Fragment {
                 i++;
             }
 
-            /*
-            Resources resources = context.getResources();
-            mPlaces = resources.getStringArray(R.array.places);
-            mPlaceDesc = resources.getStringArray(R.array.place_desc);
-            TypedArray a = resources.obtainTypedArray(R.array.place_avator);
-            mPlaceAvators = new Drawable[a.length()];
-            for (int i = 0; i < mPlaceAvators.length; i++) {
-                mPlaceAvators[i] = a.getDrawable(i);
-            }
-            a.recycle();
-            */
         }
 
         @Override
-        public ContenidoLista.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ContenidoLista.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+        public ContenidoListaEliminar.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ContenidoListaEliminar.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
-        public void onBindViewHolder(ContenidoLista.ViewHolder holder, int position) {
+        public void onBindViewHolder(ContenidoListaEliminar.ViewHolder holder, int position) {
             //holder.avator.setImageDrawable(mPlaceAvators[position % mPlaceAvators.length]);
-           // holder.avator.setImageBitmap(
+            // holder.avator.setImageBitmap(
             //        loadImage("/Pictures/testing123.jpg")
             //);
             if(position>=0) {
@@ -149,3 +146,4 @@ public class ContenidoLista extends Fragment {
         }
     }
 }
+

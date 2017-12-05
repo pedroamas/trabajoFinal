@@ -36,7 +36,8 @@
 
         tools:text="@string/item_title"
         android:textAppearance="?attr/textAppearanceListItem"
-        android:textSize="@dimen/article_subheading" /><!--android:layout_toRightOf="@+id/list_avatar"-->
+        android:textSize="@dimen/article_subheading"
+        android:layout_toRightOf="@+id/list_avatar"/><!--android:layout_toRightOf="@+id/list_avatar"-->
 
     <TextView
         android:id="@+id/list_desc"

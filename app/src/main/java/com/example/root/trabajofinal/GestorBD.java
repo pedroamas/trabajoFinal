@@ -89,10 +89,26 @@ public class GestorBD {
         AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
                 "administracion", null, versionDB);
         SQLiteDatabase bd = admin.getWritableDatabase();
+
+        Cursor fila = bd.rawQuery(
+                "select foto from puntos " +
+                        "WHERE id not in ("+listaPuntosEliminar+")", null);
+
+        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+        if (fila.moveToFirst()) {
+            do{
+                gestorImagenes.borrarImagen(fila.getString(0));
+
+            }while (fila.moveToNext());
+        }
+
         bd.execSQL("DELETE FROM puntos WHERE id not in ("+listaPuntosEliminar+")");
 
         Log.e(TAG,"DELETE FROM puntos WHERE id not in ("+listaPuntosEliminar+")");
         bd.close();
+
+
+
     }
 
     public void actualizarPunto(Punto punto){

@@ -61,8 +61,20 @@
                 android:value=".MainActivity" />
         </activity>
         <activity android:name=".VistaSatelital" />
-        <activity android:name=".ListaMaterialDesign" />
-        <activity android:name=".SubirPuntoAdmin"></activity>
+        <activity
+            android:name=".ListaMaterialDesign"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SubirPuntoAdmin" />
+        <activity
+            android:name=".EliminarPunto"
+            android:screenOrientation="portrait" />
+        <activity android:name=".DetalleEliminarPunto"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -39,6 +39,15 @@ public class MenuAdmin extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        Button btnEliminarPunto=(Button)findViewById(R.id.btnEliminarPunto);
+        btnEliminarPunto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(),EliminarPunto.class);
+                startActivity(intent);
+            }
+        });
+
 
 
     }

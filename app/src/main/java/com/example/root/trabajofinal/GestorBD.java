@@ -6,12 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * Created by root on 12/09/17.
- */
 
 public class GestorBD {
     private int versionDB=1;
@@ -37,18 +35,33 @@ public class GestorBD {
         leerPuntos();
         Iterator<Punto> ite=puntos.iterator();
         while (ite.hasNext()){
+
             Punto puntoIn=ite.next();
+            Log.e(TAG,"id punto: "+puntoIn.getId());
             listaPuntosEliminar+=puntoIn.getId()+",";
 
             Punto puntoOut=localizacion(puntoIn.getId());
-
+            Log.e(TAG,"PUNTO out ");
             //El punto no fue encontrado, entonces agregarlo
             if(puntoOut==null){
+                Log.e(TAG,"Inserta "+puntoIn.getFotoWeb());
+                File file=new File(puntoIn.getFotoWeb());
+                puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName());
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                gestorImagenes.descargarImagen(puntoIn.getFotoWeb(),file.getName(),puntoIn.getId());
+
                 insertarNuevoPunto(puntoIn);
 
             }else if(!puntoIn.equals(puntoOut)){             //Comparar si tienen las mismas caracteristicas
                 //Si no son iguales, actualizar el punto
+                Log.e(TAG,"Actualiza "+puntoOut.getTitulo());
+                File file=new File(puntoIn.getFotoWeb());
+                puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName());
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                gestorImagenes.descargarImagen(puntoIn.getFotoWeb(),file.getName(),puntoIn.getId());
                 actualizarPunto(puntoIn);
+            }else{
+                Log.e(TAG,"NADA "+puntoIn.getTitulo());
             }
 
         }
@@ -137,6 +150,7 @@ public class GestorBD {
 
 
     public Punto localizacion(int id){
+        if (puntosBD==null) return null;
         Iterator<Punto> ite = puntosBD.iterator();
         while (ite.hasNext()){
             Punto puntoAux=ite.next();

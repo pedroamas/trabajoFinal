@@ -68,13 +68,17 @@
         <activity
             android:name=".EliminarPunto"
             android:screenOrientation="portrait" />
-        <activity android:name=".DetalleEliminarPunto"
+        <activity
+            android:name=".DetalleEliminarPunto"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity android:name=".MostrarImagenesSec" />
+        <activity android:name=".TiposEnumerados.SubirVideo"></activity>
+        <activity android:name=".VerVideo" />
     </application>
 
 </manifest>

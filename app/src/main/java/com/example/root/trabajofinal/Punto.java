@@ -1,5 +1,6 @@
 package com.example.root.trabajofinal;
 
+import android.util.Log;
 import android.widget.TextView;
 
 public class Punto {
@@ -66,15 +67,28 @@ public class Punto {
     }
 
 
+    public void setFoto(String foto) {
+        this.foto = foto;
+    }
+
     public boolean equals(Punto puntoComp){
+        Log.e("","SRA ak");
+        if(puntoComp==null) return false;
+        Log.e("","is nul");
         if(id!=puntoComp.getId()) return false;
+        Log.e("","en id");
         if(!titulo.equals(puntoComp.getTitulo())) return false;
+        Log.e("","en tit");
         if(!descripcion.equals(puntoComp.getDescripcion())) return false;
+        Log.e("","en desc");
         if(latitud!=puntoComp.getLatitud()) return false;
+        Log.e("","en lat");
         if(longitud!=puntoComp.getLongitud()) return false;
-        if(!foto.equals(puntoComp.getFoto())) return false;
+        Log.e("","en lon");
         if(!fotoWeb.equals(puntoComp.getFotoWeb())) return false;
+        Log.e("","en fot");
         return true;
+
     }
 
     public void setImagen(Multimedia imagen) {

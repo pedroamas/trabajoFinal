@@ -102,7 +102,7 @@ public class ContenidoLista extends Fragment {
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
                 //Log.e("Lista",punto.getFoto());
-                mPlaceAvators[i]=punto.getFoto() ;
+                //mPlaceAvators[i]=punto.getFoto() ;
                 i++;
             }
 
@@ -133,10 +133,10 @@ public class ContenidoLista extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
-                Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+               /* Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 if(bitmap!=null) {
-                    holder.avator.setImageBitmap(bitmap);
-                }
+                    //holder.avator.setImageBitmap(bitmap);
+                }*/
             }
             //holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
         }

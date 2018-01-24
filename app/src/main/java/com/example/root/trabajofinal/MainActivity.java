@@ -1,17 +1,12 @@
 package com.example.root.trabajofinal;
 
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.example.root.trabajofinal.Dialogos.DialogoEliminarPunto;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -111,7 +106,9 @@ public class MainActivity extends AppCompatActivity {
         btnEnviarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), VerVideo.class);
+                intent.putExtra("id_video",61);
+                startActivity(intent);
             }
         });
         Button btnMalDescargados=(Button)findViewById(R.id.btnMalDescargados);
@@ -119,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                //gestorDePuntos.puntosMalDescargados();
+                gestorDePuntos.puntosMalDescargados();
 
 
             }

@@ -3,9 +3,13 @@ package com.example.root.trabajofinal;
 import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
+import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,13 +84,20 @@ public class GestorDePuntos {
 
     public void actualizarPuntos(){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.actualizarPuntos();
+        gestorWebService.actualizarPuntos(new ActualizarPuntoListener() {
+            @Override
+            public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+                GestorBD gestorBD=GestorBD.getGestorBD(context);
+                Log.e(TAG,"llega ak");
+                if(!puntos.isEmpty()) {
+                    gestorBD.actualizarPuntos(puntos);
+                    Toast.makeText(context,"Se está actualizando",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
-    public void respActualizarPuntos(ArrayList<Punto> puntos){
-        GestorBD gestorBD=GestorBD.getGestorBD(context);
-        gestorBD.actualizarPuntos(puntos);
-    }
+
 
     public void logMostrarPuntos(){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
@@ -141,9 +152,15 @@ public class GestorDePuntos {
         }
     }
 
-    public void eliminarPunto(int idPunto) {
+    public void eliminarPunto(int idPunto, EliminarPuntoListener eliminarPuntoListener) {
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.eliminarPunto(idPunto);
+        gestorWebService.eliminarPunto(idPunto,eliminarPuntoListener);
+    }
+
+    public void setPunto(Punto punto, SetPuntoListener setPuntoListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.setPunto(punto,setPuntoListener);
+
     }
 
 

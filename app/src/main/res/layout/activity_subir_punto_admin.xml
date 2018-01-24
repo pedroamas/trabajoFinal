@@ -78,6 +78,26 @@
             android:text="Foto"/>
 
         <TextView
+            android:text="Título imagen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/edTituloImg" />
+        <TextView
+            android:text="Descripción imagen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/edDescripcionImg" />
+        <TextView
             android:text="Fecha de captura"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,7 +113,7 @@
         <ImageView
             android:id="@+id/set_picture"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"/>
 

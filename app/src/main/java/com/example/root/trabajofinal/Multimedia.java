@@ -1,5 +1,7 @@
 package com.example.root.trabajofinal;
 
+import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
+
 import java.util.Date;
 
 /**
@@ -14,8 +16,9 @@ public class Multimedia {
     private Date fechaCaptura;
     private Date fechaSubida;
     private int idPunto;
+    private TipoMultimedia tipo;
 
-    public Multimedia(int id, String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto) {
+    public Multimedia(int id, String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto,TipoMultimedia tipo) {
         this.id = id;
         this.descripcion = descripcion;
         this.path = path;
@@ -23,6 +26,7 @@ public class Multimedia {
         this.fechaCaptura = fechaCaptura;
         this.fechaSubida = fechaSubida;
         this.idPunto = idPunto;
+        this.tipo=tipo;
     }
 
     public Multimedia(String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto) {

@@ -1,16 +1,10 @@
 package com.example.root.trabajofinal;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.example.root.trabajofinal.Dialogos.DialogoEliminarPunto;
 
 import java.util.Iterator;
 
@@ -110,7 +102,7 @@ public class ContenidoListaEliminar extends Fragment {
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
                 //Log.e("Lista",punto.getFoto());
-                mPlaceAvators[i]=punto.getFoto() ;
+                //mPlaceAvators[i]=punto.getFoto() ;
                 i++;
             }
 
@@ -130,10 +122,11 @@ public class ContenidoListaEliminar extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
+                /*
                 Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 if(bitmap!=null) {
                     holder.avator.setImageBitmap(bitmap);
-                }
+                }*/
             }
             //holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
         }

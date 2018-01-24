@@ -11,5 +11,8 @@
     <style name="BotonPrimary" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
+    <style name="BotonRojo" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/red</item>
+    </style>
 
 </resources>

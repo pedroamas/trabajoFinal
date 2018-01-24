@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -38,6 +39,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -46,11 +48,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class SubirPuntoAdmin extends AppCompatActivity {
+public class SubirPuntoAdmin extends AppCompatActivity  {
 
     private static String APP_DIRECTORY = "MyPictureApp/";
     private static String MEDIA_DIRECTORY = APP_DIRECTORY + "PictureApp";
@@ -66,6 +70,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
     private String mPath;
     private String pathImagen;
     private String nombreImagen;
+    private GestorDePuntos gestorDePuntos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,36 +98,65 @@ public class SubirPuntoAdmin extends AppCompatActivity {
         btnAgregarPunto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String titulo=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
-                String descripcion=((EditText)findViewById(R.id.edDescripcion)).getEditableText().toString();
-                Double latitud=Double.parseDouble(((EditText)findViewById(R.id.edLatitud)).getEditableText().toString());
-                Double longitud=Double.parseDouble(((EditText)findViewById(R.id.edLongitud)).getEditableText().toString());
+                String titulo,descripcion;
+                Double latitud,longitud;
+                Date fechaCaptura=null;
+                titulo=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
+                if(titulo.isEmpty()){
+                    Toast.makeText(getApplicationContext(),"El titulo es obligatorio",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                descripcion=((EditText)findViewById(R.id.edDescripcion)).getEditableText().toString();
+                if(descripcion.isEmpty()){
+                    Toast.makeText(getApplicationContext(),"La descripción es obligatoria",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                try {
+                    latitud = Double.parseDouble(((EditText) findViewById(R.id.edLatitud)).getEditableText().toString());
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(),"La latitud es obligatoria",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                try {
+                    longitud=Double.parseDouble(((EditText)findViewById(R.id.edLongitud)).getEditableText().toString());
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(),"La longitud es obligatoria",Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd");
 
-                Date fechaCaptura=null;
+                String tituloImg=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
+                String descripcionImg=((EditText)findViewById(R.id.edDescripcionImg)).getEditableText().toString();
+
                 try {
                     fechaCaptura = formatoDelTexto.parse(((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString());
                 } catch (ParseException ex) {
-                    ex.printStackTrace();
+                    //Toast.makeText(getApplicationContext(),"La fecha de capturaes incorrecta",Toast.LENGTH_LONG).show();
+
                 }
 
                 Punto punto=new Punto(titulo,descripcion,latitud,longitud,"");
                 GestorWebService gestorWebService=GestorWebService.getGestorWebService(getApplicationContext());
-
-                Log.e("Paso x aca","Paso x aca");
-                //GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
                 Multimedia multimedia=new Multimedia(
-                        "",
+                        descripcionImg,
                         pathImagen,
-                        "",
+                        tituloImg,
                         fechaCaptura,
                         null,
                         0);
                 Log.e("envIMG",pathImagen+"- Nombre"+nombreImagen);
 
                 punto.setImagen(multimedia);
-                gestorWebService.setPunto(punto);
-                //gestorImagenes.enviarImagen(multimedia);
+
+                gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+                gestorDePuntos.setPunto(punto, new SetPuntoListener() {
+                    @Override
+                    public void onResponseSetPunto(String response) {
+                        Toast.makeText(getApplicationContext(),"Respuesta: "+response,Toast.LENGTH_LONG).show();
+                        gestorDePuntos.actualizarPuntos();
+                    }
+                });
             }
         });
     }
@@ -180,10 +214,12 @@ public class SubirPuntoAdmin extends AppCompatActivity {
         boolean isDirectoryCreated = file.exists();
 
         if(!isDirectoryCreated)
+            //Crea la carpeta
             isDirectoryCreated = file.mkdirs();
 
         if(isDirectoryCreated){
             Long timestamp = System.currentTimeMillis() / 1000;
+            //setea la imagen como jpg
             String imageName = timestamp.toString() + ".jpg";
 
             mPath = Environment.getExternalStorageDirectory() + File.separator + MEDIA_DIRECTORY
@@ -215,6 +251,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case PHOTO_CODE:
@@ -230,17 +267,20 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
 
                     Bitmap bitmap = BitmapFactory.decodeFile(mPath);
-                    mSetImage.setImageBitmap(bitmap);
+                    mSetImage.setImageBitmap(gestorImagenes.rotarImagen(bitmap));
                     break;
                 case SELECT_PICTURE:
                     Uri path = data.getData();
-                    mSetImage.setImageURI(path);
-                    try {
-                        pathImagen=getFilePath(getApplicationContext(),path);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("<SubirPunto>",pathImagen );
+
+                    Log.e("Subir punto","path "+getRealPathFromDocumentUri(this,path));
+
+                    mSetImage.setImageBitmap(
+                            gestorImagenes.rotarImagen(
+                                    gestorImagenes.cargarImagen(getRealPathFromDocumentUri(this,path)))
+                    );
+                    pathImagen=getRealPathFromDocumentUri(this,path);
+                    /*mSetImage.setImageURI(path);*/
+
                     break;
 
             }
@@ -349,5 +389,34 @@ public class SubirPuntoAdmin extends AppCompatActivity {
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
+
+
+
+    public String getRealPathFromDocumentUri(Context context, Uri uri){
+        String filePath = "";
+
+        Pattern p = Pattern.compile("(\\d+)$");
+        Matcher m = p.matcher(uri.toString());
+        if (!m.find()) {
+            return filePath;
+        }
+        String imgId = m.group();
+
+        String[] column = { MediaStore.Images.Media.DATA };
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, new String[]{ imgId }, null);
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+        cursor.close();
+
+        return filePath;
+    }
+
 
 }

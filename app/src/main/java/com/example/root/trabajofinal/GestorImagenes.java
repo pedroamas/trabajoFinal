@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.util.Base64;
 import android.util.Log;
@@ -19,6 +20,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.root.trabajofinal.Listeners.ImagenListener;
+import com.example.root.trabajofinal.Listeners.ImagenesListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +37,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -50,11 +54,14 @@ public class GestorImagenes {
     private static GestorImagenes gestorImagenes;
     private Context context;
     public static String TAG="<GestorImagenes>";
+    private ArrayList<ImagenesListener> imagenesListener;
+
     private GestorImagenes(Context context) {
         nombreDescargas=new String[400];
         count=-1;
         countDescargados=-1;
         this.context=context;
+        imagenesListener=new ArrayList<ImagenesListener>();
     }
 
     public static GestorImagenes obtenerGestorImagenes(Context context){
@@ -185,5 +192,34 @@ public class GestorImagenes {
         }else{
             Log.e(TAG,"Error en Borrado: "+url);
         }
+    }
+
+    public void addImagenesListener(ImagenesListener imagenesListener){
+        this.imagenesListener.add(imagenesListener);
+    }
+    public void removeImagenesListener(ImagenesListener imagenesListener){
+        this.imagenesListener.remove(imagenesListener);
+    }
+    public void getImagenes(int idPunto,ImagenesListener imagenesListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        Log.e(TAG,"Entro en gestor de imagnes");
+        gestorWebService.getImagenes(idPunto,imagenesListener);
+
+    }
+    public Bitmap rotarImagen(Bitmap img){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(-90);  // La rotación debe ser decimal (float o double)
+
+        //Ahora creamos el bitmap y le aplicamos la matriz generada anteriormente:
+
+        Bitmap rotatedBitmap = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        return rotatedBitmap;
+    }
+
+    public void getImagen(int idImagen, ImagenListener imagenListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        Log.e(TAG,"Entro en gestor de imagnes");
+        gestorWebService.getImagen(idImagen,imagenListener);
+
     }
 }

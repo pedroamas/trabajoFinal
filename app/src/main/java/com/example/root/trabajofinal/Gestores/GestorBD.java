@@ -1,10 +1,13 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Gestores;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.example.root.trabajofinal.AdminSQLiteOpenHelper;
+import com.example.root.trabajofinal.Punto;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,12 +47,13 @@ public class GestorBD {
             Log.e(TAG,"PUNTO out ");
             //El punto no fue encontrado, entonces agregarlo
             if(puntoOut==null){
-                Log.e(TAG,"Inserta "+puntoIn.getFotoWeb());
-                File file=new File(puntoIn.getFotoWeb());
-                puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName());
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.descargarImagen(puntoIn.getFotoWeb(),file.getName(),puntoIn.getId());
-
+                if(puntoIn.getFotoWeb()!=null) {
+                    Log.e(TAG, "Inserta " + puntoIn.getFotoWeb());
+                    File file = new File(puntoIn.getFotoWeb());
+                    puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
+                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
+                    gestorImagenes.descargarImagen(puntoIn.getFotoWeb(), file.getName(), puntoIn.getId());
+                }
                 insertarNuevoPunto(puntoIn);
 
             }else if(!puntoIn.equals(puntoOut)){             //Comparar si tienen las mismas caracteristicas
@@ -86,13 +90,14 @@ public class GestorBD {
         SQLiteDatabase bd = admin.getWritableDatabase();
 
         ContentValues registro = new ContentValues();
+
         registro.put("id", punto.getId());
         registro.put("titulo", punto.getTitulo());
         registro.put("descripcion", punto.getDescripcion());
         registro.put("latitud", punto.getLatitud());
         registro.put("longitud", punto.getLongitud());
-        registro.put("foto", punto.getFoto());
-        registro.put("foto_web", punto.getFotoWeb());
+        if(punto.getFoto()!=null) registro.put("foto", punto.getFoto());
+        if(punto.getFotoWeb()!=null) registro.put("foto_web", punto.getFotoWeb());
         registro.put("estado_foto", 0);
 
         bd.insert("puntos", null, registro);

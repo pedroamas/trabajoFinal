@@ -1,14 +1,16 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Gestores;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.example.root.trabajofinal.IRespuesta;
+import com.example.root.trabajofinal.Listeners.LoginListener;
+import com.example.root.trabajofinal.Listeners.RegistrarListener;
+import com.example.root.trabajofinal.TipoMensaje;
+import com.example.root.trabajofinal.Usuario;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-
-/**
- * Created by root on 25/07/17.
- */
 
 public class GestorUsuarios{
 
@@ -29,13 +31,9 @@ public class GestorUsuarios{
         return gestorUsuarios;
     }
 
-    public void registerView(IRespuesta respuesta){
-        vistas.add(respuesta);
-    }
-
-    public void login(Usuario usuario){
+    public void login(Usuario usuario, LoginListener loginListener){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.login(usuario);
+        gestorWebService.login(usuario,loginListener);
     }
 
     public void notifyViews(Usuario usuario){
@@ -43,10 +41,14 @@ public class GestorUsuarios{
         Log.e("ASD","RESPUESTA LOGIN    ");
         Iterator<IRespuesta> ite=vistas.iterator();
         while (ite.hasNext()){
-            ite.next().onResponse(1,TipoMensaje.USUARIO,this.usuario);
+            ite.next().onResponse(1, TipoMensaje.USUARIO,this.usuario);
         }
     }
 
+    public void registrar(Usuario usuario, RegistrarListener registrarListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.registrar(usuario,registrarListener);
+    }
 
     public Usuario getUsuario() {
         return usuario;

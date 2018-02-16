@@ -77,6 +77,13 @@
             android:layout_height="50dp"
             android:text="Foto"/>
 
+        <ImageView
+            android:id="@+id/imagenPicasso"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"/>
+
         <TextView
             android:text="Título imagen"
             android:layout_width="match_parent"
@@ -109,13 +116,6 @@
             android:inputType="date"
             android:ems="10"
             android:id="@+id/edFechaCaptura" />
-
-        <ImageView
-            android:id="@+id/set_picture"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"/>
 
         <Button
             android:text="Agregar Punto"

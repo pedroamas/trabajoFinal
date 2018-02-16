@@ -1,12 +1,18 @@
 package com.example.root.trabajofinal;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.example.root.trabajofinal.Gestores.GestorBD;
+import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +55,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.actualizarPuntos();
+                gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                    @Override
+                    public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+
+                    }
+                });
             }
         });
 
@@ -82,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 GestorBD gestorBD=GestorBD.getGestorBD(getApplicationContext());
-                gestorBD.borrarPuntos();
+                //gestorBD.borrarPuntos();
             }
         });
         Button btnLista=(Button)findViewById(R.id.btnLista);

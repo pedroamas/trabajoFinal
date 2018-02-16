@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.root.trabajofinal.Gestores.GestorImagenes;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.squareup.picasso.Picasso;
 

@@ -1,15 +1,18 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Gestores;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
+import com.example.root.trabajofinal.IRespuesta;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
+import com.example.root.trabajofinal.Punto;
+import com.example.root.trabajofinal.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +36,7 @@ public class GestorDePuntos {
         puntos=new ArrayList<Punto>();
         this.context=context;
         this.vistas=new ArrayList<IRespuesta>();
-        puntos=GestorBD.getGestorBD(context).getPuntos();
+        puntos= GestorBD.getGestorBD(context).getPuntos();
     }
 
     public void registerView(IRespuesta vista){
@@ -82,17 +85,17 @@ public class GestorDePuntos {
         return mundo;
     }
 
-    public void actualizarPuntos(){
+    public void actualizarPuntos(final ActualizarPuntoListener actualizarPuntoListener){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
         gestorWebService.actualizarPuntos(new ActualizarPuntoListener() {
             @Override
             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                 GestorBD gestorBD=GestorBD.getGestorBD(context);
-                Log.e(TAG,"llega ak");
                 if(!puntos.isEmpty()) {
-                    gestorBD.actualizarPuntos(puntos);
                     Toast.makeText(context,"Se está actualizando",Toast.LENGTH_LONG).show();
+                    gestorBD.actualizarPuntos(puntos);
                 }
+                actualizarPuntoListener.onResponseActualizarPunto(puntos);
             }
         });
     }
@@ -127,7 +130,6 @@ public class GestorDePuntos {
     public Punto getPunto(String titulo){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
         gestorBD.leerPuntos();
-        int i=0;
         Punto p;
         Iterator<Punto> iterator=puntos.iterator();
         while (iterator.hasNext()){
@@ -160,6 +162,12 @@ public class GestorDePuntos {
     public void setPunto(Punto punto, SetPuntoListener setPuntoListener){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
         gestorWebService.setPunto(punto,setPuntoListener);
+
+    }
+
+    public void editarPunto(Punto punto, EditarPuntoListener editarPuntoListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.editarPunto(punto,editarPuntoListener);
 
     }
 

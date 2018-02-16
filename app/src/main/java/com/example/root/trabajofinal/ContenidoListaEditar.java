@@ -17,11 +17,8 @@ import com.example.root.trabajofinal.Gestores.GestorImagenes;
 
 import java.util.Iterator;
 
-/**
- * Created by root on 30/11/17.
- */
 
-public class ContenidoListaEliminar extends Fragment {
+public class ContenidoListaEditar extends Fragment {
 
     private GestorDePuntos gestorDePuntos;
     private GestorImagenes gestorImagenes;
@@ -34,7 +31,7 @@ public class ContenidoListaEliminar extends Fragment {
         gestorDePuntos=GestorDePuntos.getGestorDePuntos(getActivity().getApplicationContext());
         gestorDePuntos.getPuntos();
         //if(gestorDePuntos.size()>0) {
-        ContenidoListaEliminar.ContentAdapter adapter = new ContenidoListaEliminar.ContentAdapter(recyclerView.getContext());
+        ContenidoListaEditar.ContentAdapter adapter = new ContenidoListaEditar.ContentAdapter(recyclerView.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -67,7 +64,7 @@ public class ContenidoListaEliminar extends Fragment {
                         idPunto=iterator.next().getId();
                         i++;
                     }
-                    intent = new Intent(context, DetalleEliminarPunto.class);
+                    intent = new Intent(context, DetalleEditarPunto.class);
 
                     intent.putExtra("id",idPunto);
                     context.startActivity(intent);
@@ -81,7 +78,7 @@ public class ContenidoListaEliminar extends Fragment {
     /**
      * Adapter to display recycler view.
      */
-    public static class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEliminar.ViewHolder> {
+    public static class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEditar.ViewHolder> {
         // Set numbers of List in RecyclerView.
         private final int LENGTH ;
         private final String[] mPlaces;
@@ -111,12 +108,12 @@ public class ContenidoListaEliminar extends Fragment {
         }
 
         @Override
-        public ContenidoListaEliminar.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ContenidoListaEliminar.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+        public ContenidoListaEditar.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ContenidoListaEditar.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
-        public void onBindViewHolder(ContenidoListaEliminar.ViewHolder holder, int position) {
+        public void onBindViewHolder(ContenidoListaEditar.ViewHolder holder, int position) {
             //holder.avator.setImageDrawable(mPlaceAvators[position % mPlaceAvators.length]);
             // holder.avator.setImageBitmap(
             //        loadImage("/Pictures/testing123.jpg")

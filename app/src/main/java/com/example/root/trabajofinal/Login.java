@@ -1,39 +1,33 @@
 package com.example.root.trabajofinal;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.view.menu.MenuAdapter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Listeners.LoginListener;
 
-import org.json.JSONArray;
-
-public class Login extends AppCompatActivity implements IRespuesta{
+public class Login extends AppCompatActivity{
 
     public static String TAG="<Web service>";
     public Usuario usuario;
     private GestorUsuarios gestorUsuarios;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Button btnAceptar=(Button)findViewById(R.id.btnAceptar);
+        context=getApplicationContext();
+        gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
 
-        Log.e("ASD","ENTRAS    ");
-        gestorUsuarios=GestorUsuarios.getGestorUsuarios(getApplicationContext());
-        gestorUsuarios.registerView(this);
-        Log.e("ASD","ENTRAS    2");
+        Button btnAceptar=(Button)findViewById(R.id.btnAceptar);
         Button btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
         btnRegistrarse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,9 +43,23 @@ public class Login extends AppCompatActivity implements IRespuesta{
                 EditText edPassword=(EditText)findViewById(R.id.edPassword);
                 usuario=new Usuario(edUsername.getEditableText().toString(),
                                     edPassword.getEditableText().toString());
-                GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(getApplicationContext());
+                gestorUsuarios=GestorUsuarios.getGestorUsuarios(getApplicationContext());
 
-                gestorUsuarios.login(usuario);
+                gestorUsuarios.login(usuario, new LoginListener() {
+                    @Override
+                    public void onResponseLoginListener(Usuario usuario) {
+                        gestorUsuarios.setUsuario(usuario);
+                        if(usuario==null){
+                            Toast.makeText(getApplicationContext(),"No esta registrado",Toast.LENGTH_LONG).show();
+                        }else if(usuario.isAdmin()){
+                            startActivity(new Intent(getApplicationContext(), MenuAdmin.class));
+                            finish();
+                        }else{
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            finish();
+                        }
+                    }
+                });
 
             }
         });
@@ -59,7 +67,7 @@ public class Login extends AppCompatActivity implements IRespuesta{
 
     }
 
-    @Override
+    /*
     public void onResponse(int idMj, TipoMensaje tipoMj, Object object) {
         if(idMj==1){
             if(tipoMj==TipoMensaje.USUARIO){
@@ -74,4 +82,5 @@ public class Login extends AppCompatActivity implements IRespuesta{
             }
         }
     }
+    */
 }

@@ -1,6 +1,8 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Gestores;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,20 +17,31 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
+import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
+import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
+import com.example.root.trabajofinal.Listeners.LoginListener;
+import com.example.root.trabajofinal.Listeners.RegistrarListener;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 import com.example.root.trabajofinal.Listeners.VideoListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
+import com.example.root.trabajofinal.Multimedia;
+import com.example.root.trabajofinal.Punto;
 import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
+import com.example.root.trabajofinal.Usuario;
+import com.example.root.trabajofinal.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -42,12 +55,14 @@ public class GestorWebService {
     private GestorUsuarios gestorUsuarios;
     private GestorDePuntos gestorDePuntos;
     public static String TAG="<GestorWebService>";
+    public SimpleDateFormat dt1;
 
     private GestorWebService(Context context){
 
         this.context=context;
         this.gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
         this.gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
+        dt1=new SimpleDateFormat("yyyy-MM-dd");
     }
 
     public static GestorWebService getGestorWebService(Context context){
@@ -57,7 +72,7 @@ public class GestorWebService {
         return gestorWebService;
     }
 
-    public void login(Usuario usuario){
+    public void login(Usuario usuario, final LoginListener loginListener){
         GestorUsuarios.getGestorUsuarios(context);
 
         VolleySingleton.
@@ -98,7 +113,7 @@ public class GestorWebService {
                                             Log.d(TAG, "Error Volley: " );
                                         }
 
-                                        gestorUsuarios.notifyViews(usuarioComleto);
+                                        loginListener.onResponseLoginListener(usuarioComleto);
 
                                     }
                                 },
@@ -106,7 +121,7 @@ public class GestorWebService {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
-                                        gestorUsuarios.notifyViews(null);
+                                        loginListener.onResponseLoginListener(null);
                                     }
                                 }
 
@@ -184,7 +199,6 @@ public class GestorWebService {
 
                                     @Override
                                     public void onResponse(String response) {
-
                                         try {
                                             Log.e(TAG,response);
                                             eliminarPuntoListener.onResponseEliminarPunto(response);
@@ -193,7 +207,6 @@ public class GestorWebService {
                                             Log.d(TAG, "Error Volley: " );
                                             eliminarPuntoListener.onResponseEliminarPunto("No se pudo eliminar correctamente");
                                         }
-
 
                                     }
                                 },
@@ -292,8 +305,8 @@ public class GestorWebService {
                                                     imagenJSON.getString(1),
                                                     imagenJSON.getString(2),
                                                     imagenJSON.getString(3),
-                                                    null,
-                                                    null,
+                                                    dt1.parse(imagenJSON.getString(4)),
+                                                    dt1.parse(imagenJSON.getString(5)),
                                                     imagenJSON.getInt(6),
                                                     TipoMultimedia.imagen
                                             );
@@ -314,6 +327,55 @@ public class GestorWebService {
                                     public void onErrorResponse(VolleyError error) {
                                         imagenListener.onResponseImagen(null);
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+    public void getImagenPortada(int idPunto, final ImagenListener imagenListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_imagen_portada.php?" +
+                                        "id_punto="+idPunto,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+
+                                        Log.e(TAG,response.toString());
+                                        Multimedia imagen=null;
+                                        try {
+
+                                            JSONArray imagenJSON=response;
+                                            imagen=new Multimedia(
+                                                    imagenJSON.getInt(0),
+                                                    imagenJSON.getString(1),
+                                                    imagenJSON.getString(2),
+                                                    imagenJSON.getString(3),
+                                                    dt1.parse(imagenJSON.getString(4)),
+                                                    dt1.parse(imagenJSON.getString(5)),
+                                                    imagenJSON.getInt(6),
+                                                    TipoMultimedia.imagen
+                                            );
+
+                                            imagenListener.onResponseImagen(imagen);
+
+                                        }catch (Exception e){
+                                            Log.e(TAG, "1 - Error Volley: " );
+                                            imagenListener.onResponseImagen(null);
+                                        }
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        imagenListener.onResponseImagen(null);
+                                        Log.d(TAG, "1 - Error Volley: " + error.getMessage());
                                     }
                                 }
 
@@ -359,13 +421,84 @@ public class GestorWebService {
 
                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
 
-                params.put("base64Img", gestorImagenes.getImagenBase64(punto.getImagen().getPath()));
+                params.put("base64Img",gestorImagenes.getImagenBase64(
+                        gestorImagenes.cargarImagen(punto.getImagen().getPath())));
 
-                Log.e(TAG, gestorImagenes.getImagenBase64(punto.getImagen().getPath()));
+                Log.e(TAG, gestorImagenes.getImagenBase64(
+                        gestorImagenes.cargarImagen(punto.getImagen().getPath())));
                 params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
                 params.put("tituloImg", punto.getImagen().getTitulo());
                 params.put("descripcionImg", punto.getImagen().getDescripcion());
-                params.put("fecha_capturaImg", ""+punto.getImagen().getFechaCaptura());
+                if (punto.getImagen().getFechaCaptura()!=null) {
+                    params.put("fecha_capturaImg", "" + dt1.format(punto.getImagen().getFechaCaptura()));
+                }
+                params.put("fecha_subidaImg", ""+dt1.format(new Date()));
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
+
+    public void editarPunto(final Punto punto, final EditarPuntoListener editarPuntoListener){
+        Log.e(TAG,"este es el ws");
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/editar_punto.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        editarPuntoListener.onResponseEditarPunto("OK");
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        editarPuntoListener.onResponseEditarPunto("Error: "+error.getMessage());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                Log.e(TAG,"id: "+punto.getId());
+                params.put("id_punto", punto.getId()+"");
+                Log.e(TAG,"titulo: "+punto.getTitulo());
+                params.put("titulo", punto.getTitulo());
+                Log.e(TAG,"latitud: "+punto.getLatitud());
+                params.put("latitud", ""+punto.getLatitud());
+                Log.e(TAG,"longitud: "+punto.getLongitud());
+                params.put("longitud", ""+punto.getLongitud());
+                Log.e(TAG,"descripcion: "+punto.getDescripcion());
+                params.put("descripcion", punto.getDescripcion());
+
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                if(punto.getImagen().getPath()!=null) {
+                    Log.e(TAG,punto.getImagen().getNombreArchivo());
+                    params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
+                    Log.e(TAG,gestorImagenes.getImagenBase64(
+                            gestorImagenes.cargarImagen(punto.getImagen().getPath())));
+                    params.put("base64Img", gestorImagenes.getImagenBase64(
+                            gestorImagenes.cargarImagen(punto.getImagen().getPath())));
+                }
+
+                Log.e(TAG,"tituloImg: "+punto.getImagen().getTitulo());
+                params.put("tituloImg", punto.getImagen().getTitulo());
+                Log.e(TAG,"descripcionImg: "+punto.getImagen().getDescripcion());
+                params.put("descripcionImg", punto.getImagen().getDescripcion());
+                params.put("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()));
+                params.put("fecha_subidaImg", "");
                 params.put("fecha_subidaImg", "");
                 return params;
             }
@@ -430,7 +563,7 @@ public class GestorWebService {
 
                                     @Override
                                     public void onResponse(JSONArray response) {
-                                        SimpleDateFormat dt1=new SimpleDateFormat("yyyy-MM-dd");
+
                                         Multimedia video=null;
                                         try {
                                             if(response.length()>0){
@@ -479,9 +612,9 @@ public class GestorWebService {
 
                                     @Override
                                     public void onResponse(JSONArray response) {
-
-                                        ArrayList<Multimedia> imagenes=new ArrayList<Multimedia>();
                                         Log.e(TAG,response.toString());
+                                        ArrayList<Multimedia> imagenes=new ArrayList<Multimedia>();
+
                                         Multimedia imagen=null;
                                         try {
                                             int i;
@@ -505,7 +638,7 @@ public class GestorWebService {
 
 
                                         }catch (Exception e){
-                                            Log.e(TAG, "Error Volley: " );
+                                            Log.e(TAG, "2 - Error Volley: " );
                                         }
 
                                         imagenesListener.onResponseImagenes(imagenes);
@@ -516,7 +649,7 @@ public class GestorWebService {
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        Log.d(TAG, "2 - Error Volley: " + error.getMessage());
                                         imagenesListener.onResponseImagenes(new ArrayList<Multimedia>());
                                     }
                                 }
@@ -588,4 +721,186 @@ public class GestorWebService {
 
 
 
+
+    public void setImagenSec(final Multimedia multimedia, final AgregarImagenSecListener agregarImagenSecListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/set_imagen_sec.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener(response);
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error: "+error.getMessage());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                params.put("id_punto", ""+multimedia.getIdPunto());
+                params.put("titulo", multimedia.getTitulo());
+                params.put("descripcion", multimedia.getDescripcion());
+
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+
+                Log.e(TAG,"path de imagen WS: "+multimedia.getPath());
+                params.put("base64Img",gestorImagenes.getImagenBase64(
+                        gestorImagenes.cargarImagen(multimedia.getPath())));
+                params.put("nombre_imagenImg",multimedia.getNombreArchivo());
+                if(multimedia.getFechaCaptura()!=null) {
+                    params.put("fecha_capturaImg", "" + dt1.format(multimedia.getFechaCaptura()));
+                }
+                params.put("fecha_subidaImg", dt1.format(new Date()));
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
+
+    public void editarImagenSec(final Multimedia multimedia, final EditarMultimediaListener editarMultimediaListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/editar_imagen_sec.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        editarMultimediaListener.onResponseEditarMultimedia(response);
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        editarMultimediaListener.onResponseEditarMultimedia("Error: "+error.getMessage());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                params.put("id_imagen", ""+multimedia.getId());
+                params.put("titulo", multimedia.getTitulo());
+                params.put("descripcion", multimedia.getDescripcion());
+
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                if(multimedia.getPath()!=null) {
+                    Log.e(TAG, "path de imagen WS: " + multimedia.getPath());
+                    params.put("base64Img", gestorImagenes.getImagenBase64(
+                            gestorImagenes.cargarImagen(multimedia.getPath())));
+                    params.put("nombre_imagenImg", multimedia.getNombreArchivo());
+                }
+                if(multimedia.getFechaCaptura()!=null) {
+                    params.put("fecha_capturaImg", "" + dt1.format(multimedia.getFechaCaptura()));
+                }
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
+
+    public void eliminarImagenSec(int idImagen, final EliminarImagenSecListener eliminarImagenSecListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new StringRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/eliminar_imagen_sec.php?id_imagen=" + idImagen ,
+                                new Response.Listener<String>() {
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            Log.e(TAG,response);
+                                            eliminarImagenSecListener.onResponseEliminarImagenSecListener(response);
+
+                                        }catch (Exception e){
+                                            Log.d(TAG, "Error Volley: " );
+                                            eliminarImagenSecListener.onResponseEliminarImagenSecListener("No se pudo eliminar correctamente");
+                                        }
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        eliminarImagenSecListener.onResponseEliminarImagenSecListener("No se pudo eliminar correctamente");
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+    public void registrar(final Usuario usuario, final RegistrarListener registrarListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/registrar.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        registrarListener.onResponseRegistrarListener(response);
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", error.getMessage());
+                        registrarListener.onResponseRegistrarListener("-1");
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                params.put("nombre", usuario.getNombre());
+                params.put("apellido", usuario.getApellido());
+                params.put("username", usuario.getUsername());
+                params.put("email", usuario.getEmail());
+                params.put("contrasena", usuario.getContrasena());
+
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
 }

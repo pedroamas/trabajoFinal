@@ -1,7 +1,6 @@
 package com.example.root.trabajofinal;
 
 import android.annotation.TargetApi;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,11 +8,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -31,13 +30,12 @@ import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Gestores.GestorWebService;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
-import com.example.root.trabajofinal.Listeners.SetPuntoListener;
+import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
+import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,35 +46,38 @@ import java.util.regex.Pattern;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class SubirPuntoAdmin extends AppCompatActivity  {
+public class DetalleEditarPunto extends AppCompatActivity {
 
+    public static final String EXTRA_POSITION = "id";
+    private Punto punto,puntoEditado;
+    private GestorImagenes gestorImagenes;
+    private Context context;
     private static String APP_DIRECTORY = "MyPictureApp/";
     private static String MEDIA_DIRECTORY = APP_DIRECTORY + "PictureApp";
 
     private final int MY_PERMISSIONS = 100;
     private final int PHOTO_CODE = 200;
     private final int SELECT_PICTURE = 300;
-
-    private ImageView imagenPicasso;
+    //private ImageView mSetImage;
     private Button mOptionButton;
     private LinearLayout mRlView;
-
     private String mPath;
     private String pathImagen;
     private String nombreImagen;
     private GestorDePuntos gestorDePuntos;
-    private Context context;
+    //private ImageView imgFotoActual;
+    private ImageView imagenPicasso;
+    private int rotacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subir_punto_admin);
-
+        setContentView(R.layout.activity_detalle_editar_punto);
         context=getApplicationContext();
-        imagenPicasso = (ImageView) findViewById(R.id.imagenPicasso);
+        imagenPicasso=(ImageView)findViewById(R.id.imagenPicasso);
+        //mSetImage = (ImageView) findViewById(R.id.set_picture);
         mOptionButton = (Button) findViewById(R.id.show_options_button);
         mRlView = (LinearLayout) findViewById(R.id.rl_view);
-
         if(mayRequestStoragePermission())
             mOptionButton.setEnabled(true);
         else
@@ -89,14 +90,17 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
                 showOptions();
             }
         });
+        gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
+        punto=gestorDePuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
 
-        Button btnAgregarPunto=(Button)findViewById(R.id.btnAgregarPunto);
-        btnAgregarPunto.setOnClickListener(new View.OnClickListener() {
+        llenarCampos();
+
+        Button btnEditarPunto=(Button)findViewById(R.id.btnEditarPunto);
+        btnEditarPunto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String titulo,descripcion;
                 Double latitud,longitud;
-                Date fechaCaptura=null;
                 titulo=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
                 if(titulo.isEmpty()){
                     Toast.makeText(getApplicationContext(),"El titulo es obligatorio",Toast.LENGTH_LONG).show();
@@ -119,42 +123,68 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
                     Toast.makeText(getApplicationContext(),"La longitud es obligatoria",Toast.LENGTH_LONG).show();
                     return;
                 }
+                puntoEditado=new Punto(
+                        punto.getId(),
+                        titulo,
+                        descripcion,
+                        latitud,
+                        longitud,
+                        ""
 
-                SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd-MM-yyyy");
-
-                String tituloImg=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
+                );
+                String tituloImg=((EditText)findViewById(R.id.edTituloImg)).getEditableText().toString();
                 String descripcionImg=((EditText)findViewById(R.id.edDescripcionImg)).getEditableText().toString();
-
+                String fechaCaptura=((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString();
+                Date dateFechaCaptura=null;
+                SimpleDateFormat dt1=new SimpleDateFormat("dd-MM-yyyy");
                 try {
-                    fechaCaptura = formatoDelTexto.parse(((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString());
-                } catch (ParseException ex) {}
+                    dateFechaCaptura=dt1.parse(fechaCaptura);
 
-                final Punto punto=new Punto(titulo,descripcion,latitud,longitud,"");
-                Multimedia multimedia=new Multimedia(
+                }catch (Exception e){
+                    try {
+                        dateFechaCaptura=dt1.parse("01-01-1000");
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                        dateFechaCaptura=null;
+                    }
+                }
+
+
+                 Multimedia imagenEditada=new Multimedia(
                         descripcionImg,
                         pathImagen,
                         tituloImg,
-                        fechaCaptura,
-                        null,
-                        0);
-
-                punto.setImagen(multimedia);
-
+                        dateFechaCaptura,
+                        new Date(),
+                        punto.getId()
+                );
+                puntoEditado.setImagen(imagenEditada);
                 gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.setPunto(punto, new SetPuntoListener() {
+                gestorDePuntos.editarPunto(puntoEditado, new EditarPuntoListener() {
                     @Override
-                    public void onResponseSetPunto(String response) {
-                        Toast.makeText(getApplicationContext(),"Respuesta: "+response,Toast.LENGTH_LONG).show();
+                    public void onResponseEditarPunto(String respuesta) {
+                        Toast.makeText(getApplicationContext(),"RESP: "+respuesta,Toast.LENGTH_LONG);
                         gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
                             @Override
                             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
-                                if(puntos==null || puntos.size()==0){
-                                    Toast.makeText(context,"Error",Toast.LENGTH_LONG).show();
-                                }else{
-                                    Toast.makeText(context,"El punto se cargó correctamente",Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                                    startActivity(intent);
-                                    SubirPuntoAdmin.super.finish();
+                                Log.e("","trajo alguna respuesta el actualizar "+puntos.size());
+                                if(puntos==null){
+                                    Toast.makeText(getApplicationContext(),
+                                            "Error",
+                                            Toast.LENGTH_LONG).show();
+                                }else {
+                                    if(puntos.size()==0){
+                                        Toast.makeText(getApplicationContext(),
+                                                "No se encontraron puntos",
+                                                Toast.LENGTH_LONG).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(),
+                                                "Punto editado correctamente",
+                                                Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(getApplicationContext(), EditarPunto.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                 }
                             }
                         });
@@ -163,6 +193,50 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
             }
         });
     }
+
+    public void llenarCampos(){
+        EditText edTitulo=(EditText)findViewById(R.id.edTitulo);
+        EditText edDescripcion=(EditText)findViewById(R.id.edDescripcion);
+        EditText edLatitud=(EditText)findViewById(R.id.edLatitud);
+        EditText edLongitud=(EditText)findViewById(R.id.edLongitud);
+        //imgFotoActual=(ImageView)findViewById(R.id.set_picture);
+
+        edTitulo.setText(punto.getTitulo());
+        edDescripcion.setText(punto.getDescripcion());
+        edLatitud.setText(punto.getLatitud()+"");
+        edLongitud.setText(punto.getLongitud()+"");
+        Toast.makeText(getApplicationContext(),"Path: "+punto.getFoto(),
+                Toast.LENGTH_SHORT).show();
+
+        File imgFile = new  File(punto.getFoto());
+        if(imgFile.exists()){
+            Picasso.with(context).load("file:"+punto.getFoto())
+                    .into(imagenPicasso);
+        }
+        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+        gestorImagenes.getImagenPortada(punto.getId(), new ImagenListener() {
+            @Override
+            public void onResponseImagen(Multimedia multimedia) {
+                SimpleDateFormat dt1=new SimpleDateFormat("dd-MM-yyyy");
+                EditText edTituloImg=(EditText)findViewById(R.id.edTituloImg);
+                EditText edDescripcionImg=(EditText)findViewById(R.id.edDescripcionImg);
+                EditText edFechaCaptura=(EditText)findViewById(R.id.edFechaCaptura);
+                try {
+                    edTituloImg.setText(multimedia.getTitulo());
+                }catch(Exception e){}
+                try {
+                    edDescripcionImg.setText(multimedia.getDescripcion());
+                }catch(Exception e){}
+                try {
+                    edFechaCaptura.setText(dt1.format(multimedia.getFechaCaptura()));
+                }catch(Exception e){}
+
+            }
+        });
+
+
+    }
+
 
     private boolean mayRequestStoragePermission() {
 
@@ -192,13 +266,14 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
 
     private void showOptions() {
         final CharSequence[] option = {"Tomar foto", "Elegir de galeria", "Cancelar"};
-        final AlertDialog.Builder builder = new AlertDialog.Builder(SubirPuntoAdmin.this);
-        builder.setTitle("Eleige una opción");
+        final AlertDialog.Builder builder = new AlertDialog.Builder(DetalleEditarPunto.this);
+        builder.setTitle("Elige una opción");
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(option[which] == "Tomar foto"){
                     openCamera();
+
                 }else if(option[which] == "Elegir de galeria"){
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
@@ -254,6 +329,7 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case PHOTO_CODE:
@@ -268,19 +344,39 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
                             });
 
 
+                    Bitmap bitmap = BitmapFactory.decodeFile(mPath);
+                    //mSetImage.setImageBitmap(gestorImagenes.rotarImagen(bitmap));
                     Picasso.with(context)
                             .load("file:"+mPath)
                             .into(imagenPicasso);
+
                     break;
                 case SELECT_PICTURE:
                     Uri path = data.getData();
-                    pathImagen=getRealPathFromDocumentUri(this,path);
-                    /*mSetImage.setImageURI(path);*/
+
+                    Log.e("Subir punto","path "+getRealPathFromDocumentUri(this,path));
+
+                    /*mSetImage.setImageBitmap(
+                            //gestorImagenes.rotarImagen(
+                                    gestorImagenes.cargarImagen(getRealPathFromDocumentUri(this,path))
+                      //)
+                    );*/
+                    Log.e("","file:"+path);
+
                     Picasso.with(context)
-                            .load("file:"+pathImagen)
+                            .load("file:"+getRealPathFromDocumentUri(this,path))
                             .into(imagenPicasso);
+                    pathImagen=getRealPathFromDocumentUri(this,path);
+                    rotacion=getCameraPhotoOrientation(pathImagen);
+                    Log.e("imagen rotation: ","vlor: "+rotacion);
+
+                    /*mSetImage.setImageURI(path);*/
+
                     break;
+
             }
+
+
         }
     }
 
@@ -290,7 +386,7 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
 
         if(requestCode == MY_PERMISSIONS){
             if(grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(SubirPuntoAdmin.this, "Permisos aceptados", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DetalleEditarPunto.this, "Permisos aceptados", Toast.LENGTH_SHORT).show();
                 mOptionButton.setEnabled(true);
             }
         }else{
@@ -299,7 +395,7 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
     }
 
     private void showExplanation() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SubirPuntoAdmin.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DetalleEditarPunto.this);
         builder.setTitle("Permisos denegados");
         builder.setMessage("Para usar las funciones de la app necesitas aceptar los permisos");
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
@@ -349,5 +445,33 @@ public class SubirPuntoAdmin extends AppCompatActivity  {
         return filePath;
     }
 
+    public int getCameraPhotoOrientation( String imagePath){
+        int rotate = 0;
+        try {
+            //context.getContentResolver().notifyChange(imageUri, null);
+            File imageFile = new File(imagePath);
 
+            ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+
+            Log.i("RotateImage", "Exif orientation: " + orientation);
+            Log.i("RotateImage", "Rotate value: " + rotate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rotate;
+    }
 }
+

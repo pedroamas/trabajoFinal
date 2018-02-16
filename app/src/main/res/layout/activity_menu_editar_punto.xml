@@ -18,20 +18,9 @@
         android:id="@+id/btnEditarInfo" />
 
     <Button
-        android:text="Imágenes"
+        android:text="Editar multimedia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEditarImg" />
+        android:id="@+id/btnEditarMultimedia" />
 
-    <Button
-        android:text="Audios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEditarAudios" />
-
-    <Button
-        android:text="Videos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEditarVideos" />
 </LinearLayout>

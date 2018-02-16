@@ -1,10 +1,9 @@
-package com.example.root.trabajofinal.TiposEnumerados;
+package com.example.root.trabajofinal;
 
-
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -20,10 +19,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.root.trabajofinal.MainActivity;
-import com.example.root.trabajofinal.R;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -38,9 +34,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class SubirVideo extends AppCompatActivity {
+public class AgregarVideo extends AppCompatActivity {
 
     private Button btnUpload;
+    private Context context;
     private int idPunto;
     private String titulo;
     private String descripcion;
@@ -57,9 +54,11 @@ public class SubirVideo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subir_video);
+        setContentView(R.layout.activity_editar_video);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        context=getApplicationContext();
+        idPunto=getIntent().getIntExtra("id_punto", 0);
         btnUpload = (Button) findViewById(R.id.btnUpload);
 
         final Calendar c = Calendar.getInstance();
@@ -67,12 +66,13 @@ public class SubirVideo extends AppCompatActivity {
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
 
+        /*
         edFechaCaptura= (EditText) findViewById(R.id.edFechaCaptura);
         edFechaCaptura.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(b){
-                    Toast.makeText(SubirVideo.this, ((TextView)findViewById(R.id.edFechaCaptura)).getEditableText().toString()+"L", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AgregarVideo.this, ((TextView)findViewById(R.id.edFechaCaptura)).getEditableText().toString()+"L", Toast.LENGTH_SHORT).show();
                     showDialog(DATE_DIALOG_ID);
                 }
             }
@@ -87,13 +87,13 @@ public class SubirVideo extends AppCompatActivity {
 
             }
 
-        });
+        });*/
 
         Button btnSubir=(Button)findViewById(R.id.btnSubir);
         btnSubir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progress = new ProgressDialog(SubirVideo.this);
+                progress = new ProgressDialog(AgregarVideo.this);
                 progress.setTitle("Subiendo");
                 progress.setMessage("Espere un momento...");
                 progress.show();
@@ -102,7 +102,6 @@ public class SubirVideo extends AppCompatActivity {
                     @Override
                     public void run() {
 
-                        idPunto=1;
                         titulo=((TextView)findViewById(R.id.edTitulo)).getEditableText().toString();
                         descripcion=((TextView)findViewById(R.id.edDescripcion)).getEditableText().toString();
                         fechaCaptura=((TextView)findViewById(R.id.edFechaCaptura)).getEditableText().toString();
@@ -137,8 +136,10 @@ public class SubirVideo extends AppCompatActivity {
                             Log.e("","Correcto");
 
                             progress.dismiss();
-                            Intent intent=new Intent(getApplicationContext(),MainActivity.class);
+                            Intent intent=new Intent(context,DetalleEditarMultimedia.class);
+                            intent.putExtra("id",idPunto);
                             startActivity(intent);
+                            finish();
 
                         } catch (IOException e) {
                             Log.e("","incorrecto");
@@ -154,8 +155,8 @@ public class SubirVideo extends AppCompatActivity {
         });
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+            if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},100);
                 return;
             }
         }
@@ -169,7 +170,7 @@ public class SubirVideo extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new MaterialFilePicker()
-                        .withActivity(SubirVideo.this)
+                        .withActivity(AgregarVideo.this)
                         .withRequestCode(10)
                         .start();
 
@@ -183,7 +184,7 @@ public class SubirVideo extends AppCompatActivity {
             enable_button();
         }else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},100);
             }
         }
     }

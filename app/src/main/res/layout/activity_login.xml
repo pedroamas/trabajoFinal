@@ -58,11 +58,6 @@
         android:gravity="right"
         android:id="@+id/btnRegistrarse" />
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/c_avator"
-        android:id="@+id/imageView" />
 
 
 </LinearLayout>

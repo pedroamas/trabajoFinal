@@ -35,7 +35,6 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
     public void onUpgrade(SQLiteDatabase db, int version1, int version2) {
 
-        db.execSQL("drop table if exists usuario");
         db.execSQL("drop table if exists puntos");
         db.execSQL("create table puntos(" +
                 "id integer primary key, " +

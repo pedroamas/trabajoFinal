@@ -3,23 +3,19 @@ package com.example.root.trabajofinal;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.root.trabajofinal.Gestores.GestorVideos;
 import com.example.root.trabajofinal.Listeners.VideoListener;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static com.example.root.trabajofinal.Detalle.EXTRA_POSITION;
 
 public class VerVideo extends Activity {
 

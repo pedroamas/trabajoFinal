@@ -4,17 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.beyondar.android.plugin.googlemap.GoogleMapWorldPlugin;
 import com.beyondar.android.util.location.BeyondarLocationManager;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
+import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,6 +29,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private World mWorld;
     private TextView txtInfo;
     private GestorDePuntos gestorDePuntos;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +38,16 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         Button myLocationButton = (Button) findViewById(R.id.myLocationButton);
         myLocationButton.setVisibility(View.VISIBLE);
         myLocationButton.setOnClickListener(this);
+        context=getApplicationContext();
+        Button btnRealidadAumentada= (Button) findViewById(R.id.btnRealidadAumentada);
+        btnRealidadAumentada.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, RealidadAumentada.class);
+                startActivity(intent);
+                finish();
+            }});
+
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
         txtInfo=(TextView)findViewById(R.id.txtInfo);
         BeyondarLocationManager
@@ -89,6 +99,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap=googleMap;

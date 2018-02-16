@@ -1,5 +1,6 @@
 package com.example.root.trabajofinal;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -17,13 +18,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
 import com.example.root.trabajofinal.Gestores.GestorVideos;
-import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
-import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
 import com.squareup.picasso.Picasso;
@@ -31,7 +29,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class DetalleEliminarPunto extends AppCompatActivity {
+public class DetalleEditarMultimedia extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
 
@@ -44,7 +42,8 @@ public class DetalleEliminarPunto extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eliminar_punto);
+        setContentView(R.layout.activity_detalle_editar_multimedia);
+        Log.e("Detalle","Estoy en detalle");
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         context=getApplicationContext();
@@ -90,7 +89,7 @@ public class DetalleEliminarPunto extends AppCompatActivity {
         }
 
         placePicutre.setImageBitmap(fotoPortada);
-
+        Log.e("","Estamos hablando del punto : "+punto.getId());
         gestorImagenes.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
@@ -115,8 +114,9 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                     imgGaleria.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent=new Intent(context,MostrarImagenesSec.class);
+                            Intent intent=new Intent(context,EditarImagenSec.class);
                             intent.putExtra("id_imagen",imagen.getId());
+                            intent.putExtra("id_punto",punto.getId());
                             startActivity(intent);
                             //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
                         }
@@ -153,42 +153,25 @@ public class DetalleEliminarPunto extends AppCompatActivity {
             }
         });
 
-
-
-        Button btnEliminarPunto=(Button)findViewById(R.id.btnEliminarPunto);
-        btnEliminarPunto.setOnClickListener(new View.OnClickListener() {
+        Button btnAgregarImagen=(Button)findViewById(R.id.btnAgregarImagen);
+        btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.eliminarPunto(punto.getId(), new EliminarPuntoListener() {
-                    @Override
-                    public void onResponseEliminarPunto(String response) {
-
-                        if (response.equals("Ok")){
-                            Toast.makeText(getApplicationContext(), "El punto se eliminó correctamente", Toast.LENGTH_LONG).show();
-                            gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
-                                @Override
-                                public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
-                                    if (puntos == null) {
-                                        Toast.makeText(getApplicationContext(), "Error al actualizar", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Se actualizó correctamente", Toast.LENGTH_LONG).show();
-                                    }
-                                    Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            });
-                        }else{
-                            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
+                Intent intent=new Intent(context,AgregarImagenesSec.class);
+                intent.putExtra("id_punto",punto.getId());
+                startActivity(intent);
             }
         });
+        Button btnAgregarVideo=(Button)findViewById(R.id.btnAgregarVideo);
+        btnAgregarVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AgregarVideo.class);
+                intent.putExtra("id_punto", punto.getId());
+                startActivity(intent);
+            }
+        });
+
     }
 
 }
-
-
-

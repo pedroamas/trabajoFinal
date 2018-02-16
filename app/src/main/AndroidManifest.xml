@@ -71,14 +71,34 @@
         <activity
             android:name=".DetalleEliminarPunto"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
         <activity android:name=".MostrarImagenesSec" />
-        <activity android:name=".TiposEnumerados.SubirVideo"></activity>
+        <activity android:name=".TiposEnumerados.SubirVideo" />
         <activity android:name=".VerVideo" />
+        <activity android:name=".EditarPunto" />
+        <activity android:name=".DetalleEditarPunto" />
+        <activity android:name=".EditarMultimedia" />
+        <activity
+            android:name=".DetalleEditarMultimedia"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".AgregarImagenesSec"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AgregarVideo"
+            android:screenOrientation="portrait" />
+        <activity android:name=".EditarImagenSec"></activity>
     </application>
 
 </manifest>

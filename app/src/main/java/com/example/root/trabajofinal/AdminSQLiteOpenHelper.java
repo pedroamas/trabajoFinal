@@ -29,7 +29,8 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "foto text," +
                 "foto_Web text,"+
                 "estado_foto integer,"+
-                "titulo text)");
+                "titulo text," +
+                "fecha_ult_mod text)");
     }
     @Override
 
@@ -44,7 +45,8 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "foto text," +
                 "foto_Web text,"+
                 "estado_foto integer,"+
-                "titulo text)");
+                "titulo text," +
+                "fecha_ult_mod text)");
 
     }
 

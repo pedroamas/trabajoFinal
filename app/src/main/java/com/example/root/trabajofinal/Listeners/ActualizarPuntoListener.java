@@ -1,6 +1,6 @@
 package com.example.root.trabajofinal.Listeners;
 
-import com.example.root.trabajofinal.Punto;
+import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.ArrayList;
 

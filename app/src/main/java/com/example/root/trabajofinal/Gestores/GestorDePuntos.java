@@ -10,8 +10,9 @@ import com.example.root.trabajofinal.IRespuesta;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
+import com.example.root.trabajofinal.Listeners.PuntosMalDescargadosListener;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
-import com.example.root.trabajofinal.Punto;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.example.root.trabajofinal.R;
 
 import java.io.File;
@@ -39,9 +40,6 @@ public class GestorDePuntos {
         puntos= GestorBD.getGestorBD(context).getPuntos();
     }
 
-    public void registerView(IRespuesta vista){
-        vistas.add(vista);
-    }
 
     public static GestorDePuntos getGestorDePuntos(Context context){
         if(gestorDePuntos == null){
@@ -55,9 +53,7 @@ public class GestorDePuntos {
     }
 
     public World generarMundo(Context context) {
-        if (mundo != null) {
-            return mundo;
-        }
+
         puntos=getPuntos();
 
         mundo = new World(context);
@@ -92,7 +88,6 @@ public class GestorDePuntos {
             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                 GestorBD gestorBD=GestorBD.getGestorBD(context);
                 if(!puntos.isEmpty()) {
-                    Toast.makeText(context,"Se está actualizando",Toast.LENGTH_LONG).show();
                     gestorBD.actualizarPuntos(puntos);
                 }
                 actualizarPuntoListener.onResponseActualizarPunto(puntos);
@@ -141,10 +136,13 @@ public class GestorDePuntos {
         return null;
     }
 
-    public void puntosMalDescargados(){
+    public boolean puntosMalDescargados(){
         GestorBD gestorBD=GestorBD.getGestorBD(context);
         GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
         ArrayList<Punto> puntosMalDescargados=gestorBD.puntosMalDescargados();
+        if(puntosMalDescargados.size()==0){
+            return true;
+        }
         Iterator<Punto> ite=puntosMalDescargados.iterator();
         while (ite.hasNext()){
             Punto punto=ite.next();
@@ -152,6 +150,7 @@ public class GestorDePuntos {
             gestorImagenes.descargarImagen(punto.getFotoWeb(), file.getName(), punto.getId());
             Log.e("<puntosMalDescargados>","Punto "+punto.getId()+" url: "+punto.getFotoWeb());
         }
+        return false;
     }
 
     public void eliminarPunto(int idPunto, EliminarPuntoListener eliminarPuntoListener) {

@@ -128,6 +128,13 @@
                 android:layout_height="wrap_content"
                 style="@style/BotonRojo"
                 android:id="@+id/btnAgregarVideo" />
+
+            <Button
+                android:text="Agregar audio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/BotonRojo"
+                android:id="@+id/btnAgregarAudio" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

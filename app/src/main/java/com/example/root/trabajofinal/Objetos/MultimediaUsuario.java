@@ -1,14 +1,14 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Objetos;
 
 import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
 
 import java.util.Date;
 
 /**
- * Created by root on 06/11/17.
+ * Created by pedro on 23/02/18.
  */
 
-public class Multimedia {
+public class MultimediaUsuario {
     private int id;
     private String descripcion;
     private String path;
@@ -18,7 +18,7 @@ public class Multimedia {
     private int idPunto;
     private TipoMultimedia tipo;
 
-    public Multimedia(int id, String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto,TipoMultimedia tipo) {
+    public MultimediaUsuario(int id, String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto,TipoMultimedia tipo) {
         this.id = id;
         this.descripcion = descripcion;
         this.path = path;
@@ -29,7 +29,7 @@ public class Multimedia {
         this.tipo=tipo;
     }
 
-    public Multimedia(String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto) {
+    public MultimediaUsuario(String descripcion, String path, String titulo, Date fechaCaptura, Date fechaSubida, int idPunto) {
         this.descripcion = descripcion;
         this.path = path;
         this.titulo = titulo;

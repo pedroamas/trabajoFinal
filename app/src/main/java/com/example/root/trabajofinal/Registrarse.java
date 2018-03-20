@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.RegistrarListener;
+import com.example.root.trabajofinal.Objetos.Usuario;
 
 public class Registrarse extends AppCompatActivity {
 

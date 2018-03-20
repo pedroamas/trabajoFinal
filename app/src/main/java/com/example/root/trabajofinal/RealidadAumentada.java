@@ -1,22 +1,18 @@
 package com.example.root.trabajofinal;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.Nullable;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.beyondar.android.fragment.BeyondarFragmentSupport;
 import com.beyondar.android.util.location.BeyondarLocationManager;
@@ -25,6 +21,7 @@ import com.beyondar.android.world.BeyondarObject;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.ArrayList;
 
@@ -45,6 +42,24 @@ public class RealidadAumentada extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         context=getApplicationContext();
+
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},100);
+                startActivity(getIntent());
+                finish();
+                return;
+            }
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.CAMERA},100);
+                startActivity(getIntent());
+                finish();
+                return;
+            }
+        }
         // Ocultar titulo de la ventana
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);

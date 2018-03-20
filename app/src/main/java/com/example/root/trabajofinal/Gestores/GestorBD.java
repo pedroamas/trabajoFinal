@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.root.trabajofinal.AdminSQLiteOpenHelper;
-import com.example.root.trabajofinal.Punto;
+import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class GestorBD {
                 }
                 insertarNuevoPunto(puntoIn);
 
-            }else if(!puntoIn.equals(puntoOut)){             //Comparar si tienen las mismas caracteristicas
+            }else if(!puntoIn.equals(puntoOut)){             //Comparar si tiene la misma fecha de ultima modificacion
                 //Si no son iguales, actualizar el punto
                 Log.e(TAG,"Actualiza "+puntoOut.getTitulo());
                 File file=new File(puntoIn.getFotoWeb());
@@ -96,6 +96,7 @@ public class GestorBD {
         registro.put("descripcion", punto.getDescripcion());
         registro.put("latitud", punto.getLatitud());
         registro.put("longitud", punto.getLongitud());
+        registro.put("fecha_ult_mod", punto.getFechaUltMod());
         if(punto.getFoto()!=null) registro.put("foto", punto.getFoto());
         if(punto.getFotoWeb()!=null) registro.put("foto_web", punto.getFotoWeb());
         registro.put("estado_foto", 0);
@@ -139,6 +140,7 @@ public class GestorBD {
                         " ,longitud='"+punto.getLongitud()+"'"+
                         " ,latitud='"+punto.getLatitud()+"'"+
                         " ,foto='"+punto.getFoto()+"'"+
+                        " ,fecha_ult_mod='"+punto.getFechaUltMod()+"'"+
                         " WHERE id="+punto.getId());
         bd.execSQL("UPDATE puntos " +
                 "SET "+
@@ -147,7 +149,8 @@ public class GestorBD {
                     " ,longitud='"+punto.getLongitud()+"'"+
                     " ,latitud='"+punto.getLatitud()+"'"+
                     " ,foto='"+punto.getFoto()+"'"+
-                    " ,foto_web='"+punto.getFotoWeb()+"'"+
+                " ,foto_web='"+punto.getFotoWeb()+"'"+
+                " ,fecha_ult_mod='"+punto.getFechaUltMod()+"'"+
                 " WHERE id="+punto.getId()
         );
         bd.close();
@@ -171,7 +174,7 @@ public class GestorBD {
                 "administracion", null, versionDB);
         SQLiteDatabase bd = admin.getWritableDatabase();
         Cursor fila = bd.rawQuery(
-                "select id,latitud, longitud, titulo,foto,descripcion,foto_web from puntos " +
+                "select id,latitud, longitud, titulo,foto,descripcion,foto_web,fecha_ult_mod from puntos " +
                         "WHERE estado_foto=1", null);
 
         puntosBD=new ArrayList<Punto>();
@@ -187,6 +190,7 @@ public class GestorBD {
                         fila.getString(6),                          //foto_web
                         1                                           //estado_foto
                 );
+                puntoBD.setFechaUltMod(fila.getString(7));
                 puntosBD.add(puntoBD);
             }while (fila.moveToNext());
         }
@@ -241,7 +245,7 @@ public class GestorBD {
                 "administracion", null, versionDB);
         SQLiteDatabase bd = admin.getWritableDatabase();
         Cursor fila = bd.rawQuery(
-                "select id,latitud, longitud, titulo,foto,descripcion,foto_web from puntos " +
+                "select id,latitud, longitud, titulo,foto,descripcion,foto_web,fecha_ult_mod from puntos " +
                         "WHERE estado_foto=0", null);
 
         ArrayList<Punto> puntosMalCargados=new ArrayList<Punto>();
@@ -257,7 +261,15 @@ public class GestorBD {
                         fila.getString(6),                          //fotoWeb
                         0
                 );
+                puntoBD.setFechaUltMod(fila.getString(7));
                 puntosMalCargados.add(puntoBD);
+
+                Log.e(TAG,"path mal descargada: "+puntoBD.getFotoWeb());
+                File file = new File(puntoBD.getFotoWeb());
+                puntoBD.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
+                GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
+                gestorImagenes.descargarImagen(puntoBD.getFotoWeb(), file.getName(), puntoBD.getId());
+
             }while (fila.moveToNext());
         }
         bd.close();

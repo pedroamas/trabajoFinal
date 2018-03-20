@@ -1,5 +1,6 @@
 package com.example.root.trabajofinal;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -26,6 +27,8 @@ import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -174,8 +177,8 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                                     } else {
                                         Toast.makeText(getApplicationContext(), "Se actualizó correctamente", Toast.LENGTH_LONG).show();
                                     }
-                                    Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                                    startActivity(intent);
+                                    Intent returnIntent=new Intent();
+                                    setResult(Activity.RESULT_OK,returnIntent);
                                     finish();
                                 }
                             });

@@ -12,29 +12,53 @@
 
     tools:context="com.example.root.trabajofinal.MenuAdmin">
 
-    <Button
-        android:text="Cerrar sesión"
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnCerrarSesion" />
+        android:stretchColumns="0,2">
+        <TableRow>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btnIniciarSesion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:visibility="invisible"
+                android:src="@drawable/ic_perm_identity_black_24dp" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btnActualizar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:src="@drawable/ic_actualizar" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btnCerrarSesion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_salir" />
+        </TableRow>
+    </TableLayout>
 
     <Button
         android:text="Subir punto de interés"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSubirPunto" />
+        android:id="@+id/btnSubirPunto"
+        style="@style/BotonRojo"/>
 
     <Button
         android:text="Eliminar punto de interés"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEliminarPunto" />
+        android:id="@+id/btnEliminarPunto"
+        style="@style/BotonRojo"/>
 
     <Button
         android:text="Editar punto de interés"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEditarPunto" />
+        android:id="@+id/btnEditarPunto"
+        style="@style/BotonRojo"/>
 
     <Button
         android:text="Validar información de usuarios"
@@ -46,5 +70,6 @@
         android:text="Eliminar comentarios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEliminarComentarios" />
+        android:id="@+id/btnEliminarComentarios"
+        style="@style/BotonPrimary"/>
 </LinearLayout>

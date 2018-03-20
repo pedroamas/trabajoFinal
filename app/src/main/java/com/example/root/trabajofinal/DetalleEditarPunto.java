@@ -1,6 +1,8 @@
 package com.example.root.trabajofinal;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +35,8 @@ import com.example.root.trabajofinal.Gestores.GestorImagenes;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -159,35 +163,21 @@ public class DetalleEditarPunto extends AppCompatActivity {
                         punto.getId()
                 );
                 puntoEditado.setImagen(imagenEditada);
+                final ProgressDialog progress;
+                progress = new ProgressDialog(DetalleEditarPunto.this);
+                progress.setTitle("Subiendo");
+                progress.setMessage("Espere un momento...");
+                progress.show();
                 gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
                 gestorDePuntos.editarPunto(puntoEditado, new EditarPuntoListener() {
                     @Override
-                    public void onResponseEditarPunto(String respuesta) {
-                        Toast.makeText(getApplicationContext(),"RESP: "+respuesta,Toast.LENGTH_LONG);
-                        gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
-                            @Override
-                            public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
-                                Log.e("","trajo alguna respuesta el actualizar "+puntos.size());
-                                if(puntos==null){
-                                    Toast.makeText(getApplicationContext(),
-                                            "Error",
-                                            Toast.LENGTH_LONG).show();
-                                }else {
-                                    if(puntos.size()==0){
-                                        Toast.makeText(getApplicationContext(),
-                                                "No se encontraron puntos",
-                                                Toast.LENGTH_LONG).show();
-                                    }else{
-                                        Toast.makeText(getApplicationContext(),
-                                                "Punto editado correctamente",
-                                                Toast.LENGTH_LONG).show();
-                                        Intent intent = new Intent(getApplicationContext(), EditarPunto.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                }
-                            }
-                        });
+                    public void onResponseEditarPunto(String response) {
+                        progress.dismiss();
+                        if(response.equals("Ok")){
+                            Intent returnIntent=new Intent();
+                            setResult(Activity.RESULT_OK,returnIntent);
+                            finish();
+                        }
                     }
                 });
             }
@@ -205,8 +195,6 @@ public class DetalleEditarPunto extends AppCompatActivity {
         edDescripcion.setText(punto.getDescripcion());
         edLatitud.setText(punto.getLatitud()+"");
         edLongitud.setText(punto.getLongitud()+"");
-        Toast.makeText(getApplicationContext(),"Path: "+punto.getFoto(),
-                Toast.LENGTH_SHORT).show();
 
         File imgFile = new  File(punto.getFoto());
         if(imgFile.exists()){

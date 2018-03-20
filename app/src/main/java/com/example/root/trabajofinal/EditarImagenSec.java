@@ -1,6 +1,8 @@
 package com.example.root.trabajofinal;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,10 +31,10 @@ import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
 import com.squareup.picasso.Picasso;
 
@@ -75,7 +77,6 @@ public class EditarImagenSec extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_imagen_sec);
-        Log.e("DASD","lllllllllllllllllllllllllllllllllllllllll");
         idImagen=getIntent().getIntExtra("id_imagen", 0);
         idPunto=getIntent().getIntExtra("id_punto", 0);
         context=getApplicationContext();
@@ -112,9 +113,8 @@ public class EditarImagenSec extends AppCompatActivity {
                             Toast.makeText(context,"La imagen ha sido borrada correctamente",
                                     Toast.LENGTH_LONG).show();
 
-                            Intent intent = new Intent(context, DetalleEditarMultimedia.class);
-                            intent.putExtra("id", idPunto);
-                            startActivity(intent);
+                            Intent returnIntent=new Intent();
+                            setResult(Activity.RESULT_OK,returnIntent);
                             finish();
                         }else{
                             Toast.makeText(context,"Ocurrió un error al eliminar la imagen",
@@ -143,6 +143,7 @@ public class EditarImagenSec extends AppCompatActivity {
 
                 Log.e("",titulo+" - "+descripcion);
 
+
                  multimediaEditado=new Multimedia(
 
                          idImagen,
@@ -154,15 +155,20 @@ public class EditarImagenSec extends AppCompatActivity {
                         0,
                          TipoMultimedia.imagen);
 
+                 final ProgressDialog progress;
+                progress = new ProgressDialog(EditarImagenSec.this);
+                progress.setTitle("Editando");
+                progress.setMessage("Espere un momento...");
+                progress.show();
                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
                 gestorImagenes.editarImagenSec(multimediaEditado, new EditarMultimediaListener() {
                     @Override
                     public void onResponseEditarMultimedia(String response) {
                         if(response.equals("Ok")) {
-                            Toast.makeText(context, "Editado ", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(context, DetalleEditarMultimedia.class);
-                            intent.putExtra("id", idPunto);
-                            startActivity(intent);
+                            //Toast.makeText(context, "Editado ", Toast.LENGTH_LONG).show();
+                            progress.dismiss();
+                            Intent returnIntent=new Intent();
+                            setResult(Activity.RESULT_OK,returnIntent);
                             finish();
                         }
                     }

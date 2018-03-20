@@ -103,6 +103,23 @@
                 android:layout_height="wrap_content"
                 tools:text="@string/detail_location" />
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnEscucharAudios"
+                android:text="Escuchar Audios"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnAgregarImagen"
+                android:text="Agregar imagen"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/lytGaleria">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -111,8 +128,24 @@
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines"
                 android:layout_marginTop="@dimen/md_keylines" />
+        </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytImagenesUsuarios">
+                <TextView
+                    android:textColor="?attr/colorAccent"
+                    android:textSize="@dimen/article_titles"
+                    android:layout_marginBottom="@dimen/md_keylines"
+                    android:layout_marginTop="@dimen/md_keylines"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Imagenes de los usuarios"/>
+            </LinearLayout>
 
         </LinearLayout>
+
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

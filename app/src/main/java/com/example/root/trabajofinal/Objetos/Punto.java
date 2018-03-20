@@ -1,7 +1,6 @@
-package com.example.root.trabajofinal;
+package com.example.root.trabajofinal.Objetos;
 
 import android.util.Log;
-import android.widget.TextView;
 
 public class Punto {
     private int id;
@@ -13,10 +12,17 @@ public class Punto {
     private String fotoWeb;
     private int estado_foto;
     private Multimedia imagen;
+    private String fechaUltMod;
 
+    public String getFechaUltMod() {
+        return fechaUltMod;
+    }
 
+    public void setFechaUltMod(String fechaUltMod) {
+        this.fechaUltMod = fechaUltMod;
+    }
 
-    public Punto(int id, String titulo,String descripcion, double latitud, double longitud, String foto) {
+    public Punto(int id, String titulo, String descripcion, double latitud, double longitud, String foto) {
         this.id = id;
         this.titulo = titulo;
         this.latitud = latitud;
@@ -72,8 +78,10 @@ public class Punto {
     }
 
     public boolean equals(Punto puntoComp){
-        Log.e("","SRA ak");
-        if(puntoComp==null) return false;
+        Log.e("comp1",id+" - "+fechaUltMod);
+        Log.e("comp2",puntoComp.getId()+" - "+puntoComp.fechaUltMod);
+        return fechaUltMod.equals(puntoComp.getFechaUltMod());
+        /*if(puntoComp==null) return false;
         Log.e("","is nul");
         if(id!=puntoComp.getId()) return false;
         Log.e("","en id");
@@ -87,7 +95,7 @@ public class Punto {
         Log.e("","en lon");
         if(!fotoWeb.equals(puntoComp.getFotoWeb())) return false;
         Log.e("","en fot");
-        return true;
+        return true;*/
 
     }
 

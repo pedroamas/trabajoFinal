@@ -14,19 +14,20 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.root.trabajofinal.EditarImagenSec;
+import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
-import com.example.root.trabajofinal.Multimedia;
+import com.example.root.trabajofinal.Objetos.Multimedia;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -82,6 +83,7 @@ public class GestorImagenes {
 
     public Bitmap cargarImagen(String nombreImagen)
     {
+        Log.e("Hay algun path",nombreImagen);
         String path=nombreImagen;
 
         Bitmap bitmap=null;
@@ -93,6 +95,7 @@ public class GestorImagenes {
         }
         catch (FileNotFoundException e)
         {
+            Log.e("Hay algun path","Errores por todos lados");
             e.printStackTrace();
         }
         return bitmap;
@@ -146,6 +149,7 @@ public class GestorImagenes {
                     public void onErrorResponse(VolleyError error) {
                         //imagenPost.setImageResource(R.drawable.illia);
                         Log.d("<Error>", "Error en respuesta Bitmap: "+ error.getMessage());
+                        error.printStackTrace();
                     }
                 });
         requestQueue.add(request);
@@ -188,10 +192,19 @@ public class GestorImagenes {
     }
     public void getImagenes(int idPunto,ImagenesListener imagenesListener){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        Log.e(TAG,"Entro en gestor de imagnes");
         gestorWebService.getImagenes(idPunto,imagenesListener);
-
     }
+
+    public void getImagenesUsuarios(int idPunto,ImagenesListener imagenesListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.getImagenesUsuarios(idPunto,imagenesListener);
+    }
+
+    public void getImagenesUsuariosPendientes(ImagenesListener imagenesListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.getImagenesUsuariosPendientes(imagenesListener);
+    }
+
     public Bitmap rotarImagen(Bitmap img,int grados){
         Matrix matrix = new Matrix();
         matrix.postRotate(grados);  // La rotación debe ser decimal (float o double)
@@ -249,6 +262,11 @@ public class GestorImagenes {
         gestorWebService.setImagenSec(multimedia,agregarImagenSecListener);
     }
 
+    public void setImagenSecUsuario(Multimedia multimedia, AgregarImagenSecListener agregarImagenSecListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.setImagenSecUsuario(multimedia,agregarImagenSecListener);
+    }
+
     public void editarImagenSec(Multimedia multimedia,EditarMultimediaListener editarMultimediaListener){
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
         gestorWebService.editarImagenSec(multimedia,editarMultimediaListener);
@@ -259,5 +277,33 @@ public class GestorImagenes {
         GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
         gestorWebService.eliminarImagenSec(idImagen,eliminarImagenSecListener);
 
+    }
+
+    public void getImagenConEstado(int idImagen,int estado, ImagenListener imagenListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        Log.e(TAG,"Entro en gestor de imagnes");
+        gestorWebService.getImagenConEstado(idImagen,estado,imagenListener);
+
+    }
+    public void setEstadoImagen(int idImagen, int estado , final ActualizarEstadoImgListener actualizarEstadoImgListener){
+        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        gestorWebService.setEstadoImagen(idImagen,estado,actualizarEstadoImgListener);
+    }
+
+    public File ajustarImagen(File f){
+        Bitmap imgAjustada=rotarImagen(BitmapFactory.decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
+
+
+        try {
+            FileOutputStream fOut = new FileOutputStream(f);
+
+            imgAjustada.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return f;
     }
 }

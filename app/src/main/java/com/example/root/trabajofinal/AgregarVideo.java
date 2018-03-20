@@ -6,8 +6,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +23,19 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.root.trabajofinal.Gestores.GestorWebService;
+import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
+import com.example.root.trabajofinal.Listeners.RegistrarListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -61,34 +71,6 @@ public class AgregarVideo extends AppCompatActivity {
         idPunto=getIntent().getIntExtra("id_punto", 0);
         btnUpload = (Button) findViewById(R.id.btnUpload);
 
-        final Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
-
-        /*
-        edFechaCaptura= (EditText) findViewById(R.id.edFechaCaptura);
-        edFechaCaptura.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(b){
-                    Toast.makeText(AgregarVideo.this, ((TextView)findViewById(R.id.edFechaCaptura)).getEditableText().toString()+"L", Toast.LENGTH_SHORT).show();
-                    showDialog(DATE_DIALOG_ID);
-                }
-            }
-        });
-
-        edFechaCaptura.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                showDialog(DATE_DIALOG_ID);
-
-            }
-
-        });*/
-
         Button btnSubir=(Button)findViewById(R.id.btnSubir);
         btnSubir.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,60 +79,25 @@ public class AgregarVideo extends AppCompatActivity {
                 progress.setTitle("Subiendo");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-
-                Thread t = new Thread(new Runnable() {
+                titulo=((TextView)findViewById(R.id.edTitulo)).getEditableText().toString();
+                descripcion=((TextView)findViewById(R.id.edDescripcion)).getEditableText().toString();
+                Multimedia video=new Multimedia(
+                        descripcion,
+                        f.getAbsolutePath(),
+                        titulo,
+                        null,
+                        null,
+                        idPunto
+                );
+                GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+                gestorWebService.setVideo(video, new AgregarImagenSecListener() {
                     @Override
-                    public void run() {
-
-                        titulo=((TextView)findViewById(R.id.edTitulo)).getEditableText().toString();
-                        descripcion=((TextView)findViewById(R.id.edDescripcion)).getEditableText().toString();
-                        fechaCaptura=((TextView)findViewById(R.id.edFechaCaptura)).getEditableText().toString();
-
-
-                        String content_type  = getMimeType(f.getPath());
-
-                        String file_path = f.getAbsolutePath();
-                        OkHttpClient client = new OkHttpClient();
-                        RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
-
-                        RequestBody request_body = new MultipartBody.Builder()
-                                .setType(MultipartBody.FORM)
-                                .addFormDataPart("id_punto",""+idPunto)
-                                .addFormDataPart("titulo",titulo)
-                                .addFormDataPart("descripcion",descripcion)
-                                .addFormDataPart("fecha_captura",fechaCaptura)
-                                .addFormDataPart("type",content_type)
-                                .addFormDataPart("uploaded_file",file_path.substring(file_path.lastIndexOf("/")+1), file_body)
-                                .build();
-                        Request request = new Request.Builder()
-                                .url("http://pedroamas.xyz/subir_video.php")
-                                .post(request_body)
-                                .build();
-
-                        try {
-                            Log.e("","entro en try");
-                            Response response = client.newCall(request).execute();
-                            if(!response.isSuccessful()){
-                                throw new IOException("Error : "+response);
-                            }
-                            Log.e("","Correcto");
-
-                            progress.dismiss();
-                            Intent intent=new Intent(context,DetalleEditarMultimedia.class);
-                            intent.putExtra("id",idPunto);
-                            startActivity(intent);
-                            finish();
-
-                        } catch (IOException e) {
-                            Log.e("","incorrecto");
-                            e.printStackTrace();
-                        }
-
-
+                    public void onResponseAgregarImagenSecListener(String response) {
+                        Log.e("Resp",response);
+                        progress.dismiss();
                     }
                 });
 
-                t.start();
             }
         });
 
@@ -169,10 +116,11 @@ public class AgregarVideo extends AppCompatActivity {
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new MaterialFilePicker()
-                        .withActivity(AgregarVideo.this)
-                        .withRequestCode(10)
-                        .start();
+
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent.createChooser(intent, "Selecciona app de imagen"), 10);
+
 
             }
         });
@@ -195,46 +143,37 @@ public class AgregarVideo extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         if(requestCode == 10 && resultCode == RESULT_OK){
 
-            f  = new File(data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH));
+            Uri selectedImage = data.getData();
+            f=new File(getRealPathFromDocumentUri(this,selectedImage));
+            if (f.exists())
+                Log.e("File path",getRealPathFromDocumentUri(this,selectedImage));
 
         }
     }
 
-    private String getMimeType(String path) {
+    public String getRealPathFromDocumentUri(Context context, Uri uri){
+        String filePath = "";
 
-        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
-
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-                // set date picker as current date
-                return new DatePickerDialog(this, datePickerListener, year, month,
-                        day);
+        Pattern p = Pattern.compile("(\\d+)$");
+        Matcher m = p.matcher(uri.toString());
+        if (!m.find()) {
+            return filePath;
         }
-        return null;
-    }
+        String imgId = m.group();
 
-    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+        String[] column = { MediaStore.Images.Media.DATA };
+        String sel = MediaStore.Images.Media._ID + "=?";
 
-        // when dialog box is closed, below method will be called.
-        public void onDateSet(DatePicker view, int selectedYear,
-                              int selectedMonth, int selectedDay) {
-            year = selectedYear;
-            month = selectedMonth;
-            day = selectedDay;
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, new String[]{ imgId }, null);
 
-            // set selected date into textview
-            edFechaCaptura.setText(new StringBuilder()
-                    .append(String.format("%02d",day))
-                    .append("-")
-                    .append(String.format("%02d",month + 1))
-                    .append("-")
-                    .append(year));
+        int columnIndex = cursor.getColumnIndex(column[0]);
 
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
         }
-    };
+        cursor.close();
+
+        return filePath;
+    }
 }

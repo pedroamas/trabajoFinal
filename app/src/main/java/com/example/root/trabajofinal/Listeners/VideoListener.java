@@ -1,6 +1,6 @@
 package com.example.root.trabajofinal.Listeners;
 
-import com.example.root.trabajofinal.Multimedia;
+import com.example.root.trabajofinal.Objetos.Multimedia;
 
 /**
  * Created by root on 10/12/17.

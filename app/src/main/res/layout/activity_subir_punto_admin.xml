@@ -18,61 +18,66 @@
     tools:context="com.example.root.trabajofinal.SubirPuntoAdmin"
     android:weightSum="1">
 
-    <TextView
-        android:text="Título"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView10" />
+            <TextView
+                android:text="Título"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView10" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/edTitulo" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/edTitulo" />
 
-    <TextView
-        android:text="Descripción"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView11" />
+            <TextView
+                android:text="Descripción"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView11" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:id="@+id/edDescripcion"
-        android:layout_weight="0.23" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/edDescripcion"
+                android:layout_weight="0.23" />
 
-    <TextView
-        android:text="Latitud"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView12" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnBuscarUbicacion"
+                android:text="Buscar Ubicación"/>
+        <TextView
+            android:text="Latitud"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView12" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number|numberSigned|numberDecimal"
-        android:ems="10"
-        android:id="@+id/edLatitud" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberSigned|numberDecimal"
+            android:ems="10"
+            android:id="@+id/edLatitud" />
 
-    <TextView
-        android:text="Longitud"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView13" />
+        <TextView
+            android:text="Longitud"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView13" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number|numberSigned|numberDecimal"
-        android:ems="10"
-        android:id="@+id/edLongitud" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberSigned|numberDecimal"
+            android:ems="10"
+            android:id="@+id/edLongitud" />
 
         <Button
-            android:id="@+id/show_options_button"
+            android:id="@+id/btnImagen"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="Foto"/>

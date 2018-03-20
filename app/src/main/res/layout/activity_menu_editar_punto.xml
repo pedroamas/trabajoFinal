@@ -15,12 +15,14 @@
         android:text="Editar información del punto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEditarInfo" />
+        android:id="@+id/btnEditarInfo"
+        style="@style/BotonRojo"/>
 
     <Button
         android:text="Editar multimedia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEditarMultimedia" />
+        android:id="@+id/btnEditarMultimedia"
+        style="@style/BotonRojo"/>
 
 </LinearLayout>

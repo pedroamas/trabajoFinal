@@ -24,6 +24,8 @@ import com.example.root.trabajofinal.Gestores.GestorImagenes;
 import com.example.root.trabajofinal.Gestores.GestorVideos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import java.util.Iterator;
 public class DetalleEditarMultimedia extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
+    private static int EDITAR_MULTIMEDIA=300;
 
     private android.support.v4.app.FragmentManager manager = null;
     private android.support.v4.app.FragmentTransaction ft;
@@ -117,7 +120,7 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
                             Intent intent=new Intent(context,EditarImagenSec.class);
                             intent.putExtra("id_imagen",imagen.getId());
                             intent.putExtra("id_punto",punto.getId());
-                            startActivity(intent);
+                            startActivityForResult(intent,EDITAR_MULTIMEDIA);
                             //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
                         }
                     });
@@ -159,7 +162,7 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent=new Intent(context,AgregarImagenesSec.class);
                 intent.putExtra("id_punto",punto.getId());
-                startActivity(intent);
+                startActivityForResult(intent,EDITAR_MULTIMEDIA);
             }
         });
         Button btnAgregarVideo=(Button)findViewById(R.id.btnAgregarVideo);
@@ -171,7 +174,24 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        Button btnAgregarAudio=(Button)findViewById(R.id.btnAgregarAudio);
+        btnAgregarAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AgregarAudio.class);
+                intent.putExtra("id_punto", punto.getId());
+                startActivity(intent);
+            }
+        });
 
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode==EDITAR_MULTIMEDIA){
+            Log.e("","Finishhhhh");
+            finish();
+            startActivity(getIntent());
+        }
+    }
 }

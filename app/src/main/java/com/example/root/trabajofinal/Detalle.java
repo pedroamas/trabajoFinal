@@ -33,12 +33,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Gestores.GestorVideos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
+import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -66,7 +70,7 @@ public class Detalle extends AppCompatActivity  {
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         // Set title of Detail page
         // collapsingToolbar.setTitle(getString(R.string.item_title));
-        GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
+        final GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
         Log.e("Intent","Detalle");
 
         punto=gestorDePuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
@@ -78,6 +82,23 @@ public class Detalle extends AppCompatActivity  {
         //String[] places = resources.getStringArray(R.array.places);
         collapsingToolbar.setTitle(punto.getTitulo());
 
+        //Click de agregar imagenes del usuario
+        Button btnAgregarImagen=(Button)findViewById(R.id.btnAgregarImagen);
+        btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                if(gestorUsuarios.getUsuario()==null){
+                    Toast.makeText(context,
+                            "Debe estar registrado para subir una imagen",
+                            Toast.LENGTH_LONG).show();
+                }else {
+                    Intent intent = new Intent(context, AgregarImagenesSecUsuario.class);
+                    intent.putExtra("id_punto", punto.getId());
+                    startActivity(intent);
+                }
+            }
+        });
 
         //String[] placeDetails = resources.getStringArray(R.array.place_details);
         TextView placeDetail = (TextView) findViewById(R.id.place_detail);
@@ -104,11 +125,24 @@ public class Detalle extends AppCompatActivity  {
 
         placePicutre.setImageBitmap(fotoPortada);
 
+        //probar los audios
+        Button btnEscucharAudios=(Button)findViewById(R.id.btnEscucharAudios);
+        btnEscucharAudios.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,EscucharAudio.class);
+                intent.putExtra("id_audio",35);
+                startActivity(intent);
+            }
+        });
+
+        //fin probar audios
+
         gestorImagenes.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes "+imagenes.size());
-                final LinearLayout layout = (LinearLayout) findViewById(R.id.content);
+                final LinearLayout layout = (LinearLayout) findViewById(R.id.lytGaleria);
 
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
@@ -162,6 +196,43 @@ public class Detalle extends AppCompatActivity  {
                         }
                     }
                 });
+
+
+            }
+        });
+        //ak
+        gestorImagenes.getImagenesUsuarios(punto.getId(), new ImagenesListener() {
+            @Override
+            public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
+                Log.e("Imagenes","Trajo imagnes de usuarios"+imagenes.size());
+                final LinearLayout layout = (LinearLayout) findViewById(R.id.lytImagenesUsuarios);
+
+                Iterator<Multimedia> ite=imagenes.iterator();
+                while (ite.hasNext()){
+
+                    final Multimedia imagen =ite.next();
+                    Log.e("Imagenes","path imagnes "+imagen.getPath());
+                    ImageView imgGaleria=new ImageView(context);
+                    linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
+
+                    Picasso.with(context).load(imagen.getPath())
+                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop().into(imgGaleria);
+                    //imgGaleria.setScaleType(ImageView.ScaleType.FIT_START);
+                    imgGaleria.setLayoutParams(linLayoutParam);
+                    layout.addView(imgGaleria);
+                    imgGaleria.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent=new Intent(context,MostrarImagenesSec.class);
+                            intent.putExtra("id_imagen",imagen.getId());
+                            startActivity(intent);
+                            //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
 
             }
         });

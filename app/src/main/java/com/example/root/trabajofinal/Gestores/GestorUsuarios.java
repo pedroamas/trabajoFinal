@@ -7,7 +7,7 @@ import com.example.root.trabajofinal.IRespuesta;
 import com.example.root.trabajofinal.Listeners.LoginListener;
 import com.example.root.trabajofinal.Listeners.RegistrarListener;
 import com.example.root.trabajofinal.TipoMensaje;
-import com.example.root.trabajofinal.Usuario;
+import com.example.root.trabajofinal.Objetos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Iterator;

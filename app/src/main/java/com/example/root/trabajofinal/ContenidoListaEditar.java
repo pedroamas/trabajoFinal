@@ -2,10 +2,14 @@ package com.example.root.trabajofinal;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.Iterator;
 
@@ -22,6 +27,8 @@ public class ContenidoListaEditar extends Fragment {
 
     private GestorDePuntos gestorDePuntos;
     private GestorImagenes gestorImagenes;
+    private static int EDITAR_INFO=300;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,7 +46,7 @@ public class ContenidoListaEditar extends Fragment {
         return recyclerView;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public  class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView avator;
         public TextView name;
         public TextView description;
@@ -67,7 +74,7 @@ public class ContenidoListaEditar extends Fragment {
                     intent = new Intent(context, DetalleEditarPunto.class);
 
                     intent.putExtra("id",idPunto);
-                    context.startActivity(intent);
+                    getActivity().startActivityForResult(intent,EDITAR_INFO);
 
 
 
@@ -78,7 +85,7 @@ public class ContenidoListaEditar extends Fragment {
     /**
      * Adapter to display recycler view.
      */
-    public static class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEditar.ViewHolder> {
+    public  class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEditar.ViewHolder> {
         // Set numbers of List in RecyclerView.
         private final int LENGTH ;
         private final String[] mPlaces;
@@ -100,8 +107,8 @@ public class ContenidoListaEditar extends Fragment {
             while (iterator.hasNext()){
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
-                //Log.e("Lista",punto.getFoto());
-                //mPlaceAvators[i]=punto.getFoto() ;
+                Log.e("Lista",punto.getFoto());
+                mPlaceAvators[i]=punto.getFoto() ;
                 i++;
             }
 
@@ -121,11 +128,11 @@ public class ContenidoListaEditar extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
-                /*
-                Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                //Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {
                     holder.avator.setImageBitmap(bitmap);
-                }*/
+                }
             }
             //holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
         }

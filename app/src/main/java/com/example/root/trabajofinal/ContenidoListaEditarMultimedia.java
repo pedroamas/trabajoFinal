@@ -2,10 +2,14 @@ package com.example.root.trabajofinal;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.Iterator;
 
@@ -103,8 +108,8 @@ public class ContenidoListaEditarMultimedia extends Fragment {
             while (iterator.hasNext()){
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
-                //Log.e("Lista",punto.getFoto());
-                //mPlaceAvators[i]=punto.getFoto() ;
+                Log.e("Lista",punto.getFoto());
+                mPlaceAvators[i]=punto.getFoto() ;
                 i++;
             }
 
@@ -124,11 +129,11 @@ public class ContenidoListaEditarMultimedia extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
-                /*
-                Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                //Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {
                     holder.avator.setImageBitmap(bitmap);
-                }*/
+                }
             }
             //holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
         }

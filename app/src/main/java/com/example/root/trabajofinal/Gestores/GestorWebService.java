@@ -1,9 +1,8 @@
 package com.example.root.trabajofinal.Gestores;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Base64;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -16,35 +15,48 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
+import com.example.root.trabajofinal.Listeners.AudioListener;
+import com.example.root.trabajofinal.Listeners.AudiosListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EliminarCometarioListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
+import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.LoginListener;
 import com.example.root.trabajofinal.Listeners.RegistrarListener;
+import com.example.root.trabajofinal.Listeners.SetComentarioListener;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 import com.example.root.trabajofinal.Listeners.VideoListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
-import com.example.root.trabajofinal.Multimedia;
-import com.example.root.trabajofinal.Punto;
+import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Comentario;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
-import com.example.root.trabajofinal.Usuario;
+import com.example.root.trabajofinal.Objetos.Usuario;
 import com.example.root.trabajofinal.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 
 public class GestorWebService {
@@ -56,6 +68,7 @@ public class GestorWebService {
     private GestorDePuntos gestorDePuntos;
     public static String TAG="<GestorWebService>";
     public SimpleDateFormat dt1;
+    public SimpleDateFormat dt2;
 
     private GestorWebService(Context context){
 
@@ -63,6 +76,8 @@ public class GestorWebService {
         this.gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
         this.gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
         dt1=new SimpleDateFormat("yyyy-MM-dd");
+        dt2=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
     }
 
     public static GestorWebService getGestorWebService(Context context){
@@ -229,7 +244,7 @@ public class GestorWebService {
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "http://www.pedroamas.xyz/get_puntos.php?" ,
+                                "http://www.pedroamas.xyz/get_puntos.php" ,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
@@ -255,6 +270,7 @@ public class GestorWebService {
                                                         puntoJSON.getString(5),             //foto_web
                                                         0                                 //estado_foto
                                                 );
+                                                puntoWB.setFechaUltMod(puntoJSON.getString(6));
 
                                                 puntos.add(puntoWB);
 
@@ -299,7 +315,9 @@ public class GestorWebService {
                                         Multimedia imagen=null;
                                         try {
 
+
                                             JSONArray imagenJSON=response;
+
                                             imagen=new Multimedia(
                                                     imagenJSON.getInt(0),
                                                     imagenJSON.getString(1),
@@ -310,6 +328,11 @@ public class GestorWebService {
                                                     imagenJSON.getInt(6),
                                                     TipoMultimedia.imagen
                                             );
+                                            if (imagenJSON.getInt(7)!=0){
+                                                imagen.setIdUsuario(imagenJSON.getInt(7));
+                                                imagen.setUsername(imagenJSON.getString(8));
+                                            }
+
 
                                             imagenListener.onResponseImagen(imagen);
 
@@ -317,6 +340,76 @@ public class GestorWebService {
                                             Log.e(TAG, "Error Volley: " );
                                             imagenListener.onResponseImagen(null);
                                         }
+
+
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        imagenListener.onResponseImagen(null);
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+    public void getImagenConEstado(int idImagen,int estado, final ImagenListener imagenListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_imagen_sec_usuarios.php?" +
+                                        "id_imagen="+idImagen+
+                                        "&estado="+estado
+                                ,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+                                        try {
+                                            Log.e(TAG,response.toString());
+
+                                            Multimedia imagen=null;
+                                            JSONArray imagenJSON=response;
+                                            imagen=new Multimedia(
+                                                    imagenJSON.getInt(0),
+                                                    imagenJSON.getString(1),
+                                                    imagenJSON.getString(2),
+                                                    imagenJSON.getString(3),
+                                                    null,
+                                                    null,
+                                                    //dt1.parse(imagenJSON.getString(4)),
+                                                    //dt1.parse(imagenJSON.getString(5)),
+                                                    imagenJSON.getInt(6),
+                                                    TipoMultimedia.imagen
+                                            );
+                                            Log.e(TAG,"donde es el error?? 2");
+                                            if (imagenJSON.getInt(7)!=0){
+                                                imagen.setIdUsuario(imagenJSON.getInt(7));
+                                                imagen.setUsername(imagenJSON.getString(8));
+                                            }
+
+                                            Log.e(TAG,"donde es el error?? 3");
+
+                                            Log.e("TAG obj img",imagen.getTitulo()+"");
+                                            Log.e("TAG obj img",imagen.getUsername()+"");
+                                            Log.e("TAG obj img",imagen.getPath()+"");
+
+
+
+                                            Log.e(TAG,"donde es el error?? 4");
+                                            imagenListener.onResponseImagen(imagen);
+                                            //imagenListener.onResponseImagen(imagen);
+
+                                        }catch (Exception e){
+                                            Log.e(TAG, "Error Volley(tipo): "+e.getMessage() );
+                                        }
+
 
 
 
@@ -382,67 +475,159 @@ public class GestorWebService {
                         )
                 );
     }
+
     public void setPunto(final Punto punto, final SetPuntoListener setPuntoListener){
-        Log.e(TAG,"este es el ws");
-        RequestQueue requestQueue;
-        requestQueue= Volley.newRequestQueue(context);
-        String url = "http://www.pedroamas.xyz/set_punto.php";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.e("Response", response);
-                        setPuntoListener.onResponseSetPunto("OK");
 
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.e("Error.Response", "");
-                        setPuntoListener.onResponseSetPunto("Error: "+error.getMessage());
-                    }
-                }
-        ) {
+        Thread t = new Thread(new Runnable() {
             @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
+            public void run() {
 
-                params.put("titulo", punto.getTitulo());
-                params.put("latitud", ""+punto.getLatitud());
-                params.put("longitud", ""+punto.getLongitud());
-                Log.e("LatLong","latidud: "+punto.getLatitud()+" Longitud: "+punto.getLongitud());
-                params.put("descripcion", punto.getDescripcion());
 
+                //obtiene la extension
+                String extension = MimeTypeMap.getFileExtensionFromUrl(punto.getFoto().substring(punto.getFoto().lastIndexOf("/")+1)  );
+                String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+                File f=new File(punto.getFoto());
                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                f=gestorImagenes.ajustarImagen(f);
+                OkHttpClient client = new OkHttpClient();
+                RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
-                params.put("base64Img",gestorImagenes.getImagenBase64(
-                        gestorImagenes.cargarImagen(punto.getImagen().getPath())));
+                Log.e("que es estp",content_type);
+                RequestBody request_body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("titulo", punto.getTitulo())
+                        .addFormDataPart("latitud", ""+punto.getLatitud())
+                        .addFormDataPart("longitud", ""+punto.getLongitud())
+                        .addFormDataPart("descripcion", punto.getDescripcion())
+                        .addFormDataPart("nombre_imagenImg",punto.getImagen().getNombreArchivo())
+                        .addFormDataPart("tituloImg", punto.getImagen().getTitulo())
+                        .addFormDataPart("descripcionImg", punto.getImagen().getDescripcion())
+                        .addFormDataPart("fecha_subidaImg", ""+dt1.format(new Date()))
+                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("type",content_type)
+                        //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
+                        .addFormDataPart("uploaded_file",punto.getFoto().substring(punto.getFoto().lastIndexOf("/")+1), file_body)
+                        .build();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/set_punto.php")
+                        .post(request_body)
+                        .build();
 
-                Log.e(TAG, gestorImagenes.getImagenBase64(
-                        gestorImagenes.cargarImagen(punto.getImagen().getPath())));
-                params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
-                params.put("tituloImg", punto.getImagen().getTitulo());
-                params.put("descripcionImg", punto.getImagen().getDescripcion());
-                if (punto.getImagen().getFechaCaptura()!=null) {
-                    params.put("fecha_capturaImg", "" + dt1.format(punto.getImagen().getFechaCaptura()));
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+                    Log.e("Body response",response.body().string());
+                    if(!response.isSuccessful()){
+
+                        setPuntoListener.onResponseSetPunto("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        setPuntoListener.onResponseSetPunto("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    setPuntoListener.onResponseSetPunto("Error");
                 }
-                params.put("fecha_subidaImg", ""+dt1.format(new Date()));
-                return params;
+
+
             }
+        });
 
-        };
-        requestQueue.add(postRequest);
-
+        t.start();
     }
 
     public void editarPunto(final Punto punto, final EditarPuntoListener editarPuntoListener){
-        Log.e(TAG,"este es el ws");
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //obtiene la extension
+                OkHttpClient client = new OkHttpClient();
+                RequestBody request_body;
+                if(punto.getImagen().getPath()!=null) {
+                    String extension= MimeTypeMap.getFileExtensionFromUrl(punto.getImagen().getPath().substring(punto.getImagen().getPath().lastIndexOf("/") + 1));
+                    String content_type= MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+                    File f = new File(punto.getImagen().getPath());
+                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
+                    f = gestorImagenes.ajustarImagen(f);
+
+                    RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
+
+                    request_body= new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_punto",""+punto.getId())
+                            .addFormDataPart("titulo",punto.getTitulo())
+                            .addFormDataPart("latitud",punto.getLatitud()+"")
+                            .addFormDataPart("longitud",punto.getLongitud()+"")
+                            .addFormDataPart("descripcion",punto.getDescripcion())
+                            .addFormDataPart("tituloImg", punto.getImagen().getTitulo())
+                            .addFormDataPart("descripcionImg", punto.getImagen().getDescripcion())
+                            .addFormDataPart("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()))
+                            .addFormDataPart("fecha_subidaImg", "")
+                            .addFormDataPart("envia_imagen","SI")
+                            .addFormDataPart("type",content_type)
+                            .addFormDataPart("uploaded_file",punto.getImagen().getPath().substring(punto.getImagen().getPath().lastIndexOf("/")+1), file_body)
+                            .build();
+                }else{
+                    request_body= new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_punto",""+punto.getId())
+                            .addFormDataPart("titulo",punto.getTitulo())
+                            .addFormDataPart("latitud",punto.getLatitud()+"")
+                            .addFormDataPart("longitud",punto.getLongitud()+"")
+                            .addFormDataPart("descripcion",punto.getDescripcion())
+                            .addFormDataPart("tituloImg", punto.getImagen().getTitulo())
+                            .addFormDataPart("descripcionImg", punto.getImagen().getDescripcion())
+                            .addFormDataPart("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()))
+                            .addFormDataPart("fecha_subidaImg", "")
+                            .build();
+                }
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/editar_punto.php")
+                        .post(request_body)
+                        .build();
+
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+                    Log.e("HTML",response.body().string());
+                    if(!response.isSuccessful()){
+
+                        editarPuntoListener.onResponseEditarPunto("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        editarPuntoListener.onResponseEditarPunto("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    editarPuntoListener.onResponseEditarPunto("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
+
+
+    }
+
+
+       /* Log.e(TAG,"este es el ws");
         RequestQueue requestQueue;
         requestQueue= Volley.newRequestQueue(context);
         String url = "http://www.pedroamas.xyz/editar_punto.php";
@@ -472,20 +657,14 @@ public class GestorWebService {
             {
                 Map<String, String>  params = new HashMap<String, String>();
 
-                Log.e(TAG,"id: "+punto.getId());
                 params.put("id_punto", punto.getId()+"");
-                Log.e(TAG,"titulo: "+punto.getTitulo());
                 params.put("titulo", punto.getTitulo());
-                Log.e(TAG,"latitud: "+punto.getLatitud());
                 params.put("latitud", ""+punto.getLatitud());
-                Log.e(TAG,"longitud: "+punto.getLongitud());
                 params.put("longitud", ""+punto.getLongitud());
-                Log.e(TAG,"descripcion: "+punto.getDescripcion());
                 params.put("descripcion", punto.getDescripcion());
 
                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
                 if(punto.getImagen().getPath()!=null) {
-                    Log.e(TAG,punto.getImagen().getNombreArchivo());
                     params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
                     Log.e(TAG,gestorImagenes.getImagenBase64(
                             gestorImagenes.cargarImagen(punto.getImagen().getPath())));
@@ -493,9 +672,7 @@ public class GestorWebService {
                             gestorImagenes.cargarImagen(punto.getImagen().getPath())));
                 }
 
-                Log.e(TAG,"tituloImg: "+punto.getImagen().getTitulo());
                 params.put("tituloImg", punto.getImagen().getTitulo());
-                Log.e(TAG,"descripcionImg: "+punto.getImagen().getDescripcion());
                 params.put("descripcionImg", punto.getImagen().getDescripcion());
                 params.put("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()));
                 params.put("fecha_subidaImg", "");
@@ -506,7 +683,7 @@ public class GestorWebService {
         };
         requestQueue.add(postRequest);
 
-    }
+    }*/
 
     public void enviarImagen(final String image, final Multimedia multimedia) {
 
@@ -583,7 +760,7 @@ public class GestorWebService {
                                         }catch (Exception e){
                                             Log.d(TAG, "Error Volley: " );
                                         }
-                                videoListener.onResponseVideo(video);
+                                        videoListener.onResponseVideo(video);
 
 
                                     }
@@ -593,6 +770,55 @@ public class GestorWebService {
                                     public void onErrorResponse(VolleyError error) {
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
                                         videoListener.onResponseVideo(null);
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+    public void getAudio(int idAudio, final AudioListener audioListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_audio.php?" +
+                                        "id_audio="+idAudio,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+
+                                        Multimedia audio=null;
+                                        try {
+                                            if(response.length()>0){
+                                                JSONArray audioJSON=response;
+                                                audio=new Multimedia(
+                                                        audioJSON.getInt(0),
+                                                        audioJSON.getString(1),
+                                                        audioJSON.getString(2),
+                                                        audioJSON.getString(3),
+                                                        dt1.parse(audioJSON.getString(4)),
+                                                        dt1.parse(audioJSON.getString(5)),
+                                                        audioJSON.getInt(6),
+                                                        TipoMultimedia.audio
+                                                );
+
+                                            }
+                                        }catch (Exception e){
+                                            Log.d(TAG, "Error Volley: " );
+                                        }
+                                        audioListener.onResponseAudioListener(audio);
+
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        audioListener.onResponseAudioListener(null);
                                     }
                                 }
 
@@ -612,6 +838,63 @@ public class GestorWebService {
 
                                     @Override
                                     public void onResponse(JSONArray response) {
+                                        Log.e("Respuesta getImagenes",response.toString());
+                                        ArrayList<Multimedia> imagenes=new ArrayList<Multimedia>();
+
+                                        Multimedia imagen=null;
+                                        try {
+                                            int i;
+                                            for(i=0;i<response.length();i++){
+
+                                                JSONArray imagenJSON=response.getJSONArray(i);
+                                                imagen=new Multimedia(
+                                                        imagenJSON.getInt(0),
+                                                        imagenJSON.getString(1),
+                                                        imagenJSON.getString(2),
+                                                        imagenJSON.getString(3),
+                                                        dt1.parse(imagenJSON.getString(4)),
+                                                        dt1.parse(imagenJSON.getString(5)),
+                                                        imagenJSON.getInt(6),
+                                                        TipoMultimedia.imagen
+                                                );
+                                                imagenes.add(imagen);
+                                                Log.e(TAG,"path WS: "+imagen.getPath());
+
+                                            }
+
+
+                                        }catch (Exception e){
+                                            Log.e(TAG, "2 - Error Volley: " );
+                                        }
+
+                                        imagenesListener.onResponseImagenes(imagenes);
+
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "2 - Error Volley: " + error.getMessage());
+                                        imagenesListener.onResponseImagenes(new ArrayList<Multimedia>());
+                                    }
+                                }
+
+                        )
+                );
+    }
+    public void getImagenesUsuarios(int idPunto, final ImagenesListener imagenesListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_imagenes_sec_usuarios.php?" +
+                                        "id_punto="+idPunto,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
                                         Log.e(TAG,response.toString());
                                         ArrayList<Multimedia> imagenes=new ArrayList<Multimedia>();
 
@@ -626,11 +909,72 @@ public class GestorWebService {
                                                         imagenJSON.getString(1),
                                                         imagenJSON.getString(2),
                                                         imagenJSON.getString(3),
-                                                        null,
-                                                        null,
+                                                        dt1.parse(imagenJSON.getString(4)),
+                                                        dt1.parse(imagenJSON.getString(5)),
                                                         imagenJSON.getInt(6),
                                                         TipoMultimedia.imagen
                                                 );
+                                                imagen.setIdUsuario(imagenJSON.getInt(7));
+                                                imagen.setUsername(imagenJSON.getString(8));
+                                                imagenes.add(imagen);
+                                                Log.e(TAG,"path WS: "+imagen.getPath());
+
+                                            }
+
+
+                                        }catch (Exception e){
+                                            Log.e(TAG, "2 - Error Volley: " );
+                                        }
+
+                                        imagenesListener.onResponseImagenes(imagenes);
+
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "2 - Error Volley: " + error.getMessage());
+                                        imagenesListener.onResponseImagenes(new ArrayList<Multimedia>());
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+    public void getImagenesUsuariosPendientes(final ImagenesListener imagenesListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_imagenes_sec_usuarios_no_apr.php",
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+                                        Log.e(TAG,response.toString());
+                                        ArrayList<Multimedia> imagenes=new ArrayList<Multimedia>();
+
+                                        Multimedia imagen=null;
+                                        try {
+                                            int i;
+                                            for(i=0;i<response.length();i++){
+
+                                                JSONArray imagenJSON=response.getJSONArray(i);
+                                                imagen=new Multimedia(
+                                                        imagenJSON.getInt(0),
+                                                        imagenJSON.getString(1),
+                                                        imagenJSON.getString(2),
+                                                        imagenJSON.getString(3),
+                                                        dt1.parse(imagenJSON.getString(4)),
+                                                        dt1.parse(imagenJSON.getString(5)),
+                                                        imagenJSON.getInt(6),
+                                                        TipoMultimedia.imagen
+                                                );
+                                                imagen.setIdUsuario(imagenJSON.getInt(7));
+                                                imagen.setUsername(imagenJSON.getString(8));
                                                 imagenes.add(imagen);
                                                 Log.e(TAG,"path WS: "+imagen.getPath());
 
@@ -665,7 +1009,7 @@ public class GestorWebService {
                         new JsonArrayRequest(
                                 Request.Method.GET,
                                 "http://www.pedroamas.xyz/get_videos.php?"+
-                                "id_punto="+idPunto,
+                                        "id_punto="+idPunto,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
@@ -718,111 +1062,259 @@ public class GestorWebService {
                 );
     }
 
+    public void getAudios(int idPunto, final AudiosListener audiosListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_audios.php?"+
+                                        "id_punto="+idPunto,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+
+                                        ArrayList<Multimedia> audios=new ArrayList<Multimedia>();
+                                        Multimedia audio=null;
+                                        try {
+                                            int i;
+                                            SimpleDateFormat dt1=new SimpleDateFormat("yyyy-MM-dd");
+                                            for(i=0;i<response.length();i++){
+
+                                                JSONArray audioJSON=response.getJSONArray(i);
+                                                Log.e(TAG,"path de audio: "+audioJSON.getString(4));
+                                                Log.e(TAG,"path de audio: "+audioJSON.getString(5));
+                                                audio=new Multimedia(
+                                                        audioJSON.getInt(0),
+                                                        audioJSON.getString(1),
+                                                        audioJSON.getString(2),
+                                                        audioJSON.getString(3),
+                                                        dt1.parse(audioJSON.getString(4)),
+                                                        dt1.parse(audioJSON.getString(5)),
+                                                        audioJSON.getInt(6),
+                                                        TipoMultimedia.audio
+                                                );
+                                                audios.add(audio);
+                                                Log.e(TAG,"path de video: "+audioJSON.getString(4));
+                                                Log.e(TAG,"path de video: "+audioJSON.getString(5));
+
+                                            }
 
 
+                                        }catch (Exception e){
+                                            Log.e(TAG, "Error Volley: " );
+                                        }
+                                        audiosListener.onResponseAudiosListener(audios);
 
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        audiosListener.onResponseAudiosListener(new ArrayList<Multimedia>());
+                                    }
+                                }
 
-    public void setImagenSec(final Multimedia multimedia, final AgregarImagenSecListener agregarImagenSecListener){
-        RequestQueue requestQueue;
-        requestQueue= Volley.newRequestQueue(context);
-        String url = "http://www.pedroamas.xyz/set_imagen_sec.php";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.e("Response", response);
-                        agregarImagenSecListener.onResponseAgregarImagenSecListener(response);
-
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.e("Error.Response", "");
-                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error: "+error.getMessage());
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("id_punto", ""+multimedia.getIdPunto());
-                params.put("titulo", multimedia.getTitulo());
-                params.put("descripcion", multimedia.getDescripcion());
-
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-
-                Log.e(TAG,"path de imagen WS: "+multimedia.getPath());
-                params.put("base64Img",gestorImagenes.getImagenBase64(
-                        gestorImagenes.cargarImagen(multimedia.getPath())));
-                params.put("nombre_imagenImg",multimedia.getNombreArchivo());
-                if(multimedia.getFechaCaptura()!=null) {
-                    params.put("fecha_capturaImg", "" + dt1.format(multimedia.getFechaCaptura()));
-                }
-                params.put("fecha_subidaImg", dt1.format(new Date()));
-                return params;
-            }
-
-        };
-        requestQueue.add(postRequest);
-
+                        )
+                );
     }
 
-    public void editarImagenSec(final Multimedia multimedia, final EditarMultimediaListener editarMultimediaListener){
-        RequestQueue requestQueue;
-        requestQueue= Volley.newRequestQueue(context);
-        String url = "http://www.pedroamas.xyz/editar_imagen_sec.php";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.e("Response", response);
-                        editarMultimediaListener.onResponseEditarMultimedia(response);
 
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.e("Error.Response", "");
-                        editarMultimediaListener.onResponseEditarMultimedia("Error: "+error.getMessage());
-                    }
-                }
-        ) {
+    public void setImagenSec(final Multimedia imagen ,final AgregarImagenSecListener agregarImagenSecListener){
+
+        Thread t = new Thread(new Runnable() {
             @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
+            public void run() {
 
-                params.put("id_imagen", ""+multimedia.getId());
-                params.put("titulo", multimedia.getTitulo());
-                params.put("descripcion", multimedia.getDescripcion());
+                //obtiene la extension
+                String extension = MimeTypeMap.getFileExtensionFromUrl(imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1)  );
+                String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
+                File f=new File(imagen.getPath());
                 GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                if(multimedia.getPath()!=null) {
-                    Log.e(TAG, "path de imagen WS: " + multimedia.getPath());
-                    params.put("base64Img", gestorImagenes.getImagenBase64(
-                            gestorImagenes.cargarImagen(multimedia.getPath())));
-                    params.put("nombre_imagenImg", multimedia.getNombreArchivo());
-                }
-                if(multimedia.getFechaCaptura()!=null) {
-                    params.put("fecha_capturaImg", "" + dt1.format(multimedia.getFechaCaptura()));
-                }
-                return params;
-            }
+                f=gestorImagenes.ajustarImagen(f);
+                OkHttpClient client = new OkHttpClient();
+                RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
-        };
-        requestQueue.add(postRequest);
+                Log.e("que es estp",content_type);
+
+                RequestBody request_body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("id_punto",""+imagen.getIdPunto())
+                        .addFormDataPart("titulo",imagen.getTitulo())
+                        .addFormDataPart("descripcion",imagen.getDescripcion())
+                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("type",content_type)
+                        //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
+                        .addFormDataPart("uploaded_file",imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1), file_body)
+                        .build();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/set_imagen_sec.php")
+                        .post(request_body)
+                        .build();
+
+                try {
+                    Log.e("","entro en try");
+                    okhttp3.Response response = client.newCall(request).execute();
+                    if(!response.isSuccessful()){
+
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
+    }
+
+    public void setImagenSecUsuario(final Multimedia imagen, final AgregarImagenSecListener agregarImagenSecListener){
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //obtiene la extension
+                String extension = MimeTypeMap.getFileExtensionFromUrl(imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1)  );
+                String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+                File f=new File(imagen.getPath());
+                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+                f=gestorImagenes.ajustarImagen(f);
+                OkHttpClient client = new OkHttpClient();
+                RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
+
+                Log.e("que es estp","id usuario"+imagen.getIdUsuario());
+
+                RequestBody request_body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("id_punto",""+imagen.getIdPunto())
+                        .addFormDataPart("titulo",imagen.getTitulo())
+                        .addFormDataPart("descripcion",imagen.getDescripcion())
+                        .addFormDataPart("id_usuario",imagen.getIdUsuario()+"")
+                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("type",content_type)
+                        //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
+                        .addFormDataPart("uploaded_file",imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1), file_body)
+                        .build();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/set_imagen_sec_usuario.php")
+                        .post(request_body)
+                        .build();
+
+                try {
+                    Log.e("","entro en try");
+                    okhttp3.Response response = client.newCall(request).execute();
+                    if(!response.isSuccessful()){
+
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
+    }
+
+
+    public void editarImagenSec(final Multimedia multimedia, final EditarMultimediaListener editarMultimediaListener){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //obtiene la extension
+                OkHttpClient client = new OkHttpClient();
+                RequestBody request_body;
+                if(multimedia.getPath()!=null) {
+                    String extension= MimeTypeMap.getFileExtensionFromUrl(multimedia.getPath().substring(multimedia.getPath().lastIndexOf("/") + 1));
+                    String content_type= MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+                    File f = new File(multimedia.getPath());
+                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
+                    f = gestorImagenes.ajustarImagen(f);
+
+                    RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
+                    request_body= new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_imagen",""+multimedia.getId())
+                            .addFormDataPart("titulo",multimedia.getTitulo())
+                            .addFormDataPart("descripcion",multimedia.getDescripcion())
+                            .addFormDataPart("envia_imagen","SI")
+                            .addFormDataPart("type",content_type)
+                            .addFormDataPart("uploaded_file",multimedia.getPath().substring(multimedia.getPath().lastIndexOf("/")+1), file_body)
+                            .build();
+                }else{
+                    request_body= new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_imagen",""+multimedia.getId())
+                            .addFormDataPart("titulo",multimedia.getTitulo())
+                            .addFormDataPart("descripcion",multimedia.getDescripcion())
+                            .build();
+                }
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/editar_imagen_sec.php")
+                        .post(request_body)
+                        .build();
+
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+                    Log.e("HTML",response.body().string());
+                    if(!response.isSuccessful()){
+
+                        editarMultimediaListener.onResponseEditarMultimedia("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        editarMultimediaListener.onResponseEditarMultimedia("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    editarMultimediaListener.onResponseEditarMultimedia("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
+
 
     }
 
@@ -902,5 +1394,279 @@ public class GestorWebService {
         };
         requestQueue.add(postRequest);
 
+    }
+
+    public void setComentarioPunto(final Comentario comentario, final SetComentarioListener setComentarioListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/set_comentario_punto.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        setComentarioListener.onResponseSetComentarioListener(response);
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        setComentarioListener.onResponseSetComentarioListener("Error: "+error.getMessage());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                params.put("texto", comentario.getTexto());
+                params.put("id_punto", comentario.getIdAsociado()+"");
+                params.put("id_usuario", comentario.getIdUsuario()+"");
+                params.put("fecha", dt2.format(new Date()));
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
+
+    public void setComentarioMultimedia(final Comentario comentario, final SetComentarioListener setComentarioListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/set_comentario_multimedia.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        setComentarioListener.onResponseSetComentarioListener(response);
+
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        setComentarioListener.onResponseSetComentarioListener("Error: "+error.getMessage());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                params.put("texto", comentario.getTexto());
+                params.put("id_punto", comentario.getIdAsociado()+"");
+                params.put("id_usuario", comentario.getIdUsuario()+"");
+                params.put("fecha", dt2.format(new Date()));
+                return params;
+            }
+
+        };
+        requestQueue.add(postRequest);
+
+    }
+    public void getComentariosMultimedia(int idMultimedia , final GetComentariosListener getComentariosListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new JsonArrayRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/get_comentarios_multimedia.php?" +
+                                        "id_multimedia="+idMultimedia,
+                                new Response.Listener<JSONArray>() {
+
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+                                        Log.e(TAG,response.toString());
+                                        ArrayList<Comentario> comentarios=new ArrayList<Comentario>();
+
+                                        Comentario comentario=null;
+                                        try {
+                                            int i;
+                                            for(i=0;i<response.length();i++){
+
+                                                JSONArray comentarioJSON=response.getJSONArray(i);
+     //id, String texto, int idAsociado, int idUsuario, String username, Date fecha
+                                                comentario=new Comentario(
+                                                        comentarioJSON.getInt(0),
+                                                        comentarioJSON.getString(1),
+                                                        comentarioJSON.getInt(2),
+                                                        comentarioJSON.getInt(3),
+                                                        comentarioJSON.getString(4),
+
+                                                        dt2.parse(comentarioJSON.getString(5))
+                                                );
+                                                comentarios.add(comentario);
+                                                Log.e("testo comentario",comentario.getTexto());
+
+                                            }
+
+                                            getComentariosListener.onResponseGetComentariosListener(comentarios);
+
+                                        }catch (Exception e){
+                                            Log.e(TAG, "2 - Error Volley: " );
+                                            getComentariosListener.onResponseGetComentariosListener(new ArrayList<Comentario>());
+                                        }
+
+
+
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "2 - Error Volley: " + error.getMessage());
+                                        getComentariosListener.onResponseGetComentariosListener(new ArrayList<Comentario>());
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+
+
+    public void eliminarComentario(int idComentario, final EliminarCometarioListener eliminarCometarioListener){
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new StringRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/eliminar_comentario_multimedia.php?id_comentario=" + idComentario,
+                                new Response.Listener<String>() {
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            Log.e(TAG,response);
+                                            eliminarCometarioListener.onResponseEliminarCometarioListener(response);
+
+                                        }catch (Exception e){
+                                            Log.d(TAG, "Error Volley: " );
+                                            eliminarCometarioListener.onResponseEliminarCometarioListener("No se pudo eliminar correctamente");
+                                        }
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        eliminarCometarioListener.onResponseEliminarCometarioListener("No se pudo eliminar correctamente");
+                                    }
+                                }
+
+                        )
+                );
+    }
+
+
+    public void setEstadoImagen(int idImagen, int estado , final ActualizarEstadoImgListener actualizarEstadoImgListener){
+        GestorUsuarios.getGestorUsuarios(context);
+
+        VolleySingleton.
+                getInstance(context).
+                addToRequestQueue(
+                        new StringRequest(
+                                Request.Method.GET,
+                                "http://www.pedroamas.xyz/set_estado_imagen.php?id_imagen=" + idImagen+
+                                "&estado="+estado,
+                                new Response.Listener<String>() {
+
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            Log.e(TAG,response);
+                                            actualizarEstadoImgListener.onResponseActualizarEstadoImgListener("Ok");
+
+                                        }catch (Exception e){
+                                            Log.d(TAG, "Error Volley: " );
+                                            actualizarEstadoImgListener.onResponseActualizarEstadoImgListener("No se pudo eliminar correctamente");
+                                        }
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.d(TAG, "Error Volley: " + error.getMessage());
+                                        actualizarEstadoImgListener.onResponseActualizarEstadoImgListener("No se pudo eliminar correctamente");
+                                    }
+                                }
+
+                        )
+                );
+
+    }
+    public void setVideo(final Multimedia video ,final AgregarImagenSecListener agregarImagenSecListener){
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //obtiene la extension
+                String extension = MimeTypeMap.getFileExtensionFromUrl(video.getPath().substring(video.getPath().lastIndexOf("/")+1)  );
+                String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+
+                OkHttpClient client = new OkHttpClient();
+                RequestBody file_body = RequestBody.create(MediaType.parse(content_type),new File(video.getPath()));
+
+                Log.e("que es estp",content_type);
+
+                RequestBody request_body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("id_punto",""+video.getIdPunto())
+                        .addFormDataPart("titulo",video.getTitulo())
+                        .addFormDataPart("descripcion",video.getDescripcion())
+                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("type",content_type)
+                        //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
+                        .addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
+                        .build();
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url("http://pedroamas.xyz/set_imagen_sec.php")
+                        .post(request_body)
+                        .build();
+
+                try {
+                    Log.e("","entro en try");
+                    okhttp3.Response response = client.newCall(request).execute();
+                    if(!response.isSuccessful()){
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
     }
 }

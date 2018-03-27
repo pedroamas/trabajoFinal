@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
-
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
     private Context context;
     public AdminSQLiteOpenHelper(Context context, String nombre, CursorFactory factory, int version) {
@@ -47,6 +46,10 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
                 "estado_foto integer,"+
                 "titulo text," +
                 "fecha_ult_mod text)");
+
+    }
+
+    public void crearIndiceRtree(SQLiteDatabase b){
 
     }
 

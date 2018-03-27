@@ -276,4 +276,10 @@ public class GestorBD {
         return puntosMalCargados;
     }
 
+    public void indiceRtree(){
+        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
+                "administracion", null, versionDB);
+        SQLiteDatabase bd = admin.getWritableDatabase();
+        admin.crearIndiceRtree(bd);
+    }
 }

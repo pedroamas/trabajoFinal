@@ -16,6 +16,7 @@ import com.example.root.trabajofinal.Gestores.GestorDePuntos;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.PuntosMalDescargadosListener;
+import com.example.root.trabajofinal.Objetos.IndiceRtree;
 import com.example.root.trabajofinal.Objetos.Punto;
 import com.example.root.trabajofinal.Objetos.Usuario;
 
@@ -130,6 +131,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
                 startActivity(intent);
+            }
+        });
+
+        Button btnPuntosCercanos = (Button) findViewById(R.id.btnPuntosCercanos);
+        btnPuntosCercanos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                //startActivity(intent);
+
+                GestorBD gestorBD=GestorBD.getGestorBD(getApplicationContext());
+                new IndiceRtree().crearIndice();
             }
         });
 

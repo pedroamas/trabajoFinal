@@ -23,7 +23,7 @@ public class Registrarse extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrarse);
         context=getApplicationContext();
-        gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+        gestorUsuarios=GestorUsuarios.getInstance(context);
 
         Button btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
         btnRegistrarse.setOnClickListener(new View.OnClickListener() {

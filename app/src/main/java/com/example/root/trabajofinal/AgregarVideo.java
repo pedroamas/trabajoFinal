@@ -1,7 +1,5 @@
 package com.example.root.trabajofinal;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,32 +15,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.root.trabajofinal.Gestores.GestorWebService;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
-import com.example.root.trabajofinal.Listeners.RegistrarListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
-import com.nbsp.materialfilepicker.MaterialFilePicker;
-import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class AgregarVideo extends AppCompatActivity {
 
@@ -89,7 +72,7 @@ public class AgregarVideo extends AppCompatActivity {
                         null,
                         idPunto
                 );
-                GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+                GestorWebService gestorWebService=GestorWebService.getInstance(context);
                 gestorWebService.setVideo(video, new AgregarImagenSecListener() {
                     @Override
                     public void onResponseAgregarImagenSecListener(String response) {

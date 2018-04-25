@@ -16,7 +16,7 @@ import com.beyondar.android.plugin.googlemap.GoogleMapWorldPlugin;
 import com.beyondar.android.util.location.BeyondarLocationManager;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Objetos.Punto;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +32,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private GoogleMapWorldPlugin mGoogleMapPlugin;
     private World mWorld;
     private TextView txtInfo;
-    private GestorDePuntos gestorDePuntos;
+    private GestorPuntos gestorPuntos;
     private Context context;
 
     @Override
@@ -64,8 +64,8 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         txtInfo=(TextView)findViewById(R.id.txtInfo);
         BeyondarLocationManager
                 .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
-        gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-        gestorDePuntos.getPuntos();
+        gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+        gestorPuntos.getPuntos();
 
     }
 
@@ -76,7 +76,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         GeoObject geoObject = mGoogleMapPlugin.getGeoObjectOwner(marker);
         if (geoObject != null) {
 
-            Punto punto=gestorDePuntos.getPunto(geoObject.getName());
+            Punto punto= gestorPuntos.getPunto(geoObject.getName());
             Intent intent = new Intent(getApplicationContext(), Detalle.class);
             intent.putExtra(Detalle.EXTRA_POSITION, punto.getId());
             startActivity(intent);
@@ -120,8 +120,8 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         }
 
         // We create the world and fill the world
-        GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-        mWorld = gestorDePuntos.generarMundo(this);
+        GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+        mWorld = gestorPuntos.generarMundo(this);
 
         // As we want to use GoogleMaps, we are going to create the plugin and
         // attach it to the World

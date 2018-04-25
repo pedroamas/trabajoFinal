@@ -29,8 +29,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
@@ -51,7 +51,7 @@ public class EditarImagenSec extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
     private Multimedia multimedia,multimediaEditado;
-    private GestorImagenes gestorImagenes;
+    private GestorMultimedia gestorMultimedia;
     private Context context;
     private static String APP_DIRECTORY = "MyPictureApp/";
     private static String MEDIA_DIRECTORY = APP_DIRECTORY + "PictureApp";
@@ -65,7 +65,7 @@ public class EditarImagenSec extends AppCompatActivity {
     private String mPath;
     private String pathImagen;
     private String nombreImagen;
-    private GestorDePuntos gestorDePuntos;
+    private GestorPuntos gestorPuntos;
     //private ImageView imgFotoActual;
     private ImageView imagenPicasso;
     private int rotacion;
@@ -105,8 +105,8 @@ public class EditarImagenSec extends AppCompatActivity {
         btnEliminarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
+                gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
                     @Override
                     public void onResponseEliminarImagenSecListener(String response) {
                         if(response.equals("Ok")){
@@ -160,8 +160,8 @@ public class EditarImagenSec extends AppCompatActivity {
                 progress.setTitle("Editando");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.editarImagenSec(multimediaEditado, new EditarMultimediaListener() {
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.editarImagenSec(multimediaEditado, new EditarMultimediaListener() {
                     @Override
                     public void onResponseEditarMultimedia(String response) {
                         if(response.equals("Ok")) {
@@ -270,7 +270,7 @@ public class EditarImagenSec extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case PHOTO_CODE:
@@ -286,7 +286,7 @@ public class EditarImagenSec extends AppCompatActivity {
 
 
                     Bitmap bitmap = BitmapFactory.decodeFile(mPath);
-                    //mSetImage.setImageBitmap(gestorImagenes.rotarImagen(bitmap));
+                    //mSetImage.setImageBitmap(gestorMultimedia.rotarImagen(bitmap));
                     Picasso.with(context)
                             .load("file:"+mPath)
                             .into(imagenPicasso);
@@ -298,8 +298,8 @@ public class EditarImagenSec extends AppCompatActivity {
                     Log.e("Subir punto","path "+getRealPathFromDocumentUri(this,path));
 
                     /*mSetImage.setImageBitmap(
-                            //gestorImagenes.rotarImagen(
-                                    gestorImagenes.cargarImagen(getRealPathFromDocumentUri(this,path))
+                            //gestorMultimedia.rotarImagen(
+                                    gestorMultimedia.cargarImagen(getRealPathFromDocumentUri(this,path))
                       //)
                     );*/
                     Log.e("","file:"+path);
@@ -388,8 +388,8 @@ public class EditarImagenSec extends AppCompatActivity {
     }
 
     public void llenarCampos(){
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-        gestorImagenes.getImagen(idImagen, new ImagenListener() {
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+        gestorMultimedia.getImagen(idImagen, new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia1) {
                 multimedia=multimedia1;

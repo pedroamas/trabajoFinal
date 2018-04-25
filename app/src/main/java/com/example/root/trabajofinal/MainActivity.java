@@ -5,17 +5,13 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorBD;
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
-import com.example.root.trabajofinal.Listeners.PuntosMalDescargadosListener;
 import com.example.root.trabajofinal.Objetos.IndiceRtree;
 import com.example.root.trabajofinal.Objetos.Punto;
 import com.example.root.trabajofinal.Objetos.Usuario;
@@ -28,28 +24,28 @@ public class MainActivity extends AppCompatActivity {
     private static int INICIAR_SESION = 100;
     private static int MENU_ADMIN = 200;
     private GestorUsuarios gestorUsuarios;
+    private IndiceRtree indiceRtree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gestorUsuarios = GestorUsuarios.getGestorUsuarios(this);
+        gestorUsuarios = GestorUsuarios.getInstance(this);
         Usuario usuario = gestorUsuarios.getUsuario();
-
 
         progress = new ProgressDialog(this);
         progress.setTitle("Actualizando");
         progress.setMessage("Espere un momento...");
         progress.show();
-        GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
-       gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+        GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+       gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
             @Override
             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
 
-                GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
                 boolean descargaCompleta;
-                descargaCompleta=gestorDePuntos.puntosMalDescargados();
+                descargaCompleta= gestorPuntos.puntosMalDescargados();
                 if(descargaCompleta){
                     Log.e("","Se descargaron todos los puntos");
                 }
@@ -89,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 progress.setTitle("Actualizando");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();
@@ -138,11 +134,10 @@ public class MainActivity extends AppCompatActivity {
         btnPuntosCercanos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                //startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), PuntosMasCercanos.class);
+                startActivity(intent);
 
-                GestorBD gestorBD=GestorBD.getGestorBD(getApplicationContext());
-                new IndiceRtree().crearIndice();
+                //indiceRtree.consultar(-33.2913857,90,-66.3386996,90);
             }
         });
 

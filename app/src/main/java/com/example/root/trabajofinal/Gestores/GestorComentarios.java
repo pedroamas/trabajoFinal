@@ -28,21 +28,21 @@ public class GestorComentarios {
     }
 
     public void setComentarioPunto(Comentario comentario, SetComentarioListener setComentarioListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.setComentarioPunto(comentario,setComentarioListener);
     }
 
-    public void setComentarioMultimedia(Comentario comentario, SetComentarioListener setComentarioListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+    public void comentar(Comentario comentario, SetComentarioListener setComentarioListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.setComentarioMultimedia(comentario,setComentarioListener);
     }
-    public void getComentariosMultimedia(int idMultimedia, GetComentariosListener getComentariosListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+    public void getComentarios(int idMultimedia, GetComentariosListener getComentariosListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.getComentariosMultimedia(idMultimedia,getComentariosListener);
     }
 
     public void eliminarComentario(int idComentario, EliminarCometarioListener eliminarCometarioListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.eliminarComentario(idComentario,eliminarCometarioListener);
     }
 

@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.util.Base64;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -16,48 +15,39 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
+import com.example.root.trabajofinal.Listeners.AudioListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
+import com.example.root.trabajofinal.Listeners.VideoListener;
+import com.example.root.trabajofinal.Listeners.VideosListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by root on 30/06/17.
  */
 
-public class GestorImagenes {
-
-    private static Bitmap bitmapRetorno;
-    private static String nombreImagen;
-    private String[] nombreDescargas;
-    private int count,countDescargados;
-    private static GestorImagenes gestorImagenes;
+public class GestorMultimedia {
+    private static GestorMultimedia gestorMultimedia;
     private Context context;
-    public static String TAG="<GestorImagenes>";
-    private ArrayList<ImagenesListener> imagenesListener;
+    public static String TAG="<GestorMultimedia>";
 
-    private GestorImagenes(Context context) {
-        nombreDescargas=new String[400];
-        count=-1;
-        countDescargados=-1;
+    private GestorMultimedia(Context context) {
         this.context=context;
-        imagenesListener=new ArrayList<ImagenesListener>();
     }
 
-    public static GestorImagenes obtenerGestorImagenes(Context context){
-        if (GestorImagenes.gestorImagenes==null){
-            GestorImagenes.gestorImagenes=new GestorImagenes(context);
+    public static GestorMultimedia getInstance(Context context){
+        if (GestorMultimedia.gestorMultimedia ==null){
+            GestorMultimedia.gestorMultimedia =new GestorMultimedia(context);
         }
-        return GestorImagenes.gestorImagenes;
+        return GestorMultimedia.gestorMultimedia;
     }
 
     public String guardarImagen(Context context, Bitmap bitmapImage, String nombreImagen){
@@ -81,8 +71,7 @@ public class GestorImagenes {
         return directory.getAbsolutePath();
     }
 
-    public Bitmap cargarImagen(String nombreImagen)
-    {
+    public Bitmap cargarImagen(String nombreImagen) {
         Log.e("Hay algun path",nombreImagen);
         String path=nombreImagen;
 
@@ -101,37 +90,10 @@ public class GestorImagenes {
         return bitmap;
     }
 
-    public void descargarImagen(final String url, final String nombreImagen){
-        RequestQueue requestQueue;
-        requestQueue= Volley.newRequestQueue(context);
-
-        nombreDescargas[++count]=nombreImagen;
-        Log.e("DescargaIMG","Descargame esta capo: "+nombreImagen);
-
-        ImageRequest request = new ImageRequest(
-                url ,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        Log.e("",url);
-                        guardarImagen(context,bitmap,nombreImagen);
-                    }
-                }, 0, 0, null,null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        //imagenPost.setImageResource(R.drawable.illia);
-                        Log.d("<Error>", "Error en respuesta Bitmap: "+ error.getMessage());
-                    }
-                });
-        requestQueue.add(request);
-
-    }
-
     public void descargarImagen(final String url, final String nombreImagen, final int idPunto){
         RequestQueue requestQueue;
         requestQueue= Volley.newRequestQueue(context);
 
-        nombreDescargas[++count]=nombreImagen;
         Log.e("DescargaIMG","Descargame esta capo: "+nombreImagen);
 
         ImageRequest request = new ImageRequest(
@@ -141,7 +103,7 @@ public class GestorImagenes {
                     public void onResponse(Bitmap bitmap) {
                         Log.e("",url);
                         guardarImagen(context,bitmap,nombreImagen);
-                        GestorBD gestorBD=GestorBD.getGestorBD(context);
+                        GestorBD gestorBD=GestorBD.getInstance(context);
                         gestorBD.setEstadoPunto(idPunto,1);
                     }
                 }, 0, 0, null,null,
@@ -156,32 +118,6 @@ public class GestorImagenes {
 
     }
 
-    public void enviarImagen(Multimedia multimedia){
-        Bitmap image=cargarImagen(multimedia.getPath());
-        String imagenBase64=getStringImage(image);
-        Log.e(TAG,imagenBase64);
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.enviarImagen(imagenBase64,multimedia);
-    }
-
-    public String getImagenBase64(Bitmap bitmap){
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-
-        return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
-
-    }
-
-
-
-    public String getStringImage(Bitmap bmp) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
-
-    }
     public void borrarImagen(String url){
         File fichero = new File(url);
         if (fichero.delete()){
@@ -190,18 +126,19 @@ public class GestorImagenes {
             Log.e(TAG,"Error en Borrado: "+url);
         }
     }
+
     public void getImagenes(int idPunto,ImagenesListener imagenesListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.getImagenes(idPunto,imagenesListener);
     }
 
     public void getImagenesUsuarios(int idPunto,ImagenesListener imagenesListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.getImagenesUsuarios(idPunto,imagenesListener);
     }
 
     public void getImagenesUsuariosPendientes(ImagenesListener imagenesListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.getImagenesUsuariosPendientes(imagenesListener);
     }
 
@@ -216,18 +153,19 @@ public class GestorImagenes {
     }
 
     public void getImagen(int idImagen, ImagenListener imagenListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         Log.e(TAG,"Entro en gestor de imagnes");
         gestorWebService.getImagen(idImagen,imagenListener);
 
     }
 
     public void getImagenPortada(int idPunto, ImagenListener imagenListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         Log.e(TAG,"Entro en gestor de imagnes");
         gestorWebService.getImagenPortada(idPunto,imagenListener);
 
     }
+
     public int getRotacionNecesaria( String imagePath){
         int rotate = 0;
         try {
@@ -258,45 +196,43 @@ public class GestorImagenes {
     }
 
     public void setImagenSec(Multimedia multimedia, AgregarImagenSecListener agregarImagenSecListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.setImagenSec(multimedia,agregarImagenSecListener);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.agregarImagenSec(multimedia,agregarImagenSecListener);
     }
 
     public void setImagenSecUsuario(Multimedia multimedia, AgregarImagenSecListener agregarImagenSecListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
-        gestorWebService.setImagenSecUsuario(multimedia,agregarImagenSecListener);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.agregarImagenSecUsuario(multimedia,agregarImagenSecListener);
     }
 
     public void editarImagenSec(Multimedia multimedia,EditarMultimediaListener editarMultimediaListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.editarImagenSec(multimedia,editarMultimediaListener);
 
     }
 
     public void eliminarImagenSec(int idImagen,EliminarImagenSecListener eliminarImagenSecListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.eliminarImagenSec(idImagen,eliminarImagenSecListener);
 
     }
 
     public void getImagenConEstado(int idImagen,int estado, ImagenListener imagenListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         Log.e(TAG,"Entro en gestor de imagnes");
         gestorWebService.getImagenConEstado(idImagen,estado,imagenListener);
 
     }
+
     public void setEstadoImagen(int idImagen, int estado , final ActualizarEstadoImgListener actualizarEstadoImgListener){
-        GestorWebService gestorWebService=GestorWebService.getGestorWebService(context);
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.setEstadoImagen(idImagen,estado,actualizarEstadoImgListener);
     }
 
     public File ajustarImagen(File f){
         Bitmap imgAjustada=rotarImagen(BitmapFactory.decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
-
-
         try {
             FileOutputStream fOut = new FileOutputStream(f);
-
             imgAjustada.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
             fOut.flush();
             fOut.close();
@@ -305,5 +241,20 @@ public class GestorImagenes {
             e.printStackTrace();
         }
         return f;
+    }
+
+    public void getVideo(int idVideo,VideoListener videoListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.getVideo(idVideo,videoListener);
+    }
+
+    public void getVideos(int idPunto,VideosListener videosListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.getVideos(idPunto,videosListener);
+    }
+
+    public void getAudio(int idAudio,AudioListener audioListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.getAudio(idAudio,audioListener);
     }
 }

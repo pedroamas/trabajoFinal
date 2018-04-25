@@ -28,7 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
@@ -150,9 +150,9 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
                 punto.setImagen(multimedia);
 
-                GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
 
-                gestorDePuntos.setPunto(punto, new SetPuntoListener() {
+                gestorPuntos.agregarPunto(punto, new SetPuntoListener() {
                     @Override
                     public void onResponseSetPunto(String response) {
                         Log.e("Resp",response);
@@ -369,7 +369,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
     private String mPath;
     private String pathImagen;
     private String nombreImagen;
-    private GestorDePuntos gestorDePuntos;
+    private GestorPuntos gestorDePuntos;
     private Context context;
     private double latitud;
     private double longitud;
@@ -456,8 +456,8 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
                 punto.setImagen(multimedia);
 
-                gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.setPunto(punto, new SetPuntoListener() {
+                gestorDePuntos=GestorPuntos.getInstance(getApplicationContext());
+                gestorDePuntos.agregarPunto(punto, new SetPuntoListener() {
                     @Override
                     public void onResponseSetPunto(String response) {
                         Toast.makeText(getApplicationContext(),"Respuesta: "+response,Toast.LENGTH_LONG).show();

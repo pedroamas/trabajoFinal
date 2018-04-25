@@ -22,8 +22,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
-import com.example.root.trabajofinal.Gestores.GestorVideos;
 import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.SetComentarioListener;
 import com.example.root.trabajofinal.Listeners.VideoListener;
@@ -58,8 +58,8 @@ public class VerVideo extends Activity {
         gestorComentarios=GestorComentarios.obtenerGestorComentarios(context);
 
         verVideo=this;
-        GestorVideos gestorVideos=GestorVideos.getGestorVideos(getApplicationContext());
-        gestorVideos.getVideo(idVideo, new VideoListener() {
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
+        gestorMultimedia.getVideo(idVideo, new VideoListener() {
             @Override
             public void onResponseVideo(Multimedia video) {
                 // Find your VideoView in your video_main.xml layout
@@ -132,7 +132,7 @@ public class VerVideo extends Activity {
         btnComentar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                 String texto=((EditText)findViewById(R.id.edComentario)).getEditableText().toString();
                 if(texto.equals("")){
                     Toast.makeText(context,"Ingrese el comentario",Toast.LENGTH_LONG).show();
@@ -146,14 +146,14 @@ public class VerVideo extends Activity {
                             gestorUsuarios.getUsuario().getId(),
                             new Date()
                     );
-                    gestorComentarios.setComentarioMultimedia(comentario, new SetComentarioListener() {
+                    gestorComentarios.comentar(comentario, new SetComentarioListener() {
                         @Override
                         public void onResponseSetComentarioListener(String response) {
                             Log.e("comentario",response);
                             if(response.equals("Ok")){
                                 Toast.makeText(context,"Gracias por tu comentario",Toast.LENGTH_LONG).show();
                                 ((EditText)findViewById(R.id.edComentario)).setText("");
-                                gestorComentarios.getComentariosMultimedia(idVideo, new GetComentariosListener() {
+                                gestorComentarios.getComentarios(idVideo, new GetComentariosListener() {
                                     @Override
                                     public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
                                         ListView lista;

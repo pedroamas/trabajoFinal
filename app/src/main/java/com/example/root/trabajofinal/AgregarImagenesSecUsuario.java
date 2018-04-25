@@ -25,7 +25,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
@@ -87,11 +87,11 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                             new Date(),
                             idPunto
                     );
-                    GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                    GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                     Usuario usuario=gestorUsuarios.getUsuario();
                     imagen.setIdUsuario(usuario.getId());
-                    GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                    gestorImagenes.setImagenSecUsuario(imagen, new AgregarImagenSecListener() {
+                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                    gestorMultimedia.setImagenSecUsuario(imagen, new AgregarImagenSecListener() {
                         @Override
                         public void onResponseAgregarImagenSecListener(String response) {
                             Log.e("Resp",response);
@@ -287,7 +287,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
         /*
         public static final String EXTRA_POSITION = "id";
         private Punto punto,puntoEditado;
-        private GestorImagenes gestorImagenes;
+        private GestorMultimedia gestorImagenes;
         private Context context;
         private static String APP_DIRECTORY = "MyPictureApp/";
         private static String MEDIA_DIRECTORY = APP_DIRECTORY + "PictureApp";
@@ -301,7 +301,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
         private String mPath;
         private String pathImagen;
         private String nombreImagen;
-        private GestorDePuntos gestorDePuntos;
+        private GestorPuntos gestorDePuntos;
         //private ImageView imgFotoActual;
         private ImageView imagenPicasso;
         private int rotacion;
@@ -361,12 +361,12 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                             null,
                             idPunto);
 
-                    GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                    GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                     Usuario usuario=gestorUsuarios.getUsuario();
                     multimedia.setIdUsuario(usuario.getId());
                     //multimedia.setIdUsuario(1);
-                    GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                    gestorImagenes.setImagenSecUsuario(multimedia, new AgregarImagenSecListener() {
+                    GestorMultimedia gestorImagenes=GestorMultimedia.getInstance(context);
+                    gestorImagenes.agregarImagenSecUsuario(multimedia, new AgregarImagenSecListener() {
                         @Override
                         public void onResponseAgregarImagenSecListener(String response) {
                             Log.e("Respuesta subirImgSec", response);
@@ -477,7 +477,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
 
-            GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
+            GestorMultimedia gestorImagenes=GestorMultimedia.getInstance(getApplicationContext());
             if(resultCode == RESULT_OK){
                 switch (requestCode){
                     case PHOTO_CODE:

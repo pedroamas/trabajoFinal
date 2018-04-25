@@ -8,8 +8,8 @@ public class Punto {
     private String descripcion;
     private double latitud;
     private double longitud;
-    private String foto;
-    private String fotoWeb;
+    private String fotoPortada;
+    private String pathFotoWeb;
     private int estado_foto;
     private Multimedia imagen;
     private String fechaUltMod;
@@ -27,18 +27,18 @@ public class Punto {
         this.titulo = titulo;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.foto = foto;
+        this.fotoPortada = foto;
         this.descripcion=descripcion;
 
     }
 
-    public Punto(int id, String titulo, String descripcion, double latitud, double longitud, String foto,String fotoWeb, int estado_foto) {
+    public Punto(int id, String titulo, String descripcion, double latitud, double longitud, String foto, String pathFotoWeb, int estado_foto) {
         this.id = id;
         this.titulo = titulo;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.foto = foto;
-        this.fotoWeb=fotoWeb;
+        this.fotoPortada = foto;
+        this.pathFotoWeb = pathFotoWeb;
         this.estado_foto=estado_foto;
         this.descripcion=descripcion;
 
@@ -48,7 +48,7 @@ public class Punto {
         this.titulo = titulo;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.foto = foto;
+        this.fotoPortada = foto;
         this.descripcion=descripcion;
     }
 
@@ -69,34 +69,18 @@ public class Punto {
     }
 
     public String getFoto() {
-        return foto;
+        return fotoPortada;
     }
 
 
     public void setFoto(String foto) {
-        this.foto = foto;
+        this.fotoPortada = foto;
     }
 
     public boolean equals(Punto puntoComp){
         Log.e("comp1",id+" - "+fechaUltMod);
         Log.e("comp2",puntoComp.getId()+" - "+puntoComp.fechaUltMod);
         return fechaUltMod.equals(puntoComp.getFechaUltMod());
-        /*if(puntoComp==null) return false;
-        Log.e("","is nul");
-        if(id!=puntoComp.getId()) return false;
-        Log.e("","en id");
-        if(!titulo.equals(puntoComp.getTitulo())) return false;
-        Log.e("","en tit");
-        if(!descripcion.equals(puntoComp.getDescripcion())) return false;
-        Log.e("","en desc");
-        if(latitud!=puntoComp.getLatitud()) return false;
-        Log.e("","en lat");
-        if(longitud!=puntoComp.getLongitud()) return false;
-        Log.e("","en lon");
-        if(!fotoWeb.equals(puntoComp.getFotoWeb())) return false;
-        Log.e("","en fot");
-        return true;*/
-
     }
 
     public void setImagen(Multimedia imagen) {
@@ -111,11 +95,11 @@ public class Punto {
         return descripcion;
     }
 
-    public String getFotoWeb() {
-        return fotoWeb;
+    public String getPathFotoWeb() {
+        return pathFotoWeb;
     }
 
-    public void setFotoWeb(String fotoWeb) {
-        this.fotoWeb = fotoWeb;
+    public void setPathFotoWeb(String pathFotoWeb) {
+        this.pathFotoWeb = pathFotoWeb;
     }
 }

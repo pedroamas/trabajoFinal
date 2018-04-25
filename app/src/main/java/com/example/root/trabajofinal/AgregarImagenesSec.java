@@ -13,9 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,8 +25,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Gestores.GestorWebService;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.squareup.picasso.Picasso;
@@ -89,8 +86,8 @@ public class AgregarImagenesSec extends AppCompatActivity {
                         new Date(),
                         idPunto
                 );
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.setImagenSec(imagen, new AgregarImagenSecListener() {
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.setImagenSec(imagen, new AgregarImagenSecListener() {
                     @Override
                     public void onResponseAgregarImagenSecListener(String response) {
                         Log.e("Resp",response);

@@ -3,6 +3,8 @@ package com.example.root.trabajofinal;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,13 +12,10 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,19 +23,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.EliminarCometarioListener;
 import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
-import com.example.root.trabajofinal.Listeners.SetComentarioListener;
 import com.example.root.trabajofinal.Objetos.Comentario;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
@@ -62,8 +58,8 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
         gestorComentarios=GestorComentarios.obtenerGestorComentarios(context);
         idImagen=getIntent().getIntExtra(EXTRA_POSITION,0);
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
-        gestorImagenes.getImagen(idImagen, new ImagenListener() {
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
+        gestorMultimedia.getImagen(idImagen, new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia) {
                 LinearLayout linearLayout=(LinearLayout)findViewById(R.id.content);
@@ -81,23 +77,32 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
                         txtTitulo.setText(multimedia.getTitulo());
                         txtTitulo.setLayoutParams(params);
                         linearLayout.addView(txtTitulo);
+                        txtTitulo.setTypeface(null, Typeface.BOLD);
+                        txtTitulo.setTextSize(18);
+                        txtTitulo.setTextColor(Color.BLACK);
                     }
                     if(!multimedia.getDescripcion().isEmpty()){
                         TextView txtDescripcion=new TextView(getApplicationContext());
-                        txtDescripcion.setText("Descripción: "+multimedia.getDescripcion());
+                        txtDescripcion.setText(multimedia.getDescripcion());
                         txtDescripcion.setLayoutParams(params);
                         linearLayout.addView(txtDescripcion);
+                        txtDescripcion.setTextColor(Color.BLACK);
+                        txtDescripcion.setTextSize(14);
                     }
-                    if(multimedia.getFechaCaptura()!=null){
-                        TextView txtCaptura=new TextView(getApplicationContext());
-                        txtCaptura.setText("Fecha de captura: "+dt2.format(multimedia.getFechaCaptura()));
-                        txtCaptura.setLayoutParams(params);
-                        linearLayout.addView(txtCaptura);
-                    }
+                    try {
+                        if (multimedia.getFechaCaptura() != null && multimedia.getFechaCaptura().after(dt2.parse("01/01/1800"))) {
+                            TextView txtCaptura = new TextView(getApplicationContext());
+                            txtCaptura.setText("Fecha de captura: " + dt2.format(multimedia.getFechaCaptura()));
+                            txtCaptura.setLayoutParams(params);
+                            linearLayout.addView(txtCaptura);
+                        }
+                    }catch (Exception e){}
+
                     if(multimedia.getFechaSubida()!=null){
                         TextView txtSubida=new TextView(getApplicationContext());
                         txtSubida.setText("Fecha de subida: "+dt2.format(multimedia.getFechaSubida()));
                         txtSubida.setLayoutParams(params);
+                        txtSubida.setPadding(0,5,0,5);
                         linearLayout.addView(txtSubida);
                     }
 
@@ -114,7 +119,7 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
     private void llenarComentarios(){
 
-        gestorComentarios.getComentariosMultimedia(idImagen, new GetComentariosListener() {
+        gestorComentarios.getComentarios(idImagen, new GetComentariosListener() {
             @Override
             public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
                 ListView lista;

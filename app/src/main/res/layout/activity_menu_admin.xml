@@ -61,7 +61,7 @@
         style="@style/BotonRojo"/>
 
     <Button
-        android:text="Validar información de usuarios"
+        android:text="Validar imágenes de los usuarios"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnValidarInfo" />

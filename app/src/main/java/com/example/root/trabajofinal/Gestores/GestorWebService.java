@@ -64,8 +64,6 @@ public class GestorWebService {
     public Usuario usuario;
     private Context context;
     private static GestorWebService gestorWebService;
-    private GestorUsuarios gestorUsuarios;
-    private GestorDePuntos gestorDePuntos;
     public static String TAG="<GestorWebService>";
     public SimpleDateFormat dt1;
     public SimpleDateFormat dt2;
@@ -73,14 +71,12 @@ public class GestorWebService {
     private GestorWebService(Context context){
 
         this.context=context;
-        this.gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
-        this.gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
         dt1=new SimpleDateFormat("yyyy-MM-dd");
         dt2=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     }
 
-    public static GestorWebService getGestorWebService(Context context){
+    public static GestorWebService getInstance(Context context){
         if(gestorWebService==null){
             gestorWebService=new GestorWebService(context);
         }
@@ -88,7 +84,7 @@ public class GestorWebService {
     }
 
     public void login(Usuario usuario, final LoginListener loginListener){
-        GestorUsuarios.getGestorUsuarios(context);
+        GestorUsuarios.getInstance(context);
 
         VolleySingleton.
                 getInstance(context).
@@ -145,64 +141,8 @@ public class GestorWebService {
 
     }
 
-    public void obtenerPuntos(int idMensaje){
-        GestorUsuarios.getGestorUsuarios(context);
-
-        VolleySingleton.
-                getInstance(context).
-                addToRequestQueue(
-                        new JsonArrayRequest(
-                                Request.Method.GET,
-                                "http://www.pedroamas.xyz/get_puntos.php?" ,
-                                new Response.Listener<JSONArray>() {
-
-                                    @Override
-                                    public void onResponse(JSONArray response) {
-                                        Usuario usuarioComleto=null;
-                                        try {
-                                            if(response.length()>0){
-                                                JSONArray usuarioJSON=response;
-                                                boolean admin;
-                                                if(usuarioJSON.getInt(6)==0){
-                                                    admin=false;
-                                                }else {
-                                                    admin=true;
-                                                }
-                                                usuarioComleto=new Usuario(
-                                                        usuarioJSON.getInt(0),
-                                                        usuarioJSON.getString(1),
-                                                        usuarioJSON.getString(2),
-                                                        usuarioJSON.getString(3),
-                                                        usuarioJSON.getString(4),
-                                                        usuarioJSON.getString(5),
-                                                        admin
-                                                );
-
-                                            }
-                                        }catch (Exception e){
-                                            usuarioComleto=null;
-                                            Log.d(TAG, "Error Volley: " );
-                                        }
-
-                                        gestorUsuarios.notifyViews(usuarioComleto);
-
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Log.d(TAG, "Error Volley: " + error.getMessage());
-                                        gestorUsuarios.notifyViews(null);
-                                    }
-                                }
-
-                        )
-                );
-
-    }
-
     public void eliminarPunto(int idPunto , final EliminarPuntoListener eliminarPuntoListener){
-        GestorUsuarios.getGestorUsuarios(context);
+        GestorUsuarios.getInstance(context);
 
         VolleySingleton.
                 getInstance(context).
@@ -476,7 +416,7 @@ public class GestorWebService {
                 );
     }
 
-    public void setPunto(final Punto punto, final SetPuntoListener setPuntoListener){
+    public void agregarPunto(final Punto punto, final SetPuntoListener setPuntoListener){
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -488,8 +428,8 @@ public class GestorWebService {
                 String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
                 File f=new File(punto.getFoto());
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                f=gestorImagenes.ajustarImagen(f);
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                f= gestorMultimedia.ajustarImagen(f);
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -556,8 +496,8 @@ public class GestorWebService {
                     String content_type= MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
                     File f = new File(punto.getImagen().getPath());
-                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
-                    f = gestorImagenes.ajustarImagen(f);
+                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                    f = gestorMultimedia.ajustarImagen(f);
 
                     RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
 
@@ -624,108 +564,6 @@ public class GestorWebService {
         t.start();
 
 
-    }
-
-
-       /* Log.e(TAG,"este es el ws");
-        RequestQueue requestQueue;
-        requestQueue= Volley.newRequestQueue(context);
-        String url = "http://www.pedroamas.xyz/editar_punto.php";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.e("Response", response);
-                        editarPuntoListener.onResponseEditarPunto("OK");
-
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.e("Error.Response", "");
-                        editarPuntoListener.onResponseEditarPunto("Error: "+error.getMessage());
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("id_punto", punto.getId()+"");
-                params.put("titulo", punto.getTitulo());
-                params.put("latitud", ""+punto.getLatitud());
-                params.put("longitud", ""+punto.getLongitud());
-                params.put("descripcion", punto.getDescripcion());
-
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                if(punto.getImagen().getPath()!=null) {
-                    params.put("nombre_imagenImg",punto.getImagen().getNombreArchivo());
-                    Log.e(TAG,gestorImagenes.getImagenBase64(
-                            gestorImagenes.cargarImagen(punto.getImagen().getPath())));
-                    params.put("base64Img", gestorImagenes.getImagenBase64(
-                            gestorImagenes.cargarImagen(punto.getImagen().getPath())));
-                }
-
-                params.put("tituloImg", punto.getImagen().getTitulo());
-                params.put("descripcionImg", punto.getImagen().getDescripcion());
-                params.put("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()));
-                params.put("fecha_subidaImg", "");
-                params.put("fecha_subidaImg", "");
-                return params;
-            }
-
-        };
-        requestQueue.add(postRequest);
-
-    }*/
-
-    public void enviarImagen(final String image, final Multimedia multimedia) {
-
-        Log.e("<GestorWebService>",multimedia.getPath());
-        final StringRequest stringRequest = new StringRequest(Request.Method.POST,
-                "http://www.pedroamas.xyz/subir_imagen.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("enviarImagen",response);
-                        Toast.makeText(context, "La imagen se envió con éxito", Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("errorEnviarImg","errorazo");
-                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
-
-                    }
-                }) {
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                Map<String, String> params = new Hashtable<String, String>();
-
-                params.put("base64", image);
-                params.put("nombre_imagen",multimedia.getNombreArchivo());
-                params.put("titulo", multimedia.getTitulo());
-                params.put("descripcion", multimedia.getDescripcion());
-                params.put("fecha_captura", ""+multimedia.getFechaCaptura());
-                params.put("fecha_subida", ""+multimedia.getFechaSubida());
-
-                return params;
-            }
-        };
-        {
-            int socketTimeout = 30000;
-            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-            stringRequest.setRetryPolicy(policy);
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
-            requestQueue.add(stringRequest);
-        }
     }
 
     public void getVideo(int idVideo, final VideoListener videoListener){
@@ -883,6 +721,7 @@ public class GestorWebService {
                         )
                 );
     }
+
     public void getImagenesUsuarios(int idPunto, final ImagenesListener imagenesListener){
         VolleySingleton.
                 getInstance(context).
@@ -1122,7 +961,7 @@ public class GestorWebService {
     }
 
 
-    public void setImagenSec(final Multimedia imagen ,final AgregarImagenSecListener agregarImagenSecListener){
+    public void agregarImagenSec(final Multimedia imagen , final AgregarImagenSecListener agregarImagenSecListener){
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -1133,8 +972,8 @@ public class GestorWebService {
                 String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
                 File f=new File(imagen.getPath());
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                f=gestorImagenes.ajustarImagen(f);
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                f= gestorMultimedia.ajustarImagen(f);
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -1184,7 +1023,7 @@ public class GestorWebService {
         t.start();
     }
 
-    public void setImagenSecUsuario(final Multimedia imagen, final AgregarImagenSecListener agregarImagenSecListener){
+    public void agregarImagenSecUsuario(final Multimedia imagen, final AgregarImagenSecListener agregarImagenSecListener){
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -1195,8 +1034,8 @@ public class GestorWebService {
                 String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
                 File f=new File(imagen.getPath());
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                f=gestorImagenes.ajustarImagen(f);
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                f= gestorMultimedia.ajustarImagen(f);
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -1261,8 +1100,8 @@ public class GestorWebService {
                     String content_type= MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
                     File f = new File(multimedia.getPath());
-                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
-                    f = gestorImagenes.ajustarImagen(f);
+                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                    f = gestorMultimedia.ajustarImagen(f);
 
                     RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
                     request_body= new MultipartBody.Builder()
@@ -1479,6 +1318,7 @@ public class GestorWebService {
         requestQueue.add(postRequest);
 
     }
+
     public void getComentariosMultimedia(int idMultimedia , final GetComentariosListener getComentariosListener){
         VolleySingleton.
                 getInstance(context).
@@ -1539,8 +1379,6 @@ public class GestorWebService {
                 );
     }
 
-
-
     public void eliminarComentario(int idComentario, final EliminarCometarioListener eliminarCometarioListener){
         VolleySingleton.
                 getInstance(context).
@@ -1575,9 +1413,8 @@ public class GestorWebService {
                 );
     }
 
-
     public void setEstadoImagen(int idImagen, int estado , final ActualizarEstadoImgListener actualizarEstadoImgListener){
-        GestorUsuarios.getGestorUsuarios(context);
+        GestorUsuarios.getInstance(context);
 
         VolleySingleton.
                 getInstance(context).
@@ -1613,6 +1450,7 @@ public class GestorWebService {
                 );
 
     }
+
     public void setVideo(final Multimedia video ,final AgregarImagenSecListener agregarImagenSecListener){
 
         Thread t = new Thread(new Runnable() {

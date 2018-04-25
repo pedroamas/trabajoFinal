@@ -30,9 +30,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
@@ -42,7 +41,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +52,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
     private Punto punto,puntoEditado;
-    private GestorImagenes gestorImagenes;
+    private GestorMultimedia gestorMultimedia;
     private Context context;
     private static String APP_DIRECTORY = "MyPictureApp/";
     private static String MEDIA_DIRECTORY = APP_DIRECTORY + "PictureApp";
@@ -68,7 +66,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
     private String mPath;
     private String pathImagen;
     private String nombreImagen;
-    private GestorDePuntos gestorDePuntos;
+    private GestorPuntos gestorPuntos;
     //private ImageView imgFotoActual;
     private ImageView imagenPicasso;
     private int rotacion;
@@ -94,8 +92,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
                 showOptions();
             }
         });
-        gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-        punto=gestorDePuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
+        gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+        punto= gestorPuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
 
         llenarCampos();
 
@@ -168,8 +166,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
                 progress.setTitle("Subiendo");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                gestorDePuntos=GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.editarPunto(puntoEditado, new EditarPuntoListener() {
+                gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.editarPunto(puntoEditado, new EditarPuntoListener() {
                     @Override
                     public void onResponseEditarPunto(String response) {
                         progress.dismiss();
@@ -201,8 +199,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
             Picasso.with(context).load("file:"+punto.getFoto())
                     .into(imagenPicasso);
         }
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-        gestorImagenes.getImagenPortada(punto.getId(), new ImagenListener() {
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+        gestorMultimedia.getImagenPortada(punto.getId(), new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia) {
                 SimpleDateFormat dt1=new SimpleDateFormat("dd-MM-yyyy");
@@ -317,7 +315,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case PHOTO_CODE:
@@ -333,7 +331,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
 
                     Bitmap bitmap = BitmapFactory.decodeFile(mPath);
-                    //mSetImage.setImageBitmap(gestorImagenes.rotarImagen(bitmap));
+                    //mSetImage.setImageBitmap(gestorMultimedia.rotarImagen(bitmap));
                     Picasso.with(context)
                             .load("file:"+mPath)
                             .into(imagenPicasso);
@@ -345,8 +343,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
                     Log.e("Subir punto","path "+getRealPathFromDocumentUri(this,path));
 
                     /*mSetImage.setImageBitmap(
-                            //gestorImagenes.rotarImagen(
-                                    gestorImagenes.cargarImagen(getRealPathFromDocumentUri(this,path))
+                            //gestorMultimedia.rotarImagen(
+                                    gestorMultimedia.cargarImagen(getRealPathFromDocumentUri(this,path))
                       //)
                     );*/
                     Log.e("","file:"+path);

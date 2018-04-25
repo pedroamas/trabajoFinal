@@ -2,9 +2,6 @@ package com.example.root.trabajofinal;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 
@@ -27,7 +24,7 @@ import java.util.Iterator;
 public class ContenidoValidarInfoUsuario extends Fragment {
 
     private static int VALIDAR_INFO=700;
-    private GestorImagenes gestorImagenes;
+    private GestorMultimedia gestorMultimedia;
     private RecyclerView recyclerView;
     private ArrayList<Multimedia> imagenesPendientes;
     @Override
@@ -35,9 +32,9 @@ public class ContenidoValidarInfoUsuario extends Fragment {
                              Bundle savedInstanceState) {
         recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
-        gestorImagenes=GestorImagenes.obtenerGestorImagenes(getActivity().getApplicationContext());
+        gestorMultimedia = GestorMultimedia.getInstance(getActivity().getApplicationContext());
         Log.e("Procesame","esto");
-        gestorImagenes.getImagenesUsuariosPendientes(new ImagenesListener() {
+        gestorMultimedia.getImagenesUsuariosPendientes(new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 //gestorDePuntos.getPuntos();
@@ -74,7 +71,7 @@ public class ContenidoValidarInfoUsuario extends Fragment {
                 public void onClick(View v) {
                     Intent intent;
                     Context context =getActivity().getApplicationContext();
-                    GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
+                    GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
 
                     intent = new Intent(context, AprobarImgSecUsuarios.class);
 
@@ -96,12 +93,12 @@ public class ContenidoValidarInfoUsuario extends Fragment {
         private final String[] mPlaces;
         //private final String[] mPlaceDesc;
         private final String[] mPlaceAvators;
-        private GestorImagenes gestorImagenes;
+        private GestorMultimedia gestorMultimedia;
         public ContentAdapter(Context context) {
 
 
-            //GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
-            //gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+            //GestorPuntos gestorDePuntos=GestorPuntos.getInstance(context);
+            //gestorMultimedia=GestorMultimedia.getInstance(context);
             Iterator<Multimedia> iterator=imagenesPendientes.iterator();
             int cantidad=imagenesPendientes.size();
             mPlaces=new String[cantidad];
@@ -133,7 +130,7 @@ public class ContenidoValidarInfoUsuario extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
-                //Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 /*Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {
                     holder.avator.setImageBitmap(bitmap);

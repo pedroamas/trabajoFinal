@@ -35,10 +35,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
-import com.example.root.trabajofinal.Gestores.GestorVideos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
@@ -54,7 +53,7 @@ public class Detalle extends AppCompatActivity  {
 
     private android.support.v4.app.FragmentManager manager = null;
     private android.support.v4.app.FragmentTransaction ft;
-    private GestorImagenes gestorImagenes;
+    private GestorMultimedia gestorMultimedia;
     private Context context;
     private Punto punto;
     private LinearLayoutCompat.LayoutParams linLayoutParam;
@@ -70,10 +69,10 @@ public class Detalle extends AppCompatActivity  {
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         // Set title of Detail page
         // collapsingToolbar.setTitle(getString(R.string.item_title));
-        final GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
+        final GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
         Log.e("Intent","Detalle");
 
-        punto=gestorDePuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
+        punto= gestorPuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
         Log.e("putExtra","id: "+punto.getFoto());
         int postion= 1;
 
@@ -87,7 +86,7 @@ public class Detalle extends AppCompatActivity  {
         btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                 if(gestorUsuarios.getUsuario()==null){
                     Toast.makeText(context,
                             "Debe estar registrado para subir una imagen",
@@ -103,20 +102,20 @@ public class Detalle extends AppCompatActivity  {
         //String[] placeDetails = resources.getStringArray(R.array.place_details);
         TextView placeDetail = (TextView) findViewById(R.id.place_detail);
         placeDetail.setText(punto.getDescripcion());
-        //GestorWebService.getGestorWebService(getApplicationContext()).obtenerDescripcion(punto.getId(),placeDetail);
-        //gestorDePuntos.getDescripcion(punto.getId(),placeDetail);
+        //GestorWebService.getInstance(getApplicationContext()).obtenerDescripcion(punto.getId(),placeDetail);
+        //gestorPuntos.getDescripcion(punto.getId(),placeDetail);
 
         //String[] placeLocations = resources.getStringArray(R.array.place_locations);
         TextView placeLocation =  (TextView) findViewById(R.id.place_location);
         placeLocation.setText("Latitud "+punto.getLatitud()+"\nLongitud "+punto.getLongitud());
 
-        gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+        gestorMultimedia = GestorMultimedia.getInstance(context);
         Log.e("<img>","path foto: "+punto.getFoto());
 
         TypedArray placePictures = resources.obtainTypedArray(R.array.places_picture);
         ImageView placePicutre = (ImageView) findViewById(R.id.image);
         //placePicutre.setImageDrawable(placePictures.getDrawable(postion % placePictures.length()));
-        Bitmap fotoPortada=gestorImagenes.cargarImagen(punto.getFoto());
+        Bitmap fotoPortada= gestorMultimedia.cargarImagen(punto.getFoto());
         //InputStream si1=fotoPortada.;
         Log.e("Foto","Foto: "+punto.getFoto());
         if(fotoPortada==null){
@@ -138,7 +137,7 @@ public class Detalle extends AppCompatActivity  {
 
         //fin probar audios
 
-        gestorImagenes.getImagenes(punto.getId(), new ImagenesListener() {
+        gestorMultimedia.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes "+imagenes.size());
@@ -170,12 +169,11 @@ public class Detalle extends AppCompatActivity  {
                     });
                 }
 
-                GestorVideos gestorVideos=GestorVideos.getGestorVideos(context);
-                gestorVideos.getVideos(punto.getId(), new VideosListener() {
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.getVideos(punto.getId(), new VideosListener() {
                     @Override
                     public void onResponseVideos(ArrayList<Multimedia> videos) {
 
-                        Log.e("","entro en listener video");
                         Iterator<Multimedia> ite=videos.iterator();
                         while (ite.hasNext()){
                             final Multimedia video=ite.next();
@@ -201,7 +199,7 @@ public class Detalle extends AppCompatActivity  {
             }
         });
         //ak
-        gestorImagenes.getImagenesUsuarios(punto.getId(), new ImagenesListener() {
+        gestorMultimedia.getImagenesUsuarios(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes de usuarios"+imagenes.size());

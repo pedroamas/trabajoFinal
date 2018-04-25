@@ -32,7 +32,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,13 +49,17 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".Login"
+        <activity
+            android:name=".Login"
             android:screenOrientation="portrait" />
-        <activity android:name=".Registrarse"
+        <activity
+            android:name=".Registrarse"
             android:screenOrientation="portrait" />
-        <activity android:name=".MenuAdmin"
+        <activity
+            android:name=".MenuAdmin"
             android:screenOrientation="portrait" />
-        <activity android:name=".MenuEditarPunto"
+        <activity
+            android:name=".MenuEditarPunto"
             android:screenOrientation="portrait" />
         <activity android:name=".RealidadAumentada" />
         <activity
@@ -69,9 +74,9 @@
         <activity
             android:name=".ListaMaterialDesign"
             android:screenOrientation="portrait" />
-        <activity android:name=".SubirPuntoAdmin"
-            android:screenOrientation="portrait"
-            />
+        <activity
+            android:name=".SubirPuntoAdmin"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EliminarPunto"
             android:screenOrientation="portrait" />
@@ -87,11 +92,14 @@
         <activity android:name=".MostrarImagenesSec" />
         <activity android:name=".TiposEnumerados.SubirVideo" />
         <activity android:name=".VerVideo" />
-        <activity android:name=".EditarPunto"
+        <activity
+            android:name=".EditarPunto"
             android:screenOrientation="portrait" />
-        <activity android:name=".DetalleEditarPunto"
+        <activity
+            android:name=".DetalleEditarPunto"
             android:screenOrientation="portrait" />
-        <activity android:name=".EditarMultimedia"
+        <activity
+            android:name=".EditarMultimedia"
             android:screenOrientation="portrait" />
         <activity
             android:name=".DetalleEditarMultimedia"
@@ -108,14 +116,18 @@
         <activity
             android:name=".AgregarVideo"
             android:screenOrientation="portrait" />
-        <activity android:name=".EditarImagenSec"
+        <activity
+            android:name=".EditarImagenSec"
             android:screenOrientation="portrait" />
         <activity android:name=".BuscarLocalizacionPunto" />
-        <activity android:name=".AgregarImagenesSecUsuario"
+        <activity
+            android:name=".AgregarImagenesSecUsuario"
             android:screenOrientation="portrait" />
-        <activity android:name=".ValidarInfoUsuario"
+        <activity
+            android:name=".ValidarInfoUsuario"
             android:screenOrientation="portrait" />
-        <activity android:name=".EliminarComentarios"
+        <activity
+            android:name=".EliminarComentarios"
             android:screenOrientation="portrait" />
         <activity
             android:name=".DetalleEliminarComentarios"
@@ -125,12 +137,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".MostrarImagenesSecEliminarComentario"
+        <activity
+            android:name=".MostrarImagenesSecEliminarComentario"
             android:screenOrientation="portrait" />
         <activity android:name=".EscucharAudio" />
         <activity android:name=".AgregarAudio" />
-        <activity android:name=".AprobarImgSecUsuarios"
-            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".AprobarImgSecUsuarios"
+            android:screenOrientation="portrait" />
+        <activity android:name=".PuntosMasCercanos" />
+        <activity android:name=".MostrarPuntosMasCercanos"></activity>
     </application>
 
 </manifest>

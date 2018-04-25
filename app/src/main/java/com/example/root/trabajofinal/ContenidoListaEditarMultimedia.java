@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.Iterator;
@@ -28,17 +28,17 @@ import java.util.Iterator;
 
 public class ContenidoListaEditarMultimedia extends Fragment {
 
-    private GestorDePuntos gestorDePuntos;
-    private GestorImagenes gestorImagenes;
+    private GestorPuntos gestorPuntos;
+    private GestorMultimedia gestorMultimedia;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
-        gestorDePuntos=GestorDePuntos.getGestorDePuntos(getActivity().getApplicationContext());
-        gestorDePuntos.getPuntos();
-        //if(gestorDePuntos.size()>0) {
+        gestorPuntos = GestorPuntos.getInstance(getActivity().getApplicationContext());
+        gestorPuntos.getPuntos();
+        //if(gestorPuntos.size()>0) {
         ContenidoListaEditarMultimedia.ContentAdapter adapter = new ContenidoListaEditarMultimedia.ContentAdapter(recyclerView.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
@@ -64,8 +64,8 @@ public class ContenidoListaEditarMultimedia extends Fragment {
                 public void onClick(View v) {
                     Intent intent;
                     Context context = v.getContext();
-                    GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
-                    Iterator<Punto> iterator=gestorDePuntos.getPuntos().iterator();
+                    GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
+                    Iterator<Punto> iterator= gestorPuntos.getPuntos().iterator();
                     int i=0;
                     int idPunto=-1;
                     while (i<=getAdapterPosition()){
@@ -92,18 +92,18 @@ public class ContenidoListaEditarMultimedia extends Fragment {
         private final String[] mPlaces;
         //private final String[] mPlaceDesc;
         private final String[] mPlaceAvators;
-        private GestorImagenes gestorImagenes;
+        private GestorMultimedia gestorMultimedia;
         public ContentAdapter(Context context) {
 
 
-            GestorDePuntos gestorDePuntos=GestorDePuntos.getGestorDePuntos(context);
-            gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-            Iterator<Punto> iterator=gestorDePuntos.getPuntos().iterator();
-            int cantidad=gestorDePuntos.getPuntos().size();
+            GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
+            gestorMultimedia = GestorMultimedia.getInstance(context);
+            Iterator<Punto> iterator= gestorPuntos.getPuntos().iterator();
+            int cantidad= gestorPuntos.getPuntos().size();
             mPlaces=new String[cantidad];
             mPlaceAvators=new String[cantidad];
 
-            LENGTH=gestorDePuntos.getPuntos().size();
+            LENGTH= gestorPuntos.getPuntos().size();
             int i=0;
             while (iterator.hasNext()){
                 Punto punto=iterator.next();
@@ -129,7 +129,7 @@ public class ContenidoListaEditarMultimedia extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
-                //Bitmap bitmap=gestorImagenes.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
+                //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {
                     holder.avator.setImageBitmap(bitmap);

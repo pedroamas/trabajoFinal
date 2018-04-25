@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Objetos.Punto;
 
@@ -54,8 +54,8 @@ public class EliminarPunto extends AppCompatActivity {
                 progress.setTitle("Actualizando");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();

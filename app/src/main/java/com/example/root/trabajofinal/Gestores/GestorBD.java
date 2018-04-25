@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 
 public class GestorBD {
-    private int versionDB=1;
+    private int versionDB=2;
     Context context;
     private static GestorBD gestorBD;
     private ArrayList<Punto> puntosBD;
@@ -26,7 +26,7 @@ public class GestorBD {
         puntosBD=new ArrayList<Punto>();
     }
 
-    public static GestorBD getGestorBD(Context context){
+    public static GestorBD getInstance(Context context){
         if(gestorBD==null){
             gestorBD=new GestorBD(context);
         }
@@ -47,22 +47,22 @@ public class GestorBD {
             Log.e(TAG,"PUNTO out ");
             //El punto no fue encontrado, entonces agregarlo
             if(puntoOut==null){
-                if(puntoIn.getFotoWeb()!=null) {
-                    Log.e(TAG, "Inserta " + puntoIn.getFotoWeb());
-                    File file = new File(puntoIn.getFotoWeb());
+                if(puntoIn.getPathFotoWeb()!=null) {
+                    Log.e(TAG, "Inserta " + puntoIn.getPathFotoWeb());
+                    File file = new File(puntoIn.getPathFotoWeb());
                     puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
-                    GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
-                    gestorImagenes.descargarImagen(puntoIn.getFotoWeb(), file.getName(), puntoIn.getId());
+                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                    gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(), file.getName(), puntoIn.getId());
                 }
                 insertarNuevoPunto(puntoIn);
 
             }else if(!puntoIn.equals(puntoOut)){             //Comparar si tiene la misma fecha de ultima modificacion
                 //Si no son iguales, actualizar el punto
                 Log.e(TAG,"Actualiza "+puntoOut.getTitulo());
-                File file=new File(puntoIn.getFotoWeb());
+                File file=new File(puntoIn.getPathFotoWeb());
                 puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName());
-                GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.descargarImagen(puntoIn.getFotoWeb(),file.getName(),puntoIn.getId());
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(),file.getName(),puntoIn.getId());
                 actualizarPunto(puntoIn);
             }else{
                 Log.e(TAG,"NADA "+puntoIn.getTitulo());
@@ -98,12 +98,13 @@ public class GestorBD {
         registro.put("longitud", punto.getLongitud());
         registro.put("fecha_ult_mod", punto.getFechaUltMod());
         if(punto.getFoto()!=null) registro.put("foto", punto.getFoto());
-        if(punto.getFotoWeb()!=null) registro.put("foto_web", punto.getFotoWeb());
+        if(punto.getPathFotoWeb()!=null) registro.put("foto_web", punto.getPathFotoWeb());
         registro.put("estado_foto", 0);
 
         bd.insert("puntos", null, registro);
         bd.close();
     }
+
     public void eliminarPuntos(String listaPuntosEliminar){
         AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
                 "administracion", null, versionDB);
@@ -113,10 +114,10 @@ public class GestorBD {
                 "select foto from puntos " +
                         "WHERE id not in ("+listaPuntosEliminar+")", null);
 
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(context);
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
         if (fila.moveToFirst()) {
             do{
-                gestorImagenes.borrarImagen(fila.getString(0));
+                gestorMultimedia.borrarImagen(fila.getString(0));
 
             }while (fila.moveToNext());
         }
@@ -149,15 +150,14 @@ public class GestorBD {
                     " ,longitud='"+punto.getLongitud()+"'"+
                     " ,latitud='"+punto.getLatitud()+"'"+
                     " ,foto='"+punto.getFoto()+"'"+
-                " ,foto_web='"+punto.getFotoWeb()+"'"+
+                " ,foto_web='"+punto.getPathFotoWeb()+"'"+
                 " ,fecha_ult_mod='"+punto.getFechaUltMod()+"'"+
                 " WHERE id="+punto.getId()
         );
         bd.close();
     }
 
-
-    public Punto localizacion(int id){
+    private Punto localizacion(int id){
         if (puntosBD==null) return null;
         Iterator<Punto> ite = puntosBD.iterator();
         while (ite.hasNext()){
@@ -197,35 +197,9 @@ public class GestorBD {
         bd.close();
     }
 
-
-    public void logMostrarPuntos(){
-        leerPuntos();
-        Iterator<Punto> ite = puntosBD.iterator();
-        while (ite.hasNext()){
-            Punto punto = ite.next();
-            Log.e("<MostrarPunto>",punto.getId()+" - "+
-                    punto.getTitulo()+" - "+
-                    punto.getDescripcion()+" - "+
-                    punto.getLatitud()+" - "+
-                    punto.getLongitud()+" - "+
-                    punto.getFoto()+" - "+
-                    punto.getFotoWeb()
-            );
-        }
-    }
-
     public ArrayList<Punto> getPuntos(){
         leerPuntos();
         return puntosBD;
-    }
-
-    public void borrarPuntos(){
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
-                "administracion", null, versionDB);
-        SQLiteDatabase bd = admin.getWritableDatabase();
-
-        bd.delete("puntos","",null);
-        bd.close();
     }
 
     public void setEstadoPunto(int idPunto, int estado){
@@ -264,11 +238,11 @@ public class GestorBD {
                 puntoBD.setFechaUltMod(fila.getString(7));
                 puntosMalCargados.add(puntoBD);
 
-                Log.e(TAG,"path mal descargada: "+puntoBD.getFotoWeb());
-                File file = new File(puntoBD.getFotoWeb());
+                Log.e(TAG,"path mal descargada: "+puntoBD.getPathFotoWeb());
+                File file = new File(puntoBD.getPathFotoWeb());
                 puntoBD.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
-                GestorImagenes gestorImagenes = GestorImagenes.obtenerGestorImagenes(context);
-                gestorImagenes.descargarImagen(puntoBD.getFotoWeb(), file.getName(), puntoBD.getId());
+                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                gestorMultimedia.descargarImagen(puntoBD.getPathFotoWeb(), file.getName(), puntoBD.getId());
 
             }while (fila.moveToNext());
         }
@@ -276,10 +250,4 @@ public class GestorBD {
         return puntosMalCargados;
     }
 
-    public void indiceRtree(){
-        AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,
-                "administracion", null, versionDB);
-        SQLiteDatabase bd = admin.getWritableDatabase();
-        admin.crearIndiceRtree(bd);
-    }
 }

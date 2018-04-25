@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
@@ -65,8 +65,8 @@ public class MostrarImagenesSec extends AppCompatActivity {
         });
         gestorComentarios=GestorComentarios.obtenerGestorComentarios(context);
         final int idImagen=getIntent().getIntExtra(EXTRA_POSITION,0);
-        GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
-        gestorImagenes.getImagen(idImagen, new ImagenListener() {
+        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
+        gestorMultimedia.getImagen(idImagen, new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia) {
                 LinearLayout linearLayout=(LinearLayout)findViewById(R.id.content);
@@ -121,7 +121,7 @@ public class MostrarImagenesSec extends AppCompatActivity {
                     }
                     //Llenar la lista de comentarios
 
-                    gestorComentarios.getComentariosMultimedia(idImagen, new GetComentariosListener() {
+                    gestorComentarios.getComentarios(idImagen, new GetComentariosListener() {
                         @Override
                         public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
                             ListView lista;
@@ -145,7 +145,7 @@ public class MostrarImagenesSec extends AppCompatActivity {
         btnComentar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GestorUsuarios gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                 String texto=((EditText)findViewById(R.id.edComentario)).getEditableText().toString();
                 if(gestorUsuarios.getUsuario()==null){
                     //Toast.makeText(context,"Tiene que estar registrado",Toast.LENGTH_LONG).show();
@@ -162,14 +162,14 @@ public class MostrarImagenesSec extends AppCompatActivity {
                             gestorUsuarios.getUsuario().getId(),
                             new Date()
                     );
-                    gestorComentarios.setComentarioMultimedia(comentario, new SetComentarioListener() {
+                    gestorComentarios.comentar(comentario, new SetComentarioListener() {
                         @Override
                         public void onResponseSetComentarioListener(String response) {
                             Log.e("comentario",response);
                             if(response.equals("Ok")){
                                 Toast.makeText(context,"Gracias por tu comentario",Toast.LENGTH_LONG).show();
                                 ((EditText)findViewById(R.id.edComentario)).setText("");
-                                gestorComentarios.getComentariosMultimedia(idImagen, new GetComentariosListener() {
+                                gestorComentarios.getComentarios(idImagen, new GetComentariosListener() {
                                     @Override
                                     public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
                                         ListView lista;

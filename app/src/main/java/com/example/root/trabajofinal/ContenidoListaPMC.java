@@ -16,32 +16,36 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Objetos.IndiceRtree;
 import com.example.root.trabajofinal.Objetos.Punto;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * Created by root on 30/11/17.
- */
-
-public class ContenidoListaEliminar extends Fragment {
+public class ContenidoListaPMC extends Fragment {
 
     private GestorPuntos gestorPuntos;
-    private GestorMultimedia gestorMultimedia;
-    private RecyclerView recyclerView;
-    private static int ELIMINAR_PUNTO=200;
-
+    private ArrayList<Punto> puntosMasCercanos;
+    private double latitud;
+    private double longitud;
+    private double distanciaKm;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        recyclerView = (RecyclerView) inflater.inflate(
+        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
         gestorPuntos = GestorPuntos.getInstance(getActivity().getApplicationContext());
-        gestorPuntos.getPuntos();
+        IndiceRtree rtree=new IndiceRtree(gestorPuntos.getPuntos());
+
+        latitud=getActivity().getIntent().getDoubleExtra("latitud", 0);
+        longitud=getActivity().getIntent().getDoubleExtra("longitud", 0);
+        distanciaKm=getActivity().getIntent().getDoubleExtra("distanciaKm", 0);
+        puntosMasCercanos=rtree.getPuntosMasCercanos(latitud,longitud,distanciaKm);
         //if(gestorPuntos.size()>0) {
-        ContenidoListaEliminar.ContentAdapter adapter = new ContenidoListaEliminar.ContentAdapter(recyclerView.getContext());
+        ContenidoListaPMC.ContentAdapter adapter = new ContenidoListaPMC.ContentAdapter(recyclerView.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -49,7 +53,7 @@ public class ContenidoListaEliminar extends Fragment {
         return recyclerView;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public  class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView avator;
         public TextView name;
         public TextView description;
@@ -59,25 +63,24 @@ public class ContenidoListaEliminar extends Fragment {
 
             avator = (ImageView) itemView.findViewById(R.id.list_avatar);
             name = (TextView) itemView.findViewById(R.id.list_title);
-            //description = (TextView) itemView.findViewById(R.id.list_desc);
+            description = (TextView) itemView.findViewById(R.id.list_desc);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent;
                     Context context = v.getContext();
-                    GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
-                    Iterator<Punto> iterator= gestorPuntos.getPuntos().iterator();
+                    Iterator<Punto> iterator=puntosMasCercanos.iterator();
                     int i=0;
                     int idPunto=-1;
                     while (i<=getAdapterPosition()){
                         idPunto=iterator.next().getId();
                         i++;
                     }
-                    intent = new Intent(context, DetalleEliminarPunto.class);
-                    intent.putExtra("id",idPunto);
+                    intent = new Intent(context, Detalle.class);
 
-                    getActivity().startActivityForResult(intent,ELIMINAR_PUNTO);
+                    intent.putExtra("id",idPunto);
+                    getActivity().startActivity(intent);
 
 
 
@@ -88,11 +91,11 @@ public class ContenidoListaEliminar extends Fragment {
     /**
      * Adapter to display recycler view.
      */
-    public class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEliminar.ViewHolder> {
+    public  class ContentAdapter extends RecyclerView.Adapter<ContenidoListaPMC.ViewHolder> {
         // Set numbers of List in RecyclerView.
         private final int LENGTH ;
         private final String[] mPlaces;
-        //private final String[] mPlaceDesc;
+        private final String[] mPlaceDesc;
         private final String[] mPlaceAvators;
         private GestorMultimedia gestorMultimedia;
         public ContentAdapter(Context context) {
@@ -100,16 +103,19 @@ public class ContenidoListaEliminar extends Fragment {
 
             GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
             gestorMultimedia = GestorMultimedia.getInstance(context);
-            Iterator<Punto> iterator= gestorPuntos.getPuntos().iterator();
-            int cantidad= gestorPuntos.getPuntos().size();
+            Iterator<Punto> iterator=puntosMasCercanos.iterator();
+            int cantidad=puntosMasCercanos.size();
             mPlaces=new String[cantidad];
+            mPlaceDesc=new String[cantidad];
             mPlaceAvators=new String[cantidad];
 
-            LENGTH= gestorPuntos.getPuntos().size();
+            LENGTH=puntosMasCercanos.size();
             int i=0;
             while (iterator.hasNext()){
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
+                DecimalFormat formato = new DecimalFormat("0.00");
+                mPlaceDesc[i]=formato.format(IndiceRtree.distance(latitud,longitud,punto.getLatitud(),punto.getLongitud()))+" Km";
                 Log.e("Lista",punto.getFoto());
                 mPlaceAvators[i]=punto.getFoto() ;
                 i++;
@@ -118,19 +124,19 @@ public class ContenidoListaEliminar extends Fragment {
         }
 
         @Override
-        public ContenidoListaEliminar.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ContenidoListaEliminar.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+        public ContenidoListaPMC.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ContenidoListaPMC.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
-        public void onBindViewHolder(ContenidoListaEliminar.ViewHolder holder, int position) {
+        public void onBindViewHolder(ContenidoListaPMC.ViewHolder holder, int position) {
             //holder.avator.setImageDrawable(mPlaceAvators[position % mPlaceAvators.length]);
             // holder.avator.setImageBitmap(
             //        loadImage("/Pictures/testing123.jpg")
             //);
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
-
+                holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
                 //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {
@@ -148,4 +154,3 @@ public class ContenidoListaEliminar extends Fragment {
         }
     }
 }
-

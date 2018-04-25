@@ -27,7 +27,7 @@ public class Login extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         context=getApplicationContext();
-        gestorUsuarios=GestorUsuarios.getGestorUsuarios(context);
+        gestorUsuarios=GestorUsuarios.getInstance(context);
 
         Button btnAceptar=(Button)findViewById(R.id.btnAceptar);
         Button btnRegistrarse=(Button)findViewById(R.id.btnRegistrarse);
@@ -46,7 +46,7 @@ public class Login extends AppCompatActivity{
                 Log.e("","clickea");
                 usuario=new Usuario(edUsername.getEditableText().toString(),
                                     edPassword.getEditableText().toString());
-                gestorUsuarios=GestorUsuarios.getGestorUsuarios(getApplicationContext());
+                gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
 
                 gestorUsuarios.login(usuario, new LoginListener() {
                     @Override

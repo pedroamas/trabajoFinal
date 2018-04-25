@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
     private Context context;
     public AdminSQLiteOpenHelper(Context context, String nombre, CursorFactory factory, int version) {
-
         super(context, nombre, factory, version);
         this.context=context;
 
@@ -17,8 +16,6 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
     @Override
 
     public void onCreate(SQLiteDatabase db) {
-
-        //aquí creamos la tabla de usuario (dni, nombre, ciudad, numero)
 
         db.execSQL("create table puntos(" +
                 "id integer primary key, " +
@@ -49,8 +46,5 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public void crearIndiceRtree(SQLiteDatabase b){
-
-    }
 
 }

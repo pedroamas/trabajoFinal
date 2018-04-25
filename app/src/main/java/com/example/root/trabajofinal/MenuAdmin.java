@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.root.trabajofinal.Gestores.GestorDePuntos;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Objetos.Punto;
@@ -27,7 +27,7 @@ public class MenuAdmin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        gestorUsuarios=GestorUsuarios.getGestorUsuarios(getApplicationContext());
+        gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
         setContentView(R.layout.activity_menu_admin);
         FloatingActionButton btnCerrarSesion=(FloatingActionButton) findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
@@ -47,8 +47,8 @@ public class MenuAdmin extends AppCompatActivity {
                 progress.setTitle("Actualizando");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();
@@ -114,8 +114,8 @@ public class MenuAdmin extends AppCompatActivity {
                 progress.setTitle("Actualizando");
                 progress.setMessage("Espere un momento...");
                 progress.show();
-                GestorDePuntos gestorDePuntos = GestorDePuntos.getGestorDePuntos(getApplicationContext());
-                gestorDePuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();

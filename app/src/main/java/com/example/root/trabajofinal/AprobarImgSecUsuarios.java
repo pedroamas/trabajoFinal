@@ -6,33 +6,20 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.root.trabajofinal.Gestores.GestorComentarios;
-import com.example.root.trabajofinal.Gestores.GestorImagenes;
-import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
-import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
-import com.example.root.trabajofinal.Listeners.SetComentarioListener;
-import com.example.root.trabajofinal.Objetos.Comentario;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 public class AprobarImgSecUsuarios extends AppCompatActivity {
 
@@ -54,8 +41,8 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
         idImagen=getIntent().getIntExtra(EXTRA_POSITION,0);
         Log.e("idIMagene","id: "+idImagen);
 
-        final GestorImagenes gestorImagenes=GestorImagenes.obtenerGestorImagenes(getApplicationContext());
-        gestorImagenes.getImagenConEstado(idImagen,0, new ImagenListener() {
+        final GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
+        gestorMultimedia.getImagenConEstado(idImagen,0, new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia) {
                 LinearLayout linearLayout=(LinearLayout)findViewById(R.id.content);
@@ -103,7 +90,7 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                     btnAprobar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            gestorImagenes.setEstadoImagen(idImagen, 1, new ActualizarEstadoImgListener() {
+                            gestorMultimedia.setEstadoImagen(idImagen, 1, new ActualizarEstadoImgListener() {
                                 @Override
                                 public void onResponseActualizarEstadoImgListener(String response) {
                                     if (response.equals("Ok")){
@@ -121,7 +108,7 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                     btnRechazar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            gestorImagenes.setEstadoImagen(idImagen, 2, new ActualizarEstadoImgListener() {
+                            gestorMultimedia.setEstadoImagen(idImagen, 2, new ActualizarEstadoImgListener() {
                                 @Override
                                 public void onResponseActualizarEstadoImgListener(String response) {
                                     Log.e("respuesta car estado",response);

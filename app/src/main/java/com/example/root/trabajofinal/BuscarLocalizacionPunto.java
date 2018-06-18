@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.Marker;
         private TextView txtInfo;
         private GestorPuntos gestorPuntos;
         private Context context;
-        private SubirPuntoAdmin subirPuntoAdmin;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +45,18 @@ import com.google.android.gms.maps.model.Marker;
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-                    startActivity(getIntent());
-                    finish();
-                    return;
+
+                }else{
+                    permisionGranted();
                 }
+            }else {
+                permisionGranted();
             }
+
+
+        }
+
+        public void permisionGranted(){
             Button myLocationButton = (Button) findViewById(R.id.myLocationButton);
             myLocationButton.setVisibility(View.VISIBLE);
             myLocationButton.setOnClickListener(this);
@@ -62,13 +68,7 @@ import com.google.android.gms.maps.model.Marker;
                     .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
             gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
             gestorPuntos.getPuntos();
-
         }
-
-        public void setSubirPuntoAdmin(SubirPuntoAdmin subirPuntoAdmin) {
-            this.subirPuntoAdmin = subirPuntoAdmin;
-        }
-
         @Override
         public boolean onMarkerClick(Marker marker) {
             // To get the GeoObject that owns the marker we use the following
@@ -166,5 +166,31 @@ import com.google.android.gms.maps.model.Marker;
             returnIntent.putExtra("longitud",latLng.longitude);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
+        }
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode,
+                                               String permissions[], int[] grantResults) {
+            switch (requestCode) {
+                case 100: {
+
+                    // If request is cancelled, the result arrays are empty.
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                        permisionGranted();
+
+                    } else {
+
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+                        Toast.makeText(this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                    }
+                    return;
+                }
+
+                // other 'case' lines to check for other
+                // permissions this app might request
+            }
         }
     }

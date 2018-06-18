@@ -20,6 +20,7 @@
     android:id="@+id/detail_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
@@ -75,7 +76,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Descripción"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines" />
@@ -86,12 +87,12 @@
                 android:id="@+id/place_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="@string/detail_desc" />
+                android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Ubicación"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines"
@@ -101,19 +102,15 @@
                 android:id="@+id/place_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="@string/detail_location" />
+                android:textColor="@color/black"/>
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/btnEscucharAudios"
-                android:text="Escuchar Audios"/>
+                android:id="@+id/btnVerMapa"
+                android:text="Ver en mapa"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/btnAgregarImagen"
-                android:text="Agregar imagen"/>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -123,7 +120,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Galería"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines"
@@ -136,13 +133,19 @@
                 android:orientation="vertical"
                 android:id="@+id/lytImagenesUsuarios">
                 <TextView
-                    android:textColor="?attr/colorAccent"
+                    android:textColor="@color/blue"
                     android:textSize="@dimen/article_titles"
                     android:layout_marginBottom="@dimen/md_keylines"
                     android:layout_marginTop="@dimen/md_keylines"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Imagenes de los usuarios"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnAgregarImagen"
+                    android:background="@color/wallet_holo_blue_light"
+                    android:text="Agregar imagen"/>
             </LinearLayout>
 
         </LinearLayout>

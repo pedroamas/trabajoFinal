@@ -1,6 +1,8 @@
 package com.example.root.trabajofinal;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -30,6 +32,8 @@ public class PuntosMasCercanos extends AppCompatActivity {
     private Location loc;
     private double latitudUser=0;
     private double longitudUser=0;
+    AlertDialog alert = null;
+    LocationManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +66,9 @@ public class PuntosMasCercanos extends AppCompatActivity {
 
                 public void onProviderEnabled(String provider) {}
 
-                public void onProviderDisabled(String provider) {}
+                public void onProviderDisabled(String provider) {
+                    AlertNoGps();
+                }
             };
 
             // Register the listener with the Location Manager to receive location updates
@@ -85,6 +91,7 @@ public class PuntosMasCercanos extends AppCompatActivity {
                     double distancia;
                     try{
                         distancia=Double.parseDouble(edDistancia.getEditableText().toString());
+                        distancia=distancia/1000.0;
                         GestorBD gestorBD=GestorBD.getInstance(getApplicationContext());
                         ArrayList<Punto> puntos=gestorBD.getPuntos();
                         IndiceRtree indiceRtree=new IndiceRtree(puntos);
@@ -95,11 +102,6 @@ public class PuntosMasCercanos extends AppCompatActivity {
                         latitud=latitudUser;
                         longitud=longitudUser;
 
-                        //Log.e("Datos consulta",latitud+"-"+indiceRtree.calculoIncrementoLatitud(distancia)+"-"+longitud+"-"+indiceRtree.calculoIncrementoLongitud(latitud,distancia));
-                        //Log.e("Latidud consulta","lat sup "+(latitud+indiceRtree.calculoIncrementoLatitud(distancia)));
-                        //Log.e("Longitud consulta","lat sup "+(longitud+indiceRtree.calculoIncrementoLongitud(latitud,distancia)));
-                        //indiceRtree.consultarAreaSuperior(latitud,indiceRtree.calculoIncrementoLatitud(distancia),longitud,indiceRtree.calculoIncrementoLongitud(latitud,distancia));
-                        //indiceRtree.consultarAreaInferior(latitud,indiceRtree.calculoIncrementoLatitud(distancia),longitud,indiceRtree.calculoIncrementoLongitud(latitud,distancia));
                         ArrayList<Punto> puntosMasCercanos=indiceRtree.getPuntosMasCercanos(latitud,longitud,distancia);
                         Iterator<Punto> iterator=puntosMasCercanos.iterator();
                         while(iterator.hasNext()){
@@ -121,4 +123,23 @@ public class PuntosMasCercanos extends AppCompatActivity {
             }
         });
     }
+    private void AlertNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
+    }
+
 }

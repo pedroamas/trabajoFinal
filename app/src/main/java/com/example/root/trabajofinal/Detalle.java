@@ -26,7 +26,9 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -62,7 +64,7 @@ public class Detalle extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalle);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         context=getApplicationContext();
         // Set Collapsing Toolbar layout to the screen
         CollapsingToolbarLayout collapsingToolbar =
@@ -124,18 +126,6 @@ public class Detalle extends AppCompatActivity  {
 
         placePicutre.setImageBitmap(fotoPortada);
 
-        //probar los audios
-        Button btnEscucharAudios=(Button)findViewById(R.id.btnEscucharAudios);
-        btnEscucharAudios.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(context,EscucharAudio.class);
-                intent.putExtra("id_audio",35);
-                startActivity(intent);
-            }
-        });
-
-        //fin probar audios
 
         gestorMultimedia.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
@@ -174,12 +164,28 @@ public class Detalle extends AppCompatActivity  {
                     @Override
                     public void onResponseVideos(ArrayList<Multimedia> videos) {
 
+                        DisplayMetrics dm = getResources().getDisplayMetrics();
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        lp.setMargins(0, convertDpToPx(16, dm), 0, convertDpToPx(16, dm));
+
+                        TextView galeriaVideos=new TextView(context);
+                        galeriaVideos.setLayoutParams(lp);
+
+                        galeriaVideos.setText("Galería de videos");
+                        galeriaVideos.setTextSize(20);
+                        galeriaVideos.setTextColor(getResources().getColor( R.color.blue));
+
+                        if(videos.size()>0) {
+                            layout.addView(galeriaVideos);
+                        }
                         Iterator<Multimedia> ite=videos.iterator();
+
                         while (ite.hasNext()){
                             final Multimedia video=ite.next();
                             Button btnVideo=new Button(context);
                             btnVideo.setLayoutParams(linLayoutParam);
                             btnVideo.setText(video.getTitulo());
+
                             btnVideo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -204,7 +210,22 @@ public class Detalle extends AppCompatActivity  {
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes de usuarios"+imagenes.size());
                 final LinearLayout layout = (LinearLayout) findViewById(R.id.lytImagenesUsuarios);
+                /*
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(0, convertDpToPx(16, dm), 0, convertDpToPx(16, dm));
 
+                TextView galeriaUsuarios=new TextView(context);
+                galeriaUsuarios.setLayoutParams(lp);
+
+                galeriaUsuarios.setText("Imagenes de los usuarios");
+                galeriaUsuarios.setTextSize(20);
+                galeriaUsuarios.setTextColor(getResources().getColor( R.color.blue));
+
+                if(imagenes.size()>0) {
+                    layout.addView(galeriaUsuarios);
+                }
+                */
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
 
@@ -235,6 +256,22 @@ public class Detalle extends AppCompatActivity  {
             }
         });
 
+        Button btnVerMapa=(Button)findViewById(R.id.btnVerMapa);
+        btnVerMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), VerMapa.class);
 
+                intent.putExtra("latitud",punto.getLatitud());
+                intent.putExtra("longitud",punto.getLongitud());
+                intent.putExtra("titulo",punto.getTitulo());
+                startActivity(intent);
+            }
+        });
+
+    }
+    private int convertDpToPx(int dp, DisplayMetrics displayMetrics) {
+        float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
+        return Math.round(pixels);
     }
 }

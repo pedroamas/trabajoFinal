@@ -115,7 +115,7 @@ public class ContenidoListaPMC extends Fragment {
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
                 DecimalFormat formato = new DecimalFormat("0.00");
-                mPlaceDesc[i]=formato.format(IndiceRtree.distance(latitud,longitud,punto.getLatitud(),punto.getLongitud()))+" Km";
+                mPlaceDesc[i]=formato.format(IndiceRtree.distance(latitud,longitud,punto.getLatitud(),punto.getLongitud())*1000.0)+" metros";
                 Log.e("Lista",punto.getFoto());
                 mPlaceAvators[i]=punto.getFoto() ;
                 i++;
@@ -136,7 +136,7 @@ public class ContenidoListaPMC extends Fragment {
             //);
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
-                holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
+                holder.description.setText(mPlaceDesc[position % mPlaceDesc.length] );
                 //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {

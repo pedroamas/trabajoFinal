@@ -984,7 +984,7 @@ public class GestorWebService {
                         .addFormDataPart("id_punto",""+imagen.getIdPunto())
                         .addFormDataPart("titulo",imagen.getTitulo())
                         .addFormDataPart("descripcion",imagen.getDescripcion())
-                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("fecha_subidaImg",dt1.format(new Date()))
                         .addFormDataPart("type",content_type)
                         //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
                         .addFormDataPart("uploaded_file",imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1), file_body)
@@ -1047,7 +1047,7 @@ public class GestorWebService {
                         .addFormDataPart("titulo",imagen.getTitulo())
                         .addFormDataPart("descripcion",imagen.getDescripcion())
                         .addFormDataPart("id_usuario",imagen.getIdUsuario()+"")
-                        //.addFormDataPart("fecha_captura",null)
+                        .addFormDataPart("fecha_subida",dt1.format(new Date()))
                         .addFormDataPart("type",content_type)
                         //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
                         .addFormDataPart("uploaded_file",imagen.getPath().substring(imagen.getPath().lastIndexOf("/")+1), file_body)
@@ -1452,59 +1452,45 @@ public class GestorWebService {
     }
 
     public void setVideo(final Multimedia video ,final AgregarImagenSecListener agregarImagenSecListener){
+        RequestQueue requestQueue;
+        requestQueue= Volley.newRequestQueue(context);
+        String url = "http://www.pedroamas.xyz/subir_video.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.e("Response", response);
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener(response);
 
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                //obtiene la extension
-                String extension = MimeTypeMap.getFileExtensionFromUrl(video.getPath().substring(video.getPath().lastIndexOf("/")+1)  );
-                String content_type  = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-
-                OkHttpClient client = new OkHttpClient();
-                RequestBody file_body = RequestBody.create(MediaType.parse(content_type),new File(video.getPath()));
-
-                Log.e("que es estp",content_type);
-
-                RequestBody request_body = new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("id_punto",""+video.getIdPunto())
-                        .addFormDataPart("titulo",video.getTitulo())
-                        .addFormDataPart("descripcion",video.getDescripcion())
-                        //.addFormDataPart("fecha_captura",null)
-                        .addFormDataPart("type",content_type)
-                        //.addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
-                        .addFormDataPart("uploaded_file",video.getPath().substring(video.getPath().lastIndexOf("/")+1), file_body)
-                        .build();
-                okhttp3.Request request = new okhttp3.Request.Builder()
-                        .url("http://pedroamas.xyz/set_imagen_sec.php")
-                        .post(request_body)
-                        .build();
-
-                try {
-                    Log.e("","entro en try");
-                    okhttp3.Response response = client.newCall(request).execute();
-                    if(!response.isSuccessful()){
-                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
-                        throw new IOException("Error : "+response);
-                    }else{
-                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Ok");
                     }
-
-                    Log.e("","Correcto");
-
-                    return;
-
-                } catch (IOException e) {
-                    Log.e("","incorrecto");
-                    e.printStackTrace();
-                    agregarImagenSecListener.onResponseAgregarImagenSecListener("Error");
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", "");
+                        agregarImagenSecListener.onResponseAgregarImagenSecListener("Error: "+error.getMessage());
+                    }
                 }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
 
-
+                params.put("id_punto", video.getIdPunto()+"");
+                params.put("titulo", video.getTitulo()+"");
+                params.put("descripcion", video.getDescripcion()+"");
+                params.put("path", video.getPath()+"");
+                params.put("fecha_subida", dt2.format(new Date()));
+                return params;
             }
-        });
 
-        t.start();
+        };
+        requestQueue.add(postRequest);
+
     }
 }

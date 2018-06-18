@@ -1,12 +1,16 @@
 package com.example.root.trabajofinal.Gestores;
 
+import android.app.ProgressDialog;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,6 +33,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import static android.content.Context.DEVICE_POLICY_SERVICE;
 
 /**
  * Created by root on 30/06/17.
@@ -38,6 +47,8 @@ public class GestorMultimedia {
     private static GestorMultimedia gestorMultimedia;
     private Context context;
     public static String TAG="<GestorMultimedia>";
+    private int contador=0;
+
 
     private GestorMultimedia(Context context) {
         this.context=context;
@@ -90,12 +101,31 @@ public class GestorMultimedia {
         return bitmap;
     }
 
+/*
     public void descargarImagen(final String url, final String nombreImagen, final int idPunto){
+        URL imageUrl = null;
+        Log.e("img","url "+url);
+        try {
+            imageUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) imageUrl.openConnection();
+            conn.connect();
+            Bitmap bitmap = BitmapFactory.decodeStream(conn.getInputStream());
+
+            guardarImagen(context,bitmap,nombreImagen);
+            GestorBD gestorBD=GestorBD.getInstance(context);
+            gestorBD.setEstadoPunto(idPunto,1);
+
+        } catch (Exception e) {
+            Toast.makeText(context, "Error cargando la imagen: "+e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+    }*/
+
+    /*public void descargarImagen(final String url, final String nombreImagen, final int idPunto){
         RequestQueue requestQueue;
         requestQueue= Volley.newRequestQueue(context);
-
         Log.e("DescargaIMG","Descargame esta capo: "+nombreImagen);
-
         ImageRequest request = new ImageRequest(
                 url ,
                 new Response.Listener<Bitmap>() {
@@ -116,7 +146,7 @@ public class GestorMultimedia {
                 });
         requestQueue.add(request);
 
-    }
+    }*/
 
     public void borrarImagen(String url){
         File fichero = new File(url);
@@ -256,5 +286,69 @@ public class GestorMultimedia {
     public void getAudio(int idAudio,AudioListener audioListener){
         GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.getAudio(idAudio,audioListener);
+    }
+
+    public void descargarImagen(final String url, final String nombreImagen, final int idPunto) {
+        new DownloadImage(nombreImagen,idPunto).execute(url);
+    }
+
+
+
+    private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
+        private String TAG = "DownloadImage";
+        private String nombreImagen;
+        private int idPunto;
+        private Bitmap downloadImageBitmap(String sUrl) {
+            Log.e("TAG","downloadImageBitmap");
+            Bitmap bitmap = null;
+            try {
+                InputStream inputStream = new URL(sUrl).openStream();   // Download Image from URL
+                bitmap = BitmapFactory.decodeStream(inputStream);       // Decode Bitmap
+                inputStream.close();
+            } catch (Exception e) {
+                Log.d(TAG, "Exception 1, Something went wrong!");
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+
+        public String guardarImagen(Context context, Bitmap bitmapImage, String nombreImagen){
+            ContextWrapper cw = new ContextWrapper(context);
+            // path to /data/data/yourapp/app_data/imageDir
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            // Create imageDir
+            File mypath=new File(directory,nombreImagen);
+
+            FileOutputStream fos = null;
+            try {
+
+                fos = new FileOutputStream(mypath);
+                bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.close();
+            } catch (Exception e) {
+
+                e.printStackTrace();
+                Log.d("<Error>", "Mensaje: "+ e.getMessage());
+            }
+            return directory.getAbsolutePath();
+        }
+
+        public DownloadImage(String nombreImagen,int idPunto) {
+            this.nombreImagen=nombreImagen;
+            this.idPunto=idPunto;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Log.e("TAG","doInBackground");
+            return downloadImageBitmap(params[0]);
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            guardarImagen(context,result,nombreImagen);
+            GestorBD gestorBD=GestorBD.getInstance(context);
+            gestorBD.setEstadoPunto(idPunto,1);
+        }
     }
 }

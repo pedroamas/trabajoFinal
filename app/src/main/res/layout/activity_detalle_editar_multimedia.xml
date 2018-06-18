@@ -21,7 +21,8 @@
     android:id="@+id/detail_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@color/white">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -71,14 +72,15 @@
             android:orientation="vertical"
             android:paddingLeft="@dimen/article_keylines"
             android:paddingRight="@dimen/md_keylines"
-            android:paddingTop="@dimen/md_keylines">
+            android:paddingTop="@dimen/md_keylines"
+            android:background="@color/white">
 
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Descripción"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines" />
@@ -89,12 +91,13 @@
                 android:id="@+id/place_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 tools:text="@string/detail_desc" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Ubicación"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines"
@@ -104,12 +107,13 @@
                 android:id="@+id/place_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 tools:text="@string/detail_location" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorAccent"
+                android:textColor="@color/blue"
                 android:text="Galería"
                 android:textSize="@dimen/article_titles"
                 android:layout_marginBottom="@dimen/md_keylines"
@@ -129,12 +133,6 @@
                 style="@style/BotonRojo"
                 android:id="@+id/btnAgregarVideo" />
 
-            <Button
-                android:text="Agregar audio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/BotonRojo"
-                android:id="@+id/btnAgregarAudio" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

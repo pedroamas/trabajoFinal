@@ -46,16 +46,13 @@
         android:text="Aceptar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
         android:id="@+id/btnAceptar"
         android:gravity="left"
-        style="@style/BotonPrimary"
-        android:layout_marginEnd="31dp" />
+        style="@style/BotonPrimary" />
     <Button
         android:text="Registrarse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="21dp"
         style="@style/BotonRojo"
         android:gravity="right"
         android:id="@+id/btnRegistrarse" />

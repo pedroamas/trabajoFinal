@@ -57,7 +57,8 @@
             android:layout_height="wrap_content"
             android:inputType="number|numberSigned|numberDecimal"
             android:ems="10"
-            android:id="@+id/edLatitud" />
+            android:id="@+id/edLatitud"
+            android:textColor="@color/black"/>
 
         <TextView
             android:text="Longitud"
@@ -69,7 +70,8 @@
             android:layout_height="wrap_content"
             android:inputType="number|numberSigned|numberDecimal"
             android:ems="10"
-            android:id="@+id/edLongitud" />
+            android:id="@+id/edLongitud"
+            android:textColor="@color/black"/>
 
 
         <Button

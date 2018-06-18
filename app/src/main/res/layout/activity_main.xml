@@ -23,19 +23,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
-                android:src="@drawable/ic_perm_identity_black_24dp" />
+                android:src="@drawable/ic_perm_identity_black_24dp"
+                app:backgroundTint="@color/wallet_holo_blue_light"
+                />
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btnActualizar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center"
-                android:src="@drawable/ic_actualizar" />
+                android:src="@drawable/ic_actualizar"
+                app:backgroundTint="@color/green"/>
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btnCerrarSesion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:src="@drawable/ic_salir" />
+                android:src="@drawable/ic_salir"
+                app:backgroundTint="@color/red"/>
         </TableRow>
     </TableLayout>
 
@@ -67,10 +71,5 @@
         android:id="@+id/btnPuntosCercanos"
         style="@style/BotonPrimary" />
 
-    <Button
-        android:text="Probar cosas"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnProbar" />
 
 </LinearLayout>

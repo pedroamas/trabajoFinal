@@ -1,6 +1,8 @@
 package com.example.root.trabajofinal;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.beyondar.android.plugin.googlemap.GoogleMapWorldPlugin;
 import com.beyondar.android.util.location.BeyondarLocationManager;
@@ -31,9 +34,11 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private GoogleMap mMap;
     private GoogleMapWorldPlugin mGoogleMapPlugin;
     private World mWorld;
-    private TextView txtInfo;
     private GestorPuntos gestorPuntos;
     private Context context;
+    AlertDialog alert = null;
+    LocationManager manager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +47,49 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-                startActivity(getIntent());
-                finish();
-                return;
+
+            }else{
+                manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+                if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                    AlertNoGps();
+                    finish();
+                }else {
+                    cargarMapa();
+                }
+            }
+        }else {
+            manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                AlertNoGps();
+
+            }else {
+                cargarMapa();
             }
         }
+
+
+
+    }
+    private void AlertNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
+    }
+
+    private void cargarMapa(){
         Button myLocationButton = (Button) findViewById(R.id.myLocationButton);
         myLocationButton.setVisibility(View.VISIBLE);
         myLocationButton.setOnClickListener(this);
@@ -61,14 +104,12 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
             }});
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
-        txtInfo=(TextView)findViewById(R.id.txtInfo);
+
         BeyondarLocationManager
                 .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
         gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
         gestorPuntos.getPuntos();
-
     }
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         // To get the GeoObject that owns the marker we use the following
@@ -106,7 +147,6 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         // When the user clicks on the button we animate the map to the user
         // location
 
-        txtInfo.setText(mWorld.getLatitude()+" "+mWorld.getLongitude());
         LatLng userLocation = new LatLng(mWorld.getLatitude(), mWorld.getLongitude());
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
@@ -144,7 +184,6 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         // Lets add the user position to the map
         GeoObject user = new GeoObject(1000l);
         user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
-        txtInfo.setText(mWorld.getLatitude()+" "+mWorld.getLongitude());
         user.setImageResource(R.drawable.flag);
         user.setName("Posición actual");
         mWorld.addBeyondarObject(user);
@@ -158,5 +197,31 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
 
         // We need to set the LocationManager to the BeyondarLocationManager.
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 100: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    cargarMapa();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }

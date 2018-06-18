@@ -146,7 +146,8 @@
             android:name=".AprobarImgSecUsuarios"
             android:screenOrientation="portrait" />
         <activity android:name=".PuntosMasCercanos" />
-        <activity android:name=".MostrarPuntosMasCercanos"></activity>
+        <activity android:name=".MostrarPuntosMasCercanos" />
+        <activity android:name=".VerMapa"></activity>
     </application>
 
 </manifest>

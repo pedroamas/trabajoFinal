@@ -2,6 +2,8 @@ package com.example.root.trabajofinal;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -29,6 +32,10 @@ import com.example.root.trabajofinal.Listeners.SetComentarioListener;
 import com.example.root.trabajofinal.Listeners.VideoListener;
 import com.example.root.trabajofinal.Objetos.Comentario;
 import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerFragment;
+import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,140 +45,167 @@ public class VerVideo extends Activity {
 
     public static final String EXTRA_POSITION = "id_video";
     private int idVideo=-1;
-    VideoView simpleVideoView;
-    MediaController mediaControls;
-    int progreso=-1;
-    SimpleDateFormat dt1;
+    SimpleDateFormat dt1,dt2;
     private Context context;
     GestorComentarios gestorComentarios;
-    private VerVideo verVideo;
     VerVideo.AdapterComentarios adaptador;
+    private VerVideo verVideo;
+    public static final String API_KEY = "AIzaSyCe6tORd9Ch4lx-9Ku5SQ476uS9OtZYsWA";
+    private YouTubePlayer youTubePlayer;
+    private YouTubePlayerFragment youTubePlayerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver_video);
 
-        context=getApplicationContext();;
-        dt1=new SimpleDateFormat("dd-MM-yyyy");
-        idVideo=getIntent().getIntExtra(EXTRA_POSITION,0);
-        gestorComentarios=GestorComentarios.obtenerGestorComentarios(context);
+        context = getApplicationContext();
+        verVideo = this;
+        dt1 = new SimpleDateFormat("dd-MM-yyyy");
+        dt2=new SimpleDateFormat("dd/MM/yyyy");
+        idVideo = getIntent().getIntExtra(EXTRA_POSITION, 0);
+        gestorComentarios = GestorComentarios.obtenerGestorComentarios(context);
 
-        verVideo=this;
+        gestorComentarios.getComentarios(idVideo, new GetComentariosListener() {
+            @Override
+            public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
+                ListView lista;
+                lista = (ListView) findViewById(R.id.listaComentarios);
+                adaptador = new VerVideo.AdapterComentarios(verVideo, comentarios);
+                lista.setAdapter(adaptador);
+
+            }
+        });
         GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         gestorMultimedia.getVideo(idVideo, new VideoListener() {
             @Override
-            public void onResponseVideo(Multimedia video) {
-                // Find your VideoView in your video_main.xml layout
-                simpleVideoView = (VideoView) findViewById(R.id.simpleVideoView);
+            public void onResponseVideo(final Multimedia video) {
 
-                if (mediaControls == null) {
-                    // create an object of media controller class
-                    mediaControls = new MediaController(VerVideo.this);
-                    mediaControls.setAnchorView(simpleVideoView);
-                }
-                // set the media controller for video view
-                simpleVideoView.setMediaController(mediaControls);
-                // set the uri for the video view
-                //simpleVideoView.setVideoURI(Uri.parse(video.getPath()));
-                simpleVideoView.setVideoURI(Uri.parse(video.getPath()));
-                // start a video
-                simpleVideoView.start();
-                simpleVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                youTubePlayerFragment = (YouTubePlayerFragment) getFragmentManager()
+                        .findFragmentById(R.id.youtubeplayerfragment);
+                youTubePlayerFragment.initialize(API_KEY, new YouTubePlayer.OnInitializedListener() {
                     @Override
-                    public boolean onError(MediaPlayer mp, int what, int extra) {
-                        Toast.makeText(getApplicationContext(), "Oops Ah ocurrido un error...!!!", Toast.LENGTH_LONG).show(); // display a toast when an error is occured while playing an video
-                        return false;
-                    }
-                });
-                simpleVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        mediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                                                                     @Override
-                                                                     public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
-                                                                         Log.e("","progreso: "+i);
-                                                                         if(progreso!=i){
-                                                                             progreso=i;
-                                                                             Toast.makeText(getApplicationContext(),progreso+"%",Toast.LENGTH_SHORT).show();
-                                                                         }
-                                                                     }
-                                                                 }
-                        );
-                    }
-                });
-
-                try{
-                    TextView txtTitulo=(TextView)findViewById(R.id.txtTitulo);
-                    TextView txtDescripcion=(TextView)findViewById(R.id.txtDescripcion);
-                    TextView txtFechaSubida=(TextView)findViewById(R.id.txtFechaSubida);
-                    TextView txtFechaCaptura=(TextView)findViewById(R.id.txtFechaCaptura);
-
-                    txtTitulo.setText(video.getTitulo());
-                    txtDescripcion.setText(video.getDescripcion());
-                    txtFechaSubida.setText("Fecha de subida: "+dt1.format(video.getFechaSubida()));
-                    txtFechaCaptura.setText("Fecha de filmación: "+dt1.format(video.getFechaCaptura()));
-
-                }catch (Exception e){
-                    Toast.makeText(getApplicationContext(),"error en fecha",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        EditText edComentario=(EditText)findViewById(R.id.edComentario);
-        edComentario.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.setFocusable(true);
-                v.setFocusableInTouchMode(true);
-                return false;
-            }
-        });
-
-        Button btnComentar=(Button)findViewById(R.id.btnComentar);
-        btnComentar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
-                String texto=((EditText)findViewById(R.id.edComentario)).getEditableText().toString();
-                if(texto.equals("")){
-                    Toast.makeText(context,"Ingrese el comentario",Toast.LENGTH_LONG).show();
-                }else if(gestorUsuarios.getUsuario()==null){
-                    Toast.makeText(context,"Tiene que estar registrado",Toast.LENGTH_LONG).show();
-                }else{
-
-                    Comentario comentario=new Comentario(
-                            texto,
-                            idVideo,
-                            gestorUsuarios.getUsuario().getId(),
-                            new Date()
-                    );
-                    gestorComentarios.comentar(comentario, new SetComentarioListener() {
-                        @Override
-                        public void onResponseSetComentarioListener(String response) {
-                            Log.e("comentario",response);
-                            if(response.equals("Ok")){
-                                Toast.makeText(context,"Gracias por tu comentario",Toast.LENGTH_LONG).show();
-                                ((EditText)findViewById(R.id.edComentario)).setText("");
-                                gestorComentarios.getComentarios(idVideo, new GetComentariosListener() {
-                                    @Override
-                                    public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
-                                        ListView lista;
-                                        lista = (ListView)findViewById(R.id.listaComentarios);
-                                        adaptador = new VerVideo.AdapterComentarios(verVideo,comentarios);
-                                        lista.setAdapter(adaptador);
-
-                                    }
-                                });
+                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
+                        try {
+                            if (!wasRestored) {
+                                youTubePlayer.cueVideo(video.getPath()); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
                             }
+
+
+                        LinearLayout linearLayout=(LinearLayout)findViewById(R.id.content);
+                        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        if(!video.getTitulo().isEmpty()){
+                            TextView txtTitulo=new TextView(getApplicationContext());
+                            txtTitulo.setText(video.getTitulo());
+                            txtTitulo.setLayoutParams(params);
+                            linearLayout.addView(txtTitulo);
+                            txtTitulo.setTypeface(null, Typeface.BOLD);
+                            txtTitulo.setTextSize(18);
+                            txtTitulo.setTextColor(Color.BLACK);
                         }
-                    });
-                }
+                        if(!video.getDescripcion().isEmpty()){
+                            TextView txtDescripcion=new TextView(getApplicationContext());
+                            txtDescripcion.setText(video.getDescripcion());
+                            txtDescripcion.setLayoutParams(params);
+                            linearLayout.addView(txtDescripcion);
+                            txtDescripcion.setTextColor(Color.BLACK);
+                            txtDescripcion.setTextSize(14);
+                        }
+                        try {
+                            if (video.getFechaCaptura() != null && video.getFechaCaptura().after(dt2.parse("01/01/1800"))) {
+                                TextView txtCaptura = new TextView(getApplicationContext());
+                                txtCaptura.setText("Fecha de captura: " + dt2.format(video.getFechaCaptura()));
+                                txtCaptura.setLayoutParams(params);
+                                linearLayout.addView(txtCaptura);
+                            }
+                        }catch (Exception e){}
+                        if(video.getFechaSubida()!=null){
+                            TextView txtSubida=new TextView(getApplicationContext());
+                            txtSubida.setText("Fecha de subida: "+dt2.format(video.getFechaSubida()));
+                            txtSubida.setLayoutParams(params);
+                            txtSubida.setPadding(0,5,0,5);
+                            linearLayout.addView(txtSubida);
+
+                        }
+
+                        if(video.getUsername()!=null){
+                            TextView txtUsername=new TextView(getApplicationContext());
+                            txtUsername.setText("Gentileza de : "+video.getUsername());
+                            txtUsername.setLayoutParams(params);
+                            linearLayout.addView(txtUsername);
+                        }
+                        } catch (Exception e) {}
+                    }
+
+                    @Override
+                    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult errorReason) {
+                        if (errorReason.isUserRecoverableError()) {
+                        } else {
+                            String error = errorReason.toString();
+                            Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
         });
+        try {
+            EditText edComentario = (EditText) findViewById(R.id.edComentario);
+            edComentario.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    v.setFocusable(true);
+                    v.setFocusableInTouchMode(true);
+                    return false;
+                }
+            });
 
+            Button btnComentar = (Button) findViewById(R.id.btnComentar);
+            btnComentar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    GestorUsuarios gestorUsuarios = GestorUsuarios.getInstance(context);
+                    String texto = ((EditText) findViewById(R.id.edComentario)).getEditableText().toString();
+                    if (texto.equals("")) {
+                        Toast.makeText(context, "Ingrese el comentario", Toast.LENGTH_LONG).show();
+                    } else if (gestorUsuarios.getUsuario() == null) {
+                        Toast.makeText(context, "Tiene que estar registrado", Toast.LENGTH_LONG).show();
+                    } else {
+
+                        Comentario comentario = new Comentario(
+                                texto,
+                                idVideo,
+                                gestorUsuarios.getUsuario().getId(),
+                                new Date()
+                        );
+                        gestorComentarios.comentar(comentario, new SetComentarioListener() {
+                            @Override
+                            public void onResponseSetComentarioListener(String response) {
+                                Log.e("comentario", response);
+                                if (response.equals("Ok")) {
+                                    Toast.makeText(context, "Gracias por tu comentario", Toast.LENGTH_LONG).show();
+                                    ((EditText) findViewById(R.id.edComentario)).setText("");
+                                    gestorComentarios.getComentarios(idVideo, new GetComentariosListener() {
+                                        @Override
+                                        public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
+                                            ListView lista;
+                                            lista = (ListView) findViewById(R.id.listaComentarios);
+                                            adaptador = new VerVideo.AdapterComentarios(verVideo, comentarios);
+                                            lista.setAdapter(adaptador);
+
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

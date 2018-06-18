@@ -5,12 +5,11 @@
     android:orientation="horizontal"
     >
 
-    <VideoView
-        android:id="@+id/simpleVideoView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-
-        android:layout_gravity="center" />
+    <fragment
+        android:name="com.google.android.youtube.player.YouTubePlayerFragment"
+        android:id="@+id/youtubeplayerfragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 
 </LinearLayout>

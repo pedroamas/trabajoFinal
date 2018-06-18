@@ -121,14 +121,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnProbar = (Button) findViewById(R.id.btnProbar);
-        btnProbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                startActivity(intent);
-            }
-        });
 
         Button btnPuntosCercanos = (Button) findViewById(R.id.btnPuntosCercanos);
         btnPuntosCercanos.setOnClickListener(new View.OnClickListener() {
@@ -176,12 +168,10 @@ public class MainActivity extends AppCompatActivity {
 
                 visibilidadBotones(usuario);
 
-
             }
-
-
         }
     }
+
     private void visibilidadBotones(Usuario usuario){
         FloatingActionButton btnIniciarSesion = (FloatingActionButton) findViewById(R.id.btnIniciarSesion);
         FloatingActionButton btnCerrarSesion = (FloatingActionButton) findViewById(R.id.btnCerrarSesion);

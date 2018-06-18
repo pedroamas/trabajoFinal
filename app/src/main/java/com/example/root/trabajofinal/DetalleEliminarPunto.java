@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -48,7 +50,7 @@ public class DetalleEliminarPunto extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eliminar_punto);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         context=getApplicationContext();
         // Set Collapsing Toolbar layout to the screen
         CollapsingToolbarLayout collapsingToolbar =
@@ -130,7 +132,20 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                     @Override
                     public void onResponseVideos(ArrayList<Multimedia> videos) {
 
-                        Log.e("","entro en listener video");
+                        DisplayMetrics dm = getResources().getDisplayMetrics();
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        lp.setMargins(0, convertDpToPx(16, dm), 0, convertDpToPx(16, dm));
+
+                        TextView galeriaVideos=new TextView(context);
+                        galeriaVideos.setLayoutParams(lp);
+
+                        galeriaVideos.setText("Galería de videos");
+                        galeriaVideos.setTextSize(20);
+                        galeriaVideos.setTextColor(getResources().getColor( R.color.blue));
+
+                        if(videos.size()>0) {
+                            layout.addView(galeriaVideos);
+                        }
                         Iterator<Multimedia> ite=videos.iterator();
                         while (ite.hasNext()){
                             final Multimedia video=ite.next();
@@ -188,6 +203,11 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private int convertDpToPx(int dp, DisplayMetrics displayMetrics) {
+        float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
+        return Math.round(pixels);
     }
 
 }

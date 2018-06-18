@@ -1,7 +1,9 @@
 package com.example.root.trabajofinal;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragmentSupport;
 import com.beyondar.android.util.location.BeyondarLocationManager;
@@ -36,36 +39,42 @@ public class RealidadAumentada extends FragmentActivity implements
     private Button mShowMap;
     private GestorPuntos gestorPuntos;
     private Context context;
-
+    private static final int MULTIPLE_PERMISSIONS_REQUEST_CODE = 3;
+    private String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA};
+    AlertDialog alert = null;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         context=getApplicationContext();
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(this, permissions[1]) != PackageManager.PERMISSION_GRANTED) {
+                //Si alguno de los permisos no esta concedido lo solicita
+                ActivityCompat.requestPermissions(this, permissions, MULTIPLE_PERMISSIONS_REQUEST_CODE);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},100);
-                Log.e("","en 1");
-                startActivity(getIntent());
-                finish();
-                return;
+            }else{
+                permisionGranted();
             }
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.CAMERA},200);
-                Log.e("","en 2");
-                startActivity(getIntent());
-                finish();
-                return;
-            }
+        }else {
+            permisionGranted();
         }
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Ocultar titulo de la ventana
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+
+
+    }
+
+    public void permisionGranted(){
+
+        LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            AlertNoGps();
+
+        }else {
             gestorPuntos = GestorPuntos.getInstance(context);
             BeyondarLocationManager
                     .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
@@ -107,7 +116,6 @@ public class RealidadAumentada extends FragmentActivity implements
         }
 
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -134,5 +142,61 @@ public class RealidadAumentada extends FragmentActivity implements
             startActivity(intent);
 
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case MULTIPLE_PERMISSIONS_REQUEST_CODE: {
+                //Verifica si todos los permisos se aceptaron o no
+                if (validatePermissions(grantResults)) {
+                    //Si todos los permisos fueron aceptados continua con el flujo normal
+                    permisionGranted();
+                } else {
+                    //Si algun permiso fue rechazado no se puede continuar
+                    Toast.makeText(getApplicationContext(),"Se necesitan todos los permisos",Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    private boolean validatePermissions(int[] grantResults) {
+        boolean allGranted = false;
+        //Revisa cada uno de los permisos y si estos fueron aceptados o no
+        for (int i = 0; i < permissions.length; i++) {
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                //Si todos los permisos fueron aceptados retorna true
+                allGranted = true;
+            } else {
+                //Si algun permiso no fue aceptado retorna false
+                allGranted = false;
+                break;
+            }
+        }
+        return allGranted;
+    }
+    private void AlertNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
     }
 }

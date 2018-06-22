@@ -24,7 +24,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
@@ -72,34 +74,39 @@ public class AgregarImagenesSec extends AppCompatActivity {
         btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progress = new ProgressDialog(AgregarImagenesSec.this);
-                progress.setTitle("Subiendo");
-                progress.setMessage("Espere un momento...");
-                progress.show();
-                titulo=((TextView)findViewById(R.id.edTitulo)).getEditableText().toString();
-                descripcion=((TextView)findViewById(R.id.edDescripcion)).getEditableText().toString();
-                Multimedia imagen=new Multimedia(
-                        descripcion,
-                        f.getAbsolutePath(),
-                        titulo,
-                        null,
-                        new Date(),
-                        idPunto
-                );
-                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                gestorMultimedia.setImagenSec(imagen, new AgregarImagenSecListener() {
-                    @Override
-                    public void onResponseAgregarImagenSecListener(String response) {
-                        Log.e("Resp",response);
-                        progress.dismiss();
-                        if(response.equals("Ok")){
-                            //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
-                            Intent returnIntent=new Intent();
-                            setResult(Activity.RESULT_OK,returnIntent);
-                            finish();
+                if(f==null){
+                    Toast.makeText(context, "Ingrese una imagen", Toast.LENGTH_LONG);
+                }else {
+                    progress = new ProgressDialog(AgregarImagenesSec.this);
+                    progress.setTitle("Subiendo");
+                    progress.setMessage("Espere un momento...");
+                    progress.show();
+                    titulo = ((TextView) findViewById(R.id.edTitulo)).getEditableText().toString();
+                    descripcion = ((TextView) findViewById(R.id.edDescripcion)).getEditableText().toString();
+                    Multimedia imagen = new Multimedia(
+                            descripcion,
+                            f.getAbsolutePath(),
+                            titulo,
+                            null,
+                            new Date(),
+                            idPunto
+                    );
+                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                    gestorMultimedia.setImagenSec(imagen, new AgregarImagenSecListener() {
+                        @Override
+                        public void onResponseAgregarImagenSecListener(String response) {
+                            Log.e("Resp", response);
+                            progress.dismiss();
+                            if (response.equals("Ok")) {
+                                //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
+                                Intent returnIntent = new Intent();
+                                setResult(Activity.RESULT_OK, returnIntent);
+                                finish();
+                            }
                         }
-                    }
-                });
+                    });
+
+                }
 
             }
         });
@@ -157,7 +164,7 @@ public class AgregarImagenesSec extends AppCompatActivity {
                             });
 
                     f=new File(mPath);
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load("file:" + mPath)
                             .into(imagenPicasso);
 
@@ -172,7 +179,7 @@ public class AgregarImagenesSec extends AppCompatActivity {
 
 
 
-                        Picasso.with(context)
+                        Glide.with(context)
                                 .load("file:" + f.getAbsolutePath())
                                 .into(imagenPicasso);
                     }else{

@@ -83,7 +83,6 @@ public class DetalleEliminarPunto extends AppCompatActivity {
         gestorMultimedia = GestorMultimedia.getInstance(context);
         Log.e("<img>","path foto: "+punto.getFoto());
 
-        TypedArray placePictures = resources.obtainTypedArray(R.array.places_picture);
         ImageView placePicutre = (ImageView) findViewById(R.id.image);
         //placePicutre.setImageDrawable(placePictures.getDrawable(postion % placePictures.length()));
         Bitmap fotoPortada= gestorMultimedia.cargarImagen(punto.getFoto());

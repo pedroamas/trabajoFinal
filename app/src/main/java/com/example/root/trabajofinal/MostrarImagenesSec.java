@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
@@ -75,7 +76,7 @@ public class MostrarImagenesSec extends AppCompatActivity {
                 if(multimedia!=null){
 
                     ImageView imgFoto=(ImageView)findViewById(R.id.imgFoto);
-                    Picasso.with(getApplicationContext()).load(multimedia.getPath())
+                    Glide.with(getApplicationContext()).load(multimedia.getPath())
                             .into(imgFoto);
 
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

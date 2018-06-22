@@ -69,10 +69,12 @@ public class VerVideo extends Activity {
         gestorComentarios.getComentarios(idVideo, new GetComentariosListener() {
             @Override
             public void onResponseGetComentariosListener(ArrayList<Comentario> comentarios) {
-                ListView lista;
-                lista = (ListView) findViewById(R.id.listaComentarios);
-                adaptador = new VerVideo.AdapterComentarios(verVideo, comentarios);
-                lista.setAdapter(adaptador);
+                try {
+                    ListView lista;
+                    lista = (ListView) findViewById(R.id.listaComentarios);
+                    adaptador = new VerVideo.AdapterComentarios(verVideo, comentarios);
+                    lista.setAdapter(adaptador);
+                }catch (Exception e){}
 
             }
         });

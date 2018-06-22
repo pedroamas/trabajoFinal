@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
@@ -50,7 +51,7 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                 if(multimedia!=null){
 
                     ImageView imgFoto=(ImageView)findViewById(R.id.imgFoto);
-                    Picasso.with(getApplicationContext()).load(multimedia.getPath())
+                    Glide.with(getApplicationContext()).load(multimedia.getPath())
                             .into(imgFoto);
 
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

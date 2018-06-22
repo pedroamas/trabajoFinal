@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
@@ -99,10 +100,6 @@ public class SubirPuntoAdmin extends AppCompatActivity {
         btnAgregarPunto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                progress = new ProgressDialog(SubirPuntoAdmin.this);
-                progress.setTitle("Subiendo");
-                progress.setMessage("Espere un momento...");
-                progress.show();
 
                 String titulo,descripcion;
                 Double latitud,longitud;
@@ -139,6 +136,10 @@ public class SubirPuntoAdmin extends AppCompatActivity {
                     fechaCaptura = formatoDelTexto.parse(((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString());
                 } catch (ParseException ex) {}
 
+                progress = new ProgressDialog(SubirPuntoAdmin.this);
+                progress.setTitle("Subiendo");
+                progress.setMessage("Espere un momento...");
+                progress.show();
                 final Punto punto=new Punto(titulo,descripcion,latitud,longitud,f.getAbsolutePath());
                 Multimedia multimedia=new Multimedia(
                         descripcionImg,
@@ -226,7 +227,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
                             });
 
                     f=new File(mPath);
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load("file:" + mPath)
                             .into(imagenPicasso);
 
@@ -241,7 +242,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
 
 
-                        Picasso.with(context)
+                        Glide.with(context)
                                 .load("file:" + f.getAbsolutePath())
                                 .into(imagenPicasso);
                     }

@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
@@ -130,16 +131,12 @@ public class EditarImagenSec extends AppCompatActivity {
             public void onClick(View v) {
                 String titulo;
                 String descripcion;
-                Date fechaCaptura;
                 titulo=((EditText)findViewById(R.id.edTitulo)).getEditableText().toString();
                 Log.e("",titulo);
                 descripcion=((EditText)findViewById(R.id.edDescripcion)).getEditableText().toString();
                 Log.e("",descripcion);
                 SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd-MM-yyyy");
-                fechaCaptura=null;
-                try {
-                    fechaCaptura = formatoDelTexto.parse(((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString());
-                } catch (Exception ex) {}
+
 
                 Log.e("",titulo+" - "+descripcion);
 
@@ -150,7 +147,7 @@ public class EditarImagenSec extends AppCompatActivity {
                         descripcion,
                         pathImagen,
                         titulo,
-                        fechaCaptura,
+                        null,
                         null,
                         0,
                          TipoMultimedia.imagen);
@@ -287,7 +284,7 @@ public class EditarImagenSec extends AppCompatActivity {
 
                     Bitmap bitmap = BitmapFactory.decodeFile(mPath);
                     //mSetImage.setImageBitmap(gestorMultimedia.rotarImagen(bitmap));
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load("file:"+mPath)
                             .into(imagenPicasso);
 
@@ -304,7 +301,7 @@ public class EditarImagenSec extends AppCompatActivity {
                     );*/
                     Log.e("","file:"+path);
 
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load("file:"+getRealPathFromDocumentUri(this,path))
                             .into(imagenPicasso);
                     pathImagen=getRealPathFromDocumentUri(this,path);
@@ -396,14 +393,12 @@ public class EditarImagenSec extends AppCompatActivity {
                 Log.e("","Si respondio eeeeeeeeeeeeeeeeeeeeeeee");
                 EditText edTitulo=(EditText)findViewById(R.id.edTitulo);
                 EditText edDescripcion=(EditText)findViewById(R.id.edDescripcion);
-                EditText edFechaCaptura=(EditText)findViewById(R.id.edFechaCaptura);
                 ImageView imgFotoSec=(ImageView)findViewById(R.id.imgFotoSec);
-                Picasso.with(context)
+                Glide.with(context)
                         .load(multimedia.getPath())
                         .into(imgFotoSec);
                 edTitulo.setText(multimedia1.getTitulo());
                 edDescripcion.setText(multimedia1.getDescripcion());
-                edFechaCaptura.setText(dt1.format(multimedia.getFechaCaptura()));
 
             }
         });

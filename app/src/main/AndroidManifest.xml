@@ -91,7 +91,8 @@
         </activity>
         <activity android:name=".MostrarImagenesSec" />
         <activity android:name=".TiposEnumerados.SubirVideo" />
-        <activity android:name=".VerVideo" />
+        <activity android:name=".VerVideo"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".EditarPunto"
             android:screenOrientation="portrait" />

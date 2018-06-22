@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -114,7 +115,6 @@ public class Detalle extends AppCompatActivity  {
         gestorMultimedia = GestorMultimedia.getInstance(context);
         Log.e("<img>","path foto: "+punto.getFoto());
 
-        TypedArray placePictures = resources.obtainTypedArray(R.array.places_picture);
         ImageView placePicutre = (ImageView) findViewById(R.id.image);
         //placePicutre.setImageDrawable(placePictures.getDrawable(postion % placePictures.length()));
         Bitmap fotoPortada= gestorMultimedia.cargarImagen(punto.getFoto());
@@ -171,6 +171,7 @@ public class Detalle extends AppCompatActivity  {
                         TextView galeriaVideos=new TextView(context);
                         galeriaVideos.setLayoutParams(lp);
 
+
                         galeriaVideos.setText("Galería de videos");
                         galeriaVideos.setTextSize(20);
                         galeriaVideos.setTextColor(getResources().getColor( R.color.blue));
@@ -185,7 +186,9 @@ public class Detalle extends AppCompatActivity  {
                             Button btnVideo=new Button(context);
                             btnVideo.setLayoutParams(linLayoutParam);
                             btnVideo.setText(video.getTitulo());
-
+                            Drawable image = context.getResources().getDrawable(R.drawable.ic_media_play );
+                            image.setBounds( 0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight() );
+                            btnVideo.setCompoundDrawables( image, null, null, null );
                             btnVideo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
@@ -74,13 +75,17 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
             btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (f == null) {
+                        Toast.makeText(context, "Ingrese una imagen", Toast.LENGTH_LONG);
+                    }else{
+
                     progress = new ProgressDialog(AgregarImagenesSecUsuario.this);
                     progress.setTitle("Subiendo");
                     progress.setMessage("Espere un momento...");
                     progress.show();
-                    titulo=((TextView)findViewById(R.id.edTitulo)).getEditableText().toString();
-                    descripcion=((TextView)findViewById(R.id.edDescripcion)).getEditableText().toString();
-                    Multimedia imagen=new Multimedia(
+                    titulo = ((TextView) findViewById(R.id.edTitulo)).getEditableText().toString();
+                    descripcion = ((TextView) findViewById(R.id.edDescripcion)).getEditableText().toString();
+                    Multimedia imagen = new Multimedia(
                             descripcion,
                             f.getAbsolutePath(),
                             titulo,
@@ -88,23 +93,24 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                             new Date(),
                             idPunto
                     );
-                    GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
-                    Usuario usuario=gestorUsuarios.getUsuario();
+                    GestorUsuarios gestorUsuarios = GestorUsuarios.getInstance(context);
+                    Usuario usuario = gestorUsuarios.getUsuario();
                     imagen.setIdUsuario(usuario.getId());
                     GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
                     gestorMultimedia.setImagenSecUsuario(imagen, new AgregarImagenSecListener() {
                         @Override
                         public void onResponseAgregarImagenSecListener(String response) {
-                            Log.e("Resp",response);
+                            Log.e("Resp", response);
                             progress.dismiss();
-                            if(response.equals("Ok")){
+                            if (response.equals("Ok")) {
                                 //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
-                                Intent returnIntent=new Intent();
-                                setResult(Activity.RESULT_OK,returnIntent);
+                                Intent returnIntent = new Intent();
+                                setResult(Activity.RESULT_OK, returnIntent);
                                 finish();
                             }
                         }
                     });
+                }
 
                 }
             });
@@ -162,7 +168,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                                 });
 
                         f=new File(mPath);
-                        Picasso.with(context)
+                        Glide.with(context)
                                 .load("file:" + mPath)
                                 .into(imagenPicasso);
 
@@ -177,7 +183,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
 
 
 
-                            Picasso.with(context)
+                            Glide.with(context)
                                     .load("file:" + f.getAbsolutePath())
                                     .into(imagenPicasso);
                         }

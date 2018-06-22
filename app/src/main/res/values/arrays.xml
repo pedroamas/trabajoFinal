@@ -73,20 +73,5 @@
         <item>At Meydanı No:7, 34122 Fatih/İstanbul, Turkey</item>
         <item>Cape Town, South Africa</item>
     </string-array>
-    <array name="place_avator">
-        <item>@drawable/foto15</item>
-        <item>@drawable/foto01</item>
-        <item>@drawable/c_avator</item>
-        <item>@drawable/d_avator</item>
-        <item>@drawable/e_avator</item>
-        <item>@drawable/f_avator</item>
-    </array>
-    <array name="places_picture">
-        <item>@drawable/foto15</item>
-        <item>@drawable/foto01</item>
-        <item>@drawable/c</item>
-        <item>@drawable/d</item>
-        <item>@drawable/e</item>
-        <item>@drawable/f</item>
-    </array>
+
 </resources>

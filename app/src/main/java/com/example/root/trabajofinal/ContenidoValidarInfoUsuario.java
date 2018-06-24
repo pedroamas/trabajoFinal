@@ -13,10 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -130,6 +132,9 @@ public class ContenidoValidarInfoUsuario extends Fragment {
             if(position>=0) {
                 holder.name.setText(mPlaces[position % mPlaces.length]);
 
+                Glide.with(getContext())
+                        .load(mPlaceAvators[position % mPlaceAvators.length])
+                        .into(holder.avator);
                 //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 /*Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {

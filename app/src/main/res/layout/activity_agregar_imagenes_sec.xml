@@ -47,15 +47,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/edDescripcion"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fecha de captura"/>
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="date"
-            android:id="@+id/edFechaCaptura"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

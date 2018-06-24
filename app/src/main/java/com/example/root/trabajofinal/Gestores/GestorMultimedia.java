@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.root.trabajofinal.Listeners.ActualizarEstadoImgListener;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.AudioListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
@@ -47,7 +48,7 @@ public class GestorMultimedia {
     private static GestorMultimedia gestorMultimedia;
     private Context context;
     public static String TAG="<GestorMultimedia>";
-    private int contador=0;
+    public static int contadorDescargas=0;
 
 
     private GestorMultimedia(Context context) {
@@ -288,8 +289,8 @@ public class GestorMultimedia {
         gestorWebService.getAudio(idAudio,audioListener);
     }
 
-    public void descargarImagen(final String url, final String nombreImagen, final int idPunto) {
-        new DownloadImage(nombreImagen,idPunto).execute(url);
+    public void descargarImagen(final String url, final String nombreImagen, final int idPunto, ActualizarPuntoListener actualizarPuntoListener) {
+        new DownloadImage(nombreImagen,idPunto,actualizarPuntoListener).execute(url);
     }
 
 
@@ -298,6 +299,8 @@ public class GestorMultimedia {
         private String TAG = "DownloadImage";
         private String nombreImagen;
         private int idPunto;
+        private ActualizarPuntoListener actualizarPuntoListener;
+
         private Bitmap downloadImageBitmap(String sUrl) {
             Log.e("TAG","downloadImageBitmap");
             Bitmap bitmap = null;
@@ -314,6 +317,7 @@ public class GestorMultimedia {
         }
 
         public String guardarImagen(Context context, Bitmap bitmapImage, String nombreImagen){
+
             ContextWrapper cw = new ContextWrapper(context);
             // path to /data/data/yourapp/app_data/imageDir
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
@@ -334,9 +338,11 @@ public class GestorMultimedia {
             return directory.getAbsolutePath();
         }
 
-        public DownloadImage(String nombreImagen,int idPunto) {
+        public DownloadImage(String nombreImagen,int idPunto,ActualizarPuntoListener actualizarPuntoListener) {
+            this.actualizarPuntoListener=actualizarPuntoListener;
             this.nombreImagen=nombreImagen;
             this.idPunto=idPunto;
+            GestorMultimedia.contadorDescargas++;
         }
 
         @Override
@@ -349,6 +355,10 @@ public class GestorMultimedia {
             guardarImagen(context,result,nombreImagen);
             GestorBD gestorBD=GestorBD.getInstance(context);
             gestorBD.setEstadoPunto(idPunto,1);
+            GestorMultimedia.contadorDescargas--;
+            if(GestorMultimedia.contadorDescargas==0){
+                actualizarPuntoListener.onResponseActualizarPunto(null);
+            }
         }
     }
 }

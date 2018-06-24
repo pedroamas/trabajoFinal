@@ -17,7 +17,6 @@ import com.example.root.trabajofinal.Objetos.Usuario;
 
 public class Login extends AppCompatActivity{
 
-    public static String TAG="<Web service>";
     public Usuario usuario;
     private GestorUsuarios gestorUsuarios;
     private Context context;

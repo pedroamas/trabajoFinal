@@ -36,7 +36,9 @@ public class ValidarInfoUsuario extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK && requestCode==VALIDAR_INFO){
+        Log.e("validar","tengo q entrar");
+        if(resultCode == RESULT_OK){
+            Log.e("validar","entre");
             finish();
             startActivity(getIntent());
         }

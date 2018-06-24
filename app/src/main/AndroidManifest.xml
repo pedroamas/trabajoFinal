@@ -89,8 +89,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".MostrarImagenesSec" />
-        <activity android:name=".TiposEnumerados.SubirVideo" />
+        <activity android:name=".MostrarImagenesSec"/>
+        <activity android:name=".TiposEnumerados.SubirVideo"
+            android:screenOrientation="portrait"/>
         <activity android:name=".VerVideo"
             android:screenOrientation="portrait"/>
         <activity

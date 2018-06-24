@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.root.trabajofinal.AdminSQLiteOpenHelper;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.io.File;
@@ -33,18 +34,18 @@ public class GestorBD {
         return gestorBD;
     }
 
-    public void actualizarPuntos(ArrayList<Punto> puntos){
+    public void actualizarPuntos(ArrayList<Punto> puntos, ActualizarPuntoListener actualizarPuntoListener){
         String listaPuntosEliminar="";
         leerPuntos();
         Iterator<Punto> ite=puntos.iterator();
         while (ite.hasNext()){
 
             Punto puntoIn=ite.next();
-            Log.e(TAG,"id punto: "+puntoIn.getId());
             listaPuntosEliminar+=puntoIn.getId()+",";
 
             Punto puntoOut=localizacion(puntoIn.getId());
             Log.e(TAG,"PUNTO out ");
+
             //El punto no fue encontrado, entonces agregarlo
             if(puntoOut==null){
                 if(puntoIn.getPathFotoWeb()!=null) {
@@ -52,7 +53,7 @@ public class GestorBD {
                     File file = new File(puntoIn.getPathFotoWeb());
                     puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
                     GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                    gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(), file.getName(), puntoIn.getId());
+                    gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(), file.getName(), puntoIn.getId(),actualizarPuntoListener);
                 }
                 insertarNuevoPunto(puntoIn);
 
@@ -62,7 +63,7 @@ public class GestorBD {
                 File file=new File(puntoIn.getPathFotoWeb());
                 puntoIn.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/"+file.getName());
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(),file.getName(),puntoIn.getId());
+                gestorMultimedia.descargarImagen(puntoIn.getPathFotoWeb(),file.getName(),puntoIn.getId(),actualizarPuntoListener);
                 actualizarPunto(puntoIn);
             }else{
                 Log.e(TAG,"NADA "+puntoIn.getTitulo());
@@ -80,6 +81,9 @@ public class GestorBD {
 
         leerPuntos();
 
+        if(GestorMultimedia.contadorDescargas==0){
+            actualizarPuntoListener.onResponseActualizarPunto(null);
+        }
 
     }
 
@@ -242,7 +246,12 @@ public class GestorBD {
                 File file = new File(puntoBD.getPathFotoWeb());
                 puntoBD.setFoto("/data/data/com.example.root.trabajofinal/app_imageDir/" + file.getName());
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                gestorMultimedia.descargarImagen(puntoBD.getPathFotoWeb(), file.getName(), puntoBD.getId());
+                gestorMultimedia.descargarImagen(puntoBD.getPathFotoWeb(), file.getName(), puntoBD.getId(), new ActualizarPuntoListener() {
+                    @Override
+                    public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+
+                    }
+                });
 
             }while (fila.moveToNext());
         }

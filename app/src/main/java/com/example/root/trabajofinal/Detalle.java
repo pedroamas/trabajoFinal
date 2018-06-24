@@ -91,9 +91,8 @@ public class Detalle extends AppCompatActivity  {
             public void onClick(View v) {
                 GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                 if(gestorUsuarios.getUsuario()==null){
-                    Toast.makeText(context,
-                            "Debe estar registrado para subir una imagen",
-                            Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getApplicationContext(), Login.class);
+                    startActivity(intent);
                 }else {
                     Intent intent = new Intent(context, AgregarImagenesSecUsuario.class);
                     intent.putExtra("id_punto", punto.getId());

@@ -49,7 +49,6 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
         private int idPunto;
         private String titulo;
         private String descripcion;
-        private String fechaCaptura;
         private ImageView imagenPicasso;
         private File f;
         private String mPath;

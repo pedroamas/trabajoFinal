@@ -1,12 +1,15 @@
 package com.example.root.trabajofinal;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
@@ -35,23 +38,22 @@ public class MainActivity extends AppCompatActivity {
         Usuario usuario = gestorUsuarios.getUsuario();
 
         progress = new ProgressDialog(this);
+        progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        progress.setCanceledOnTouchOutside(true);
+        progress.setCancelable(false);
         progress.setTitle("Actualizando");
         progress.setMessage("Espere un momento...");
         progress.show();
+
+
+
         GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
        gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
             @Override
             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
 
-                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
-                boolean descargaCompleta;
-                descargaCompleta= gestorPuntos.puntosMalDescargados();
-                if(descargaCompleta){
-                    Log.e("","Se descargaron todos los puntos");
-                }
+
                 progress.dismiss();
-
-
 
             }
         });

@@ -95,7 +95,7 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                                 @Override
                                 public void onResponseActualizarEstadoImgListener(String response) {
                                     if (response.equals("Ok")){
-                                        finish();
+
                                         Intent returnIntent=new Intent();
                                         setResult(Activity.RESULT_OK,returnIntent);
                                         finish();

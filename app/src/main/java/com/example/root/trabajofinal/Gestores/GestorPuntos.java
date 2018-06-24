@@ -25,7 +25,6 @@ public class GestorPuntos {
     private ArrayList<Punto> puntos;
     private static GestorPuntos gestorPuntos;
     private Context context;
-    public static String TAG="<Web service>";
     public World mundo;
 
 
@@ -73,18 +72,21 @@ public class GestorPuntos {
     }
 
     public void actualizarPuntos(final ActualizarPuntoListener actualizarPuntoListener){
+
         GestorWebService gestorWebService=GestorWebService.getInstance(context);
         gestorWebService.actualizarPuntos(new ActualizarPuntoListener() {
             @Override
             public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                 GestorBD gestorBD=GestorBD.getInstance(context);
                 if(!puntos.isEmpty()) {
-                    gestorBD.actualizarPuntos(puntos);
+                    gestorBD.actualizarPuntos(puntos,actualizarPuntoListener);
+                }else {
+                    actualizarPuntoListener.onResponseActualizarPunto(puntos);
                 }
-                actualizarPuntoListener.onResponseActualizarPunto(puntos);
             }
         });
     }
+
 
     public void editarPunto(Punto punto, EditarPuntoListener editarPuntoListener){
         GestorWebService gestorWebService=GestorWebService.getInstance(context);
@@ -148,7 +150,12 @@ public class GestorPuntos {
         while (ite.hasNext()){
             Punto punto=ite.next();
             File file=new File(punto.getPathFotoWeb());
-            gestorMultimedia.descargarImagen(punto.getPathFotoWeb(), file.getName(), punto.getId());
+            gestorMultimedia.descargarImagen(punto.getPathFotoWeb(), file.getName(), punto.getId(), new ActualizarPuntoListener() {
+                @Override
+                public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+
+                }
+            });
             Log.e("<puntosMalDescargados>","Punto "+punto.getId()+" url: "+punto.getPathFotoWeb());
         }
         return false;

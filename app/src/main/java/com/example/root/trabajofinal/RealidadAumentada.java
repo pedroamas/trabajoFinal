@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beyondar.android.fragment.BeyondarFragmentSupport;
@@ -75,6 +77,7 @@ public class RealidadAumentada extends FragmentActivity implements
             AlertNoGps();
 
         }else {
+            try {
             gestorPuntos = GestorPuntos.getInstance(context);
             BeyondarLocationManager
                     .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
@@ -113,6 +116,13 @@ public class RealidadAumentada extends FragmentActivity implements
             mWorld.addBeyondarObject(user);
 
             BeyondarLocationManager.addGeoObjectLocationUpdate(user);
+        }catch (Exception e){
+                TextView txtAviso=new TextView(context);
+                FrameLayout frameLayout=(FrameLayout)findViewById(R.id.content);
+                txtAviso.setText("Es posible que su dispositivo no tenga giroscopio");
+                frameLayout.addView(txtAviso);
+
+            }
         }
 
     }

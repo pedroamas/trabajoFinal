@@ -78,7 +78,7 @@ android:fitsSystemWindows="true"
             android:text="Eliminar Punto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/BotonRojo"
+            app:backgroundTint="@color/red"
             android:id="@+id/btnEliminarPunto" />
 
         <TextView

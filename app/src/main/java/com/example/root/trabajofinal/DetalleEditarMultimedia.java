@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -141,7 +142,9 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
                         galeriaVideos.setText("Galería de videos");
                         galeriaVideos.setTextSize(20);
                         galeriaVideos.setTextColor(getResources().getColor( R.color.blue));
-                        layout.addView(galeriaVideos);
+                        if(videos.size()>0) {
+                            layout.addView(galeriaVideos);
+                        }
 
                         Iterator<Multimedia> ite=videos.iterator();
                         while (ite.hasNext()){
@@ -149,6 +152,9 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
                             Button btnVideo=new Button(context);
                             btnVideo.setLayoutParams(linLayoutParam);
                             btnVideo.setText(video.getTitulo());
+                            Drawable image = context.getResources().getDrawable(R.drawable.ic_media_play );
+                            image.setBounds( 0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight() );
+                            btnVideo.setCompoundDrawables( image, null, null, null );
                             btnVideo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -182,7 +188,7 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(context, AgregarVideo.class);
                 intent.putExtra("id_punto", punto.getId());
-                startActivity(intent);
+                startActivityForResult(intent,EDITAR_MULTIMEDIA);
             }
         });
 
@@ -190,7 +196,7 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode==EDITAR_MULTIMEDIA){
+        if(resultCode == RESULT_OK ){
             Log.e("","Finishhhhh");
             finish();
             startActivity(getIntent());

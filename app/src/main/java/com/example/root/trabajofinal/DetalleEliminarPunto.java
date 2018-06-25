@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -151,6 +152,9 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                             Button btnVideo=new Button(context);
                             btnVideo.setLayoutParams(linLayoutParam);
                             btnVideo.setText(video.getTitulo());
+                            Drawable image = context.getResources().getDrawable(R.drawable.ic_media_play );
+                            image.setBounds( 0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight() );
+                            btnVideo.setCompoundDrawables( image, null, null, null );
                             btnVideo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {

@@ -13,6 +13,20 @@
     android:orientation="vertical"
     tools:context="com.example.root.trabajofinal.MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lytUsuario"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtUsuario"
+            android:visibility="invisible"
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:textColor="@color/blue"/>
+    </LinearLayout>
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,6 +84,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnPuntosCercanos"
         style="@style/BotonPrimary" />
+    <Button
+        android:text="Administración"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnAdministracion"
+        android:visibility="invisible"
+        app:backgroundTint="@color/wallet_holo_blue_light" />
 
 
 </LinearLayout>

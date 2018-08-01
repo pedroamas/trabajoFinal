@@ -305,6 +305,7 @@ public class GestorMultimedia {
             Log.e("TAG","downloadImageBitmap");
             Bitmap bitmap = null;
             try {
+                Log.e("path",""+sUrl);
                 InputStream inputStream = new URL(sUrl).openStream();   // Download Image from URL
                 bitmap = BitmapFactory.decodeStream(inputStream);       // Decode Bitmap
                 inputStream.close();
@@ -328,6 +329,7 @@ public class GestorMultimedia {
             try {
 
                 fos = new FileOutputStream(mypath);
+
                 bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.close();
             } catch (Exception e) {
@@ -352,9 +354,12 @@ public class GestorMultimedia {
         }
 
         protected void onPostExecute(Bitmap result) {
-            guardarImagen(context,result,nombreImagen);
-            GestorBD gestorBD=GestorBD.getInstance(context);
-            gestorBD.setEstadoPunto(idPunto,1);
+            if (result!=null){
+                guardarImagen(context,result,nombreImagen);
+                GestorBD gestorBD=GestorBD.getInstance(context);
+                gestorBD.setEstadoPunto(idPunto,1);
+            }
+
             GestorMultimedia.contadorDescargas--;
             if(GestorMultimedia.contadorDescargas==0){
                 actualizarPuntoListener.onResponseActualizarPunto(null);

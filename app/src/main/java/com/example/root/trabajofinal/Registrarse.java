@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
@@ -43,13 +44,15 @@ public class Registrarse extends AppCompatActivity {
                 }else if(email.equals("")){
                     Toast.makeText(context,"Ingrese el email",Toast.LENGTH_LONG).show();
                 }else if(username.equals("")){
-                    Toast.makeText(context,"Ingrese el username",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Ingrese el nombre de usuario",Toast.LENGTH_LONG).show();
                 }else if(contrasena.equals("")){
                     Toast.makeText(context,"Ingrese el contraseña",Toast.LENGTH_LONG).show();
                 }else if(confContrasena.equals("")){
                     Toast.makeText(context,"Confirme la contraseña",Toast.LENGTH_LONG).show();
                 }else if(!confContrasena.equals(contrasena)){
                     Toast.makeText(context,"La confirmación la contraseña es incorrecta",Toast.LENGTH_LONG).show();
+                    TextView edValidarContr=(TextView) findViewById(R.id.edValidarContr);
+                    edValidarContr.setText("La confirmación la contraseña es incorrecta");
                 }else{
                     Usuario usuario=new Usuario(
                             nombre,
@@ -64,7 +67,7 @@ public class Registrarse extends AppCompatActivity {
                             //Toast.makeText(context,response,Toast.LENGTH_LONG).show();
                             Log.e("",response);
                             if(response.equals("0")){
-                                Toast.makeText(context,"El username ya se encuentra registrado",Toast.LENGTH_LONG).show();
+                                Toast.makeText(context,"El nombre de usuario ya se encuentra registrado",Toast.LENGTH_LONG).show();
                             }else  if(response.equals("-1")){
                                 Toast.makeText(context,"Error de conexión",Toast.LENGTH_LONG).show();
                             }else {

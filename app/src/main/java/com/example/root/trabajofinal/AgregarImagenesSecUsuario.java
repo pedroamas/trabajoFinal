@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -77,38 +78,60 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                     if (f == null) {
                         Toast.makeText(context, "Ingrese una imagen", Toast.LENGTH_LONG);
                     }else{
-
-                    progress = new ProgressDialog(AgregarImagenesSecUsuario.this);
-                    progress.setTitle("Subiendo");
-                    progress.setMessage("Espere un momento...");
-                    progress.show();
-                    titulo = ((TextView) findViewById(R.id.edTitulo)).getEditableText().toString();
-                    descripcion = ((TextView) findViewById(R.id.edDescripcion)).getEditableText().toString();
-                    Multimedia imagen = new Multimedia(
-                            descripcion,
-                            f.getAbsolutePath(),
-                            titulo,
-                            null,
-                            new Date(),
-                            idPunto
-                    );
-                    GestorUsuarios gestorUsuarios = GestorUsuarios.getInstance(context);
-                    Usuario usuario = gestorUsuarios.getUsuario();
-                    imagen.setIdUsuario(usuario.getId());
-                    GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                    gestorMultimedia.setImagenSecUsuario(imagen, new AgregarImagenSecListener() {
-                        @Override
-                        public void onResponseAgregarImagenSecListener(String response) {
-                            Log.e("Resp", response);
-                            progress.dismiss();
-                            if (response.equals("Ok")) {
-                                //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
-                                Intent returnIntent = new Intent();
-                                setResult(Activity.RESULT_OK, returnIntent);
-                                finish();
-                            }
+                        AlertDialog.Builder builder;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(), android.R.style.Theme_Material
+                            );
+                        } else {
+                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
                         }
-                    });
+                        //builder.setTitle(Html.fromHtml("<font color='#3F51B5'>Comentario de</font>"));
+
+                        builder.setMessage(Html.fromHtml("<font color='#000000'>La imagen debe ser aprobada por el administrador</font>"));
+                        //builder.setTitle("Eliminar");
+                        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                progress = new ProgressDialog(AgregarImagenesSecUsuario.this);
+                                progress.setTitle("Subiendo");
+                                progress.setMessage("Espere un momento...");
+                                progress.show();
+                                titulo = ((TextView) findViewById(R.id.edTitulo)).getEditableText().toString();
+                                descripcion = ((TextView) findViewById(R.id.edDescripcion)).getEditableText().toString();
+                                Multimedia imagen = new Multimedia(
+                                        descripcion,
+                                        f.getAbsolutePath(),
+                                        titulo,
+                                        null,
+                                        new Date(),
+                                        idPunto
+                                );
+                                GestorUsuarios gestorUsuarios = GestorUsuarios.getInstance(context);
+                                Usuario usuario = gestorUsuarios.getUsuario();
+                                imagen.setIdUsuario(usuario.getId());
+                                GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
+                                gestorMultimedia.setImagenSecUsuario(imagen, new AgregarImagenSecListener() {
+                                    @Override
+                                    public void onResponseAgregarImagenSecListener(String response) {
+                                        Log.e("Resp", response);
+                                        progress.dismiss();
+                                        if (response.equals("Ok")) {
+
+
+
+                                            //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
+                                            Intent returnIntent = new Intent();
+                                            setResult(Activity.RESULT_OK, returnIntent);
+                                            finish();
+                                        }
+                                    }
+                                });
+
+                            }
+                        })
+                                .show();
+
+
                 }
 
                 }
@@ -266,7 +289,7 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
 
 
         private void showOptions() {
-            final CharSequence[] option = {"Tomar foto", "Elegir de galeria", "Cancelar"};
+            final CharSequence[] option = {"Tomar foto", "Elegir de galería", "Cancelar"};
             final AlertDialog.Builder builder = new AlertDialog.Builder(AgregarImagenesSecUsuario.this);
             builder.setTitle("Eleige una opción");
             builder.setItems(option, new DialogInterface.OnClickListener() {

@@ -18,6 +18,9 @@ public class Multimedia {
     private int idPunto;
     private int idUsuario;
     private String username;
+    private String tituloPunto;
+
+
 
     public int getIdUsuario() {
         return idUsuario;
@@ -112,6 +115,14 @@ public class Multimedia {
 
     public int getIdPunto() {
         return idPunto;
+    }
+
+    public String getTituloPunto() {
+        return tituloPunto;
+    }
+
+    public void setTituloPunto(String tituloPunto) {
+        this.tituloPunto = tituloPunto;
     }
 
     public String getNombreArchivo(){

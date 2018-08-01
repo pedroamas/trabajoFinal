@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
@@ -95,6 +96,7 @@ public class DetalleEliminarPunto extends AppCompatActivity {
 
         placePicutre.setImageBitmap(fotoPortada);
 
+
         gestorMultimedia.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
@@ -110,11 +112,14 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                     linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
 
-                    Picasso.with(context).load(imagen.getPath())
-                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop().into(imgGaleria);
-                    //imgGaleria.setScaleType(ImageView.ScaleType.FIT_START);
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
                     imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
                     layout.addView(imgGaleria);
                     imgGaleria.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -175,6 +180,18 @@ public class DetalleEliminarPunto extends AppCompatActivity {
 
 
 
+        Button btnVerMapa=(Button)findViewById(R.id.btnVerMapa);
+        btnVerMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), VerMapa.class);
+
+                intent.putExtra("latitud",punto.getLatitud());
+                intent.putExtra("longitud",punto.getLongitud());
+                intent.putExtra("titulo",punto.getTitulo());
+                startActivity(intent);
+            }
+        });
         Button btnEliminarPunto=(Button)findViewById(R.id.btnEliminarPunto);
         btnEliminarPunto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,18 +206,13 @@ public class DetalleEliminarPunto extends AppCompatActivity {
                             gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
                                 @Override
                                 public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
-                                    if (puntos == null) {
-                                        Toast.makeText(getApplicationContext(), "Error al actualizar", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Se actualizó correctamente", Toast.LENGTH_LONG).show();
-                                    }
                                     Intent returnIntent=new Intent();
                                     setResult(Activity.RESULT_OK,returnIntent);
                                     finish();
                                 }
                             });
                         }else{
-                            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         }
                     }
                 });

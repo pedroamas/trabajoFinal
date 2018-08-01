@@ -110,16 +110,6 @@
                 android:textColor="@color/black"
                 tools:text="@string/detail_location" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/blue"
-                android:text="Galería"
-                android:textSize="@dimen/article_titles"
-                android:layout_marginBottom="@dimen/md_keylines"
-                android:layout_marginTop="@dimen/md_keylines" />
-
-
             <Button
                 android:text="Agregar imagen"
                 android:layout_width="match_parent"
@@ -132,6 +122,18 @@
                 android:layout_height="wrap_content"
                 style="@style/BotonRojo"
                 android:id="@+id/btnAgregarVideo" />
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="Galería de imágenes"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines" />
+
+
+
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,8 @@ import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -44,6 +48,13 @@ public class RealidadAumentada extends FragmentActivity implements
     private static final int MULTIPLE_PERMISSIONS_REQUEST_CODE = 3;
     private String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA};
     AlertDialog alert = null;
+    private boolean primeraVez=true;
+    private double latitudUser=0;
+    private double longitudUser=0;
+    private GeoObject user;
+    private Location loc;
+    LocationManager manager;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +70,10 @@ public class RealidadAumentada extends FragmentActivity implements
                 ActivityCompat.requestPermissions(this, permissions, MULTIPLE_PERMISSIONS_REQUEST_CODE);
 
             }else{
-                permisionGranted();
+                controlGPS();
             }
         }else {
-            permisionGranted();
+            controlGPS();
         }
 
 
@@ -70,13 +81,38 @@ public class RealidadAumentada extends FragmentActivity implements
 
     }
 
+    private void controlGPS(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+
+            } else {
+                manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertNoGps();
+                    finish();
+                } else {
+                    permisionGranted();
+                }
+            }
+        } else {
+            manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                AlertNoGps();
+
+            } else {
+                permisionGranted();
+            }
+        }
+    }
     public void permisionGranted(){
 
         LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !manager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ) {
             AlertNoGps();
 
-        }else {
+        }
+        else {
             try {
             gestorPuntos = GestorPuntos.getInstance(context);
             BeyondarLocationManager
@@ -86,6 +122,53 @@ public class RealidadAumentada extends FragmentActivity implements
 
             mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(
                     R.id.beyondarFragment);
+
+                try {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+                            //startActivity(getIntent());
+                            //finish();
+                            return;
+                        }
+                    }
+                    // Acquire a reference to the system Location Manager
+                    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+                    // Define a listener that responds to location updates
+                    LocationListener locationListener = new LocationListener() {
+                        public void onLocationChanged(Location location) {
+                            // Called when a new location is found by the network location provider.
+                            Log.e("Location updates",location.getLatitude()+" - "+location.getLongitude());
+                            latitudUser=location.getLatitude();
+                            longitudUser=location.getLongitude();
+                            if(mWorld!=null&& user!=null){
+                                user.setGeoPosition(latitudUser, longitudUser);
+                                mWorld.addBeyondarObject(user);
+                                mWorld.setLocation(location);
+                            }
+                        }
+
+                        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                        public void onProviderEnabled(String provider) {}
+
+                        public void onProviderDisabled(String provider) {
+                            AlertNoGps();
+                        }
+                    };
+
+                    // Register the listener with the Location Manager to receive location updates
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+                    loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    Log.e("Posicion","latitud: "+loc.getLatitude());
+                    Log.e("Posicion","longitud: "+loc.getLongitude());
+                    latitudUser=loc.getLatitude();
+                    longitudUser=loc.getLongitude();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
 
             mShowMap = (Button) findViewById(R.id.showMapButton);
             mShowMap.setOnClickListener(new View.OnClickListener() {
@@ -107,15 +190,15 @@ public class RealidadAumentada extends FragmentActivity implements
             //enableLocationUpdates();          //habilita la localizacion
             mBeyondarFragment.setOnClickBeyondarObjectListener(this);
 
-            BeyondarLocationManager.addWorldLocationUpdate(mWorld);
+            //BeyondarLocationManager.addWorldLocationUpdate(mWorld);
             // Lets add the user position to the map
-            GeoObject user = new GeoObject(1000l);
+            user = new GeoObject(1000l);
             user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
             user.setImageResource(R.drawable.flag);
             user.setName("Posición actual");
-            mWorld.addBeyondarObject(user);
+            //mWorld.addBeyondarObject(user);
 
-            BeyondarLocationManager.addGeoObjectLocationUpdate(user);
+            //BeyondarLocationManager.addGeoObjectLocationUpdate(user);
         }catch (Exception e){
                 TextView txtAviso=new TextView(context);
                 FrameLayout frameLayout=(FrameLayout)findViewById(R.id.content);
@@ -204,6 +287,7 @@ public class RealidadAumentada extends FragmentActivity implements
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         dialog.cancel();
+                        finish();
                     }
                 });
         alert = builder.create();

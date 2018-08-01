@@ -21,7 +21,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
@@ -37,6 +39,7 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
     private static int EDITAR_MULTIMEDIA=300;
+    private boolean primeraVez=true;
 
     private android.support.v4.app.FragmentManager manager = null;
     private android.support.v4.app.FragmentTransaction ft;
@@ -109,22 +112,38 @@ public class DetalleEditarMultimedia extends AppCompatActivity {
                     linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
 
-                    Picasso.with(context).load(imagen.getPath())
-                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop().into(imgGaleria);
-                    //imgGaleria.setScaleType(ImageView.ScaleType.FIT_START);
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
                     imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
                     layout.addView(imgGaleria);
-                    imgGaleria.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent=new Intent(context,EditarImagenSec.class);
-                            intent.putExtra("id_imagen",imagen.getId());
-                            intent.putExtra("id_punto",punto.getId());
-                            startActivityForResult(intent,EDITAR_MULTIMEDIA);
-                            //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    if(primeraVez){
+                        imgGaleria.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(context,"No se puede editar la imagen de portada, dirigirse a Editar información de punto",Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                        primeraVez=false;
+                    }
+
+                    else{
+                        imgGaleria.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(context, EditarImagenSec.class);
+                                intent.putExtra("id_imagen", imagen.getId());
+                                intent.putExtra("id_punto", punto.getId());
+                                startActivityForResult(intent, EDITAR_MULTIMEDIA);
+                            }
+                        });
+
+                    }
                 }
 
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);

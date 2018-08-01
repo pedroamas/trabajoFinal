@@ -332,6 +332,7 @@ public class GestorWebService {
                                             if (imagenJSON.getInt(7)!=0){
                                                 imagen.setIdUsuario(imagenJSON.getInt(7));
                                                 imagen.setUsername(imagenJSON.getString(8));
+                                                imagen.setTituloPunto(imagenJSON.getString(9));
                                             }
 
                                             Log.e(TAG,"donde es el error?? 3");
@@ -457,6 +458,7 @@ public class GestorWebService {
                 try {
                     okhttp3.Response response = client.newCall(request).execute();
                     Log.e("Body response",response.body().string());
+                    Log.e("Body response2",response.body().toString());
                     if(!response.isSuccessful()){
 
                         setPuntoListener.onResponseSetPunto("Error");
@@ -510,7 +512,7 @@ public class GestorWebService {
                             .addFormDataPart("descripcion",punto.getDescripcion())
                             .addFormDataPart("tituloImg", punto.getImagen().getTitulo())
                             .addFormDataPart("descripcionImg", punto.getImagen().getDescripcion())
-                            .addFormDataPart("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()))
+                            .addFormDataPart("fecha_capturaImg", "")
                             .addFormDataPart("fecha_subidaImg", "")
                             .addFormDataPart("envia_imagen","SI")
                             .addFormDataPart("type",content_type)
@@ -526,7 +528,7 @@ public class GestorWebService {
                             .addFormDataPart("descripcion",punto.getDescripcion())
                             .addFormDataPart("tituloImg", punto.getImagen().getTitulo())
                             .addFormDataPart("descripcionImg", punto.getImagen().getDescripcion())
-                            .addFormDataPart("fecha_capturaImg", ""+dt1.format(punto.getImagen().getFechaCaptura()))
+                            .addFormDataPart("fecha_capturaImg", "")
                             .addFormDataPart("fecha_subidaImg", "")
                             .build();
                 }
@@ -538,6 +540,7 @@ public class GestorWebService {
                 try {
                     okhttp3.Response response = client.newCall(request).execute();
                     Log.e("HTML",response.body().string());
+                    Log.e("resp HTML",response.body().toString());
                     if(!response.isSuccessful()){
 
                         editarPuntoListener.onResponseEditarPunto("Error");
@@ -1486,6 +1489,9 @@ public class GestorWebService {
                 params.put("descripcion", video.getDescripcion()+"");
                 params.put("path", video.getPath()+"");
                 params.put("fecha_subida", dt2.format(new Date()));
+                if(video.getFechaCaptura()!=null) {
+                    params.put("fecha_captura", dt2.format(video.getFechaCaptura()));
+                }
                 return params;
             }
 

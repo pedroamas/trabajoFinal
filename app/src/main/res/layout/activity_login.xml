@@ -13,7 +13,7 @@
     tools:context="com.example.root.trabajofinal.Login">
 
     <TextView
-        android:text="Username"
+        android:text="Nombre de usuario"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView" />

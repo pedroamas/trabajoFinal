@@ -203,7 +203,7 @@ public class EditarImagenSec extends AppCompatActivity {
 
 
     private void showOptions() {
-        final CharSequence[] option = {"Tomar foto", "Elegir de galeria", "Cancelar"};
+        final CharSequence[] option = {"Tomar foto", "Elegir de galería", "Cancelar"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(EditarImagenSec.this);
         builder.setTitle("Elige una opción");
         builder.setItems(option, new DialogInterface.OnClickListener() {

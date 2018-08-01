@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
@@ -94,7 +96,7 @@ public class DetalleEliminarComentarios extends AppCompatActivity {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes "+imagenes.size());
-                final LinearLayout layout = (LinearLayout) findViewById(R.id.content);
+                final LinearLayout layout = (LinearLayout) findViewById(R.id.lytGaleria);
 
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
@@ -104,11 +106,15 @@ public class DetalleEliminarComentarios extends AppCompatActivity {
                     ImageView imgGaleria=new ImageView(context);
                     linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-
-                    Picasso.with(context).load(imagen.getPath())
-                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop().into(imgGaleria);
+                    //linLayoutParam.setMargins(0,10,0,0);
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
                     imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
                     layout.addView(imgGaleria);
                     imgGaleria.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -133,6 +139,7 @@ public class DetalleEliminarComentarios extends AppCompatActivity {
                         TextView galeriaVideos=new TextView(context);
                         galeriaVideos.setLayoutParams(lp);
 
+
                         galeriaVideos.setText("Galería de videos");
                         galeriaVideos.setTextSize(20);
                         galeriaVideos.setTextColor(getResources().getColor( R.color.blue));
@@ -141,15 +148,19 @@ public class DetalleEliminarComentarios extends AppCompatActivity {
                             layout.addView(galeriaVideos);
                         }
                         Iterator<Multimedia> ite=videos.iterator();
+
                         while (ite.hasNext()){
                             final Multimedia video=ite.next();
                             Button btnVideo=new Button(context);
                             btnVideo.setLayoutParams(linLayoutParam);
                             btnVideo.setText(video.getTitulo());
+                            Drawable image = context.getResources().getDrawable(R.drawable.ic_media_play );
+                            image.setBounds( 0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight() );
+                            btnVideo.setCompoundDrawables( image, null, null, null );
                             btnVideo.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent intent = new Intent(getApplicationContext(), VerVideo.class);
+                                    Intent intent = new Intent(getApplicationContext(), VerVideoEliminarComentario.class);
                                     intent.putExtra("id_video",video.getId());
                                     startActivity(intent);
                                 }
@@ -161,6 +172,58 @@ public class DetalleEliminarComentarios extends AppCompatActivity {
                     }
                 });
 
+
+            }
+        });
+        gestorMultimedia.getImagenesUsuarios(punto.getId(), new ImagenesListener() {
+            @Override
+            public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
+                Log.e("Imagenes","Trajo imagnes de usuarios"+imagenes.size());
+                final LinearLayout layout = (LinearLayout) findViewById(R.id.lytImagenesUsuarios);
+
+                Iterator<Multimedia> ite=imagenes.iterator();
+                while (ite.hasNext()){
+
+                    final Multimedia imagen =ite.next();
+                    Log.e("Imagenes","path imagnes "+imagen.getPath());
+                    ImageView imgGaleria=new ImageView(context);
+                    linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
+
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
+                    imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
+                    layout.addView(imgGaleria);
+                    imgGaleria.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent=new Intent(context,MostrarImagenesSecEliminarComentario.class);
+                            intent.putExtra("id_imagen",imagen.getId());
+                            startActivity(intent);
+                            //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+
+            }
+        });
+
+        Button btnVerMapa=(Button)findViewById(R.id.btnVerMapa);
+        btnVerMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), VerMapa.class);
+
+                intent.putExtra("latitud",punto.getLatitud());
+                intent.putExtra("longitud",punto.getLongitud());
+                intent.putExtra("titulo",punto.getTitulo());
+                startActivity(intent);
             }
         });
 

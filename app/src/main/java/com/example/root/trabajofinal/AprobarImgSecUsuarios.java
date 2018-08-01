@@ -1,6 +1,7 @@
 package com.example.root.trabajofinal;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +31,7 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
     public static final String EXTRA_POSITION = "id_imagen";
     private SimpleDateFormat dt1,dt2;
     private int idImagen;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,14 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
         final GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         gestorMultimedia.getImagenConEstado(idImagen,0, new ImagenListener() {
             @Override
-            public void onResponseImagen(Multimedia multimedia) {
+            public void onResponseImagen(final Multimedia multimedia) {
                 LinearLayout linearLayout=(LinearLayout)findViewById(R.id.content);
 
                 if(multimedia!=null){
 
                     ImageView imgFoto=(ImageView)findViewById(R.id.imgFoto);
                     Glide.with(getApplicationContext()).load(multimedia.getPath())
+                            .placeholder(R.drawable.ic_image_box)
                             .into(imgFoto);
 
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -86,14 +90,40 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                         txtUsername.setLayoutParams(params);
                         linearLayout.addView(txtUsername);
                     }
+                    if(multimedia.getTituloPunto()!=null){
+                        TextView txtTituloPunto=new TextView(getApplicationContext());
+                        txtTituloPunto.setText("Punto de referencia : "+multimedia.getTituloPunto());
+                        txtTituloPunto.setLayoutParams(params);
+                        linearLayout.addView(txtTituloPunto);
+                        Button btnVerPunto=new Button(getApplicationContext());
+                        btnVerPunto.setText("Ver punto de referencia");
+                        btnVerPunto.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(context, Detalle.class);
+                                Log.e("link punto","id"+multimedia.getIdPunto());
+                                intent.putExtra("id",multimedia.getIdPunto());
+                                startActivity(intent);
+                            }
+                        });
+                        linearLayout.addView(btnVerPunto);
+                    }
 
                     Button btnAprobar=(Button)findViewById(R.id.btnAprobar);
                     btnAprobar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            progress = new ProgressDialog(AprobarImgSecUsuarios.this);
+                            progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                            progress.setCanceledOnTouchOutside(true);
+                            progress.setCancelable(false);
+                            progress.setTitle("Procesando");
+                            progress.setMessage("Espere un momento...");
+                            progress.show();
                             gestorMultimedia.setEstadoImagen(idImagen, 1, new ActualizarEstadoImgListener() {
                                 @Override
                                 public void onResponseActualizarEstadoImgListener(String response) {
+                                    progress.dismiss();
                                     if (response.equals("Ok")){
 
                                         Intent returnIntent=new Intent();
@@ -109,16 +139,25 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                     btnRechazar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            progress = new ProgressDialog(AprobarImgSecUsuarios.this);
+                            progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                            progress.setCanceledOnTouchOutside(true);
+                            progress.setCancelable(false);
+                            progress.setTitle("Procesando");
+                            progress.setMessage("Espere un momento...");
+                            progress.show();
                             gestorMultimedia.setEstadoImagen(idImagen, 2, new ActualizarEstadoImgListener() {
                                 @Override
                                 public void onResponseActualizarEstadoImgListener(String response) {
                                     Log.e("respuesta car estado",response);
                                     //Toast.makeText(context,response,Toast.LENGTH_LONG).show();
+                                    progress.dismiss();
                                     if (response.equals("Ok")){
                                         Intent returnIntent=new Intent();
                                         setResult(Activity.RESULT_OK,returnIntent);
                                         finish();
                                     }
+
 
                                 }
                             });

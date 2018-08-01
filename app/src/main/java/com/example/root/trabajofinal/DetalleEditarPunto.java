@@ -60,6 +60,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
     private final int MY_PERMISSIONS = 100;
     private final int PHOTO_CODE = 200;
     private final int SELECT_PICTURE = 300;
+    private final int BUSCAR_LOCALIZACION = 400;
     //private ImageView mSetImage;
     private Button mOptionButton;
     private LinearLayout mRlView;
@@ -96,6 +97,18 @@ public class DetalleEditarPunto extends AppCompatActivity {
         punto= gestorPuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
 
         llenarCampos();
+
+        //Buscar en Maps
+        Button btnBuscarUbicacion=(Button)findViewById(R.id.btnBuscarUbicacion);
+        btnBuscarUbicacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), BuscarLocalizacionPunto.class);
+                startActivityForResult(intent,BUSCAR_LOCALIZACION);
+
+            }
+        });
+        //Fin Buscar en Maps
 
         Button btnEditarPunto=(Button)findViewById(R.id.btnEditarPunto);
         btnEditarPunto.setOnClickListener(new View.OnClickListener() {
@@ -136,27 +149,14 @@ public class DetalleEditarPunto extends AppCompatActivity {
                 );
                 String tituloImg=((EditText)findViewById(R.id.edTituloImg)).getEditableText().toString();
                 String descripcionImg=((EditText)findViewById(R.id.edDescripcionImg)).getEditableText().toString();
-                String fechaCaptura=((EditText)findViewById(R.id.edFechaCaptura)).getEditableText().toString();
-                Date dateFechaCaptura=null;
-                SimpleDateFormat dt1=new SimpleDateFormat("dd-MM-yyyy");
-                try {
-                    dateFechaCaptura=dt1.parse(fechaCaptura);
 
-                }catch (Exception e){
-                    try {
-                        dateFechaCaptura=dt1.parse("01-01-1000");
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                        dateFechaCaptura=null;
-                    }
-                }
 
 
                  Multimedia imagenEditada=new Multimedia(
                         descripcionImg,
                         pathImagen,
                         tituloImg,
-                        dateFechaCaptura,
+                        null,
                         new Date(),
                         punto.getId()
                 );
@@ -175,6 +175,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
                             Intent returnIntent=new Intent();
                             setResult(Activity.RESULT_OK,returnIntent);
                             finish();
+                        }else {
+                            Toast.makeText(context,"El punto no se cargó correctamente",Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -206,16 +208,13 @@ public class DetalleEditarPunto extends AppCompatActivity {
                 SimpleDateFormat dt1=new SimpleDateFormat("dd-MM-yyyy");
                 EditText edTituloImg=(EditText)findViewById(R.id.edTituloImg);
                 EditText edDescripcionImg=(EditText)findViewById(R.id.edDescripcionImg);
-                EditText edFechaCaptura=(EditText)findViewById(R.id.edFechaCaptura);
                 try {
                     edTituloImg.setText(multimedia.getTitulo());
                 }catch(Exception e){}
                 try {
                     edDescripcionImg.setText(multimedia.getDescripcion());
                 }catch(Exception e){}
-                try {
-                    edFechaCaptura.setText(dt1.format(multimedia.getFechaCaptura()));
-                }catch(Exception e){}
+
 
             }
         });
@@ -251,7 +250,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
 
     private void showOptions() {
-        final CharSequence[] option = {"Tomar foto", "Elegir de galeria", "Cancelar"};
+        final CharSequence[] option = {"Tomar foto", "Elegir de galería", "Cancelar"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(DetalleEditarPunto.this);
         builder.setTitle("Elige una opción");
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -360,6 +359,10 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
                     break;
 
+                case BUSCAR_LOCALIZACION:
+                    ((EditText)findViewById(R.id.edLatitud)).setText(data.getDoubleExtra("latitud",0)+"");
+                    ((EditText)findViewById(R.id.edLongitud)).setText(data.getDoubleExtra("longitud",0)+"");
+                    break;
             }
 
 

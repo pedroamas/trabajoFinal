@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 
 public class GestorBD {
-    private int versionDB=2;
+    private int versionDB=3;
     Context context;
     private static GestorBD gestorBD;
     private ArrayList<Punto> puntosBD;

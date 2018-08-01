@@ -2,9 +2,13 @@ package com.example.root.trabajofinal;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -37,23 +41,59 @@ import com.google.android.gms.maps.model.Marker;
         private TextView txtInfo;
         private GestorPuntos gestorPuntos;
         private Context context;
+        private Location loc;
+        private boolean primeraVez=true;
+        private double latitudUser=0;
+        private double longitudUser=0;
+        LocationManager manager;
+        AlertDialog alert = null;
+        private GeoObject user;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_buscar_localizacion_punto);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setContentView(R.layout.map_google);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
-                }else{
-                    permisionGranted();
+                } else {
+                    manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        AlertNoGps();
+                        finish();
+                    } else {
+                        cargarMapa();
+                    }
                 }
-            }else {
-                permisionGranted();
+            } else {
+                manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertNoGps();
+
+                } else {
+                    cargarMapa();
+                }
             }
+        }
 
-
+        private void AlertNoGps() {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            alert = builder.create();
+            alert.show();
         }
 
         public void permisionGranted(){
@@ -80,6 +120,78 @@ import com.google.android.gms.maps.model.Marker;
             return false;
         }
 
+        private void cargarMapa() {
+            Button myLocationButton = (Button) findViewById(R.id.myLocationButton);
+            myLocationButton.setVisibility(View.VISIBLE);
+            myLocationButton.setOnClickListener(this);
+            context = getApplicationContext();
+            Button btnRealidadAumentada = (Button) findViewById(R.id.btnRealidadAumentada);
+            btnRealidadAumentada.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, RealidadAumentada.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+            ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+
+            BeyondarLocationManager
+                    .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
+            gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+            gestorPuntos.getPuntos();
+            try {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+                        //startActivity(getIntent());
+                        //finish();
+                        return;
+                    }
+                }
+                // Acquire a reference to the system Location Manager
+                LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+                // Define a listener that responds to location updates
+                LocationListener locationListener = new LocationListener() {
+                    public void onLocationChanged(Location location) {
+                        // Called when a new location is found by the network location provider.
+                        Log.e("Location updates",location.getLatitude()+" - "+location.getLongitude());
+                        latitudUser=location.getLatitude();
+                        longitudUser=location.getLongitude();
+                        if(primeraVez && mWorld!=null&& user!=null){
+                            LatLng userLocation = new LatLng(latitudUser, longitudUser);
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                            mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
+                            primeraVez=false;
+                        }
+                        if(mWorld!=null&& user!=null){
+                            user.setGeoPosition(latitudUser, longitudUser);
+                            mWorld.addBeyondarObject(user);
+                        }
+                    }
+
+                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                    public void onProviderEnabled(String provider) {}
+
+                    public void onProviderDisabled(String provider) {
+                        AlertNoGps();
+                    }
+                };
+
+                // Register the listener with the Location Manager to receive location updates
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+                loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Log.e("Posicion","latitud: "+loc.getLatitude());
+                Log.e("Posicion","longitud: "+loc.getLongitude());
+                latitudUser=loc.getLatitude();
+                longitudUser=loc.getLongitude();
+            }catch (Exception e){}
+        }
+
         @Override
         protected void onResume() {
             super.onResume();
@@ -101,8 +213,8 @@ import com.google.android.gms.maps.model.Marker;
             // When the user clicks on the button we animate the map to the user
             // location
 
-            txtInfo.setText(mWorld.getLatitude()+" "+mWorld.getLongitude());
-            LatLng userLocation = new LatLng(mWorld.getLatitude(), mWorld.getLongitude());
+            //txtInfo.setText(mWorld.getLatitude()+" "+mWorld.getLongitude());
+            LatLng userLocation = new LatLng(latitudUser, longitudUser);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
         }
@@ -136,20 +248,20 @@ import com.google.android.gms.maps.model.Marker;
 
 
 
-            BeyondarLocationManager.addWorldLocationUpdate(mWorld);
+            //BeyondarLocationManager.addWorldLocationUpdate(mWorld);
             // Lets add the user position to the map
-            GeoObject user = new GeoObject(1000l);
+            user = new GeoObject(1000l);
             user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
             user.setImageResource(R.drawable.flag);
             user.setName("Posición actual");
             mWorld.addBeyondarObject(user);
 
 
-            BeyondarLocationManager.addGeoObjectLocationUpdate(user);
+            //BeyondarLocationManager.addGeoObjectLocationUpdate(user);
 
-            LatLng userLocation = new LatLng(mWorld.getLatitude(), mWorld.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
+            //LatLng userLocation = new LatLng(mWorld.getLatitude(), mWorld.getLongitude());
+            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            //mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
 
             // We need to set the LocationManager to the BeyondarLocationManager.
 
@@ -158,9 +270,7 @@ import com.google.android.gms.maps.model.Marker;
         @Override
         public void onMapLongClick(LatLng latLng) {
             Log.e("","Latitud: "+latLng.latitude + " Longitud: "+latLng.longitude);
-            Toast.makeText(context,
-                    "Latitud: "+latLng.latitude + " Longitud: "+latLng.longitude,
-                    Toast.LENGTH_LONG).show();
+
             Intent returnIntent=new Intent();
             returnIntent.putExtra("latitud",latLng.latitude);
             returnIntent.putExtra("longitud",latLng.longitude);

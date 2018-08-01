@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
@@ -45,12 +47,18 @@ public class ContenidoListaPMC extends Fragment {
         distanciaKm=getActivity().getIntent().getDoubleExtra("distanciaKm", 0);
         puntosMasCercanos=rtree.getPuntosMasCercanos(latitud,longitud,distanciaKm);
         //if(gestorPuntos.size()>0) {
+
         ContenidoListaPMC.ContentAdapter adapter = new ContenidoListaPMC.ContentAdapter(recyclerView.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        if(puntosMasCercanos.size()==0){
+            Toast.makeText(getContext(),"No se han encontrado puntos cercanos dentro del radio",Toast.LENGTH_LONG).show();
+        }
         return recyclerView;
+
+
     }
 
     public  class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,6 +81,7 @@ public class ContenidoListaPMC extends Fragment {
                     Iterator<Punto> iterator=puntosMasCercanos.iterator();
                     int i=0;
                     int idPunto=-1;
+
                     while (i<=getAdapterPosition()){
                         idPunto=iterator.next().getId();
                         i++;

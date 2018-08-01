@@ -41,6 +41,32 @@ public class PuntosMasCercanos extends AppCompatActivity {
         setContentView(R.layout.activity_puntos_mas_cercanos);
 
         context=getApplicationContext();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+
+            } else {
+                manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertNoGps();
+                    finish();
+                } else {
+                    permissionGranted();
+                }
+            }
+        } else {
+            manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                AlertNoGps();
+
+            } else {
+                permissionGranted();
+            }
+        }
+
+    }
+    private void permissionGranted(){
         try {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -136,6 +162,7 @@ public class PuntosMasCercanos extends AppCompatActivity {
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         dialog.cancel();
+                        finish();
                     }
                 });
         alert = builder.create();

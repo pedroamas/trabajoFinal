@@ -72,7 +72,11 @@
             android:ems="10"
             android:id="@+id/edLongitud"
             android:textColor="@color/black"/>
-
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnBuscarUbicacion"
+            android:text="Buscar Ubicación"/>
 
         <Button
             android:id="@+id/show_options_button"
@@ -111,16 +115,7 @@
             android:inputType="textPersonName"
             android:ems="10"
             android:id="@+id/edDescripcionImg" />
-        <TextView
-            android:text="Fecha de captura"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/edFechaCaptura" />
+
         <Button
             android:text="Editar Punto"
             android:layout_width="match_parent"

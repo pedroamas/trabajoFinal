@@ -113,12 +113,17 @@ android:fitsSystemWindows="true"
             android:layout_height="wrap_content"
             tools:text="@string/detail_location"
             android:textColor="@color/black"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnVerMapa"
+            android:text="Ver en mapa"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/blue"
-            android:text="Galería"
+            android:text="Galería de imágenes"
             android:textSize="@dimen/article_titles"
             android:layout_marginBottom="@dimen/md_keylines"
             android:layout_marginTop="@dimen/md_keylines" />

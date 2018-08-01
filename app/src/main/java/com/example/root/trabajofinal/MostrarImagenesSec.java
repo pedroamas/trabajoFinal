@@ -77,6 +77,8 @@ public class MostrarImagenesSec extends AppCompatActivity {
 
                     ImageView imgFoto=(ImageView)findViewById(R.id.imgFoto);
                     Glide.with(getApplicationContext()).load(multimedia.getPath())
+                            .crossFade()
+                            .placeholder(R.drawable.ic_image_box)
                             .into(imgFoto);
 
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

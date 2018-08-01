@@ -42,18 +42,25 @@ public class Login extends AppCompatActivity{
             public void onClick(View v) {
                 EditText edUsername=(EditText)findViewById(R.id.edUsername);
                 EditText edPassword=(EditText)findViewById(R.id.edPassword);
+
                 Log.e("","clickea");
                 usuario=new Usuario(edUsername.getEditableText().toString(),
                                     edPassword.getEditableText().toString());
                 gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
-
+                if(usuario.getUsername().isEmpty()){
+                    Toast.makeText(getApplicationContext(),"Ingrese el nombre de usuario",Toast.LENGTH_LONG).show();
+                    return;
+                }else if(usuario.getContrasena().isEmpty()){
+                    Toast.makeText(getApplicationContext(),"Ingrese la contraseña",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 gestorUsuarios.login(usuario, new LoginListener() {
                     @Override
                     public void onResponseLoginListener(Usuario usuario) {
                         gestorUsuarios.setUsuario(usuario);
                         Log.e("","manda algo el login");
                         if(usuario==null){
-                            Toast.makeText(getApplicationContext(),"No esta registrado",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"No está registrado",Toast.LENGTH_LONG).show();
                         }else if(usuario.isAdmin()){
                             Log.e("","siiii es admin");
                             Intent returnIntent=new Intent();

@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -70,6 +71,8 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
                     ImageView imgFoto=(ImageView)findViewById(R.id.imgFoto);
                     Glide.with(getApplicationContext()).load(multimedia.getPath())
+                            .crossFade()
+                            .placeholder(R.drawable.ic_image_box)
                             .into(imgFoto);
 
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -137,11 +140,11 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
                         final Comentario comentario=(Comentario)adaptador.getItem(position);
                         AlertDialog.Builder builder;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(), android.R.style.Theme_Material_Dialog_Alert);
+                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(), android.R.style.Theme_Material_Dialog);
                         } else {
                             builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
                         }
-                        builder.setTitle(Html.fromHtml("<font color='#FF0000'>Comentario de "+comentario.getUsername()+"</font>"));
+                        builder.setTitle(Html.fromHtml("<font color='#3F51B5'>Comentario de "+comentario.getUsername()+"</font>"));
 
                         builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el mensaje?</font>"));
                         //builder.setTitle("Eliminar");
@@ -169,14 +172,21 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
                                     }
                                 })
 
-                                .setIcon(R.drawable.ic_dialog_alert)
-                                .show();
+                                .setIcon(R.drawable.ic_dialog_alert);
+
+                        AlertDialog a=builder.create();
+
+                        a.show();
+                        Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+                        bq.setBackgroundColor(Color.RED);
+                        bq.setTextColor(getResources().getColor(R.color.white));
 
                     }
                 });
 
             }
         });
+
     }
 
 

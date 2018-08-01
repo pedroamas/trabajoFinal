@@ -94,6 +94,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".VerVideo"
             android:screenOrientation="portrait"/>
+        <activity android:name=".VerVideoEliminarComentario"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".EditarPunto"
             android:screenOrientation="portrait" />

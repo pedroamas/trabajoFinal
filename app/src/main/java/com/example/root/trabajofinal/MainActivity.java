@@ -3,14 +3,19 @@ package com.example.root.trabajofinal;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
@@ -27,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static int INICIAR_SESION = 100;
     private static int MENU_ADMIN = 200;
     private GestorUsuarios gestorUsuarios;
-    private IndiceRtree indiceRtree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +83,14 @@ public class MainActivity extends AppCompatActivity {
         visibilidadBotones(usuario);
 
 
+        Button btnAdministracion=(Button)findViewById(R.id.btnAdministracion);
+        btnAdministracion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                startActivityForResult(intent,MENU_ADMIN);
+            }
+        });
         FloatingActionButton btnActualizar = (FloatingActionButton) findViewById(R.id.btnActualizar);
         btnActualizar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request it is that we're responding to
-        Log.e("","1");
+
+
         if (requestCode == INICIAR_SESION||requestCode==MENU_ADMIN)  {
             Log.e("","2");
             // Make sure the request was successful
@@ -177,19 +189,30 @@ public class MainActivity extends AppCompatActivity {
     private void visibilidadBotones(Usuario usuario){
         FloatingActionButton btnIniciarSesion = (FloatingActionButton) findViewById(R.id.btnIniciarSesion);
         FloatingActionButton btnCerrarSesion = (FloatingActionButton) findViewById(R.id.btnCerrarSesion);
-
+        Button btnAdministracion=(Button)findViewById(R.id.btnAdministracion);
+        TextView txtUsuario=(TextView)findViewById(R.id.txtUsuario);
         if(usuario==null) {
             btnIniciarSesion.setVisibility(View.VISIBLE);
             btnCerrarSesion.setVisibility(View.INVISIBLE);
+            btnAdministracion.setVisibility(View.INVISIBLE);
+            txtUsuario.setVisibility(View.INVISIBLE);
 
         }
         else{
             btnIniciarSesion.setVisibility(View.INVISIBLE);
             btnCerrarSesion.setVisibility(View.VISIBLE);
+            btnAdministracion.setVisibility(View.INVISIBLE);
+            txtUsuario.setText(usuario.getUsername());
+            txtUsuario.setVisibility(View.VISIBLE);
             if(usuario.isAdmin()){
+                btnAdministracion.setVisibility(View.VISIBLE);
                 Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
                 startActivityForResult(intent,MENU_ADMIN);
             }
         }
     }
+
+
+
+
 }

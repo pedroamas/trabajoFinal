@@ -88,8 +88,7 @@
                 android:id="@+id/place_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="@string/detail_desc"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -104,19 +103,48 @@
                 android:id="@+id/place_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="@string/detail_location"
                 android:textColor="@color/black"/>
 
-            <TextView
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/blue"
-                android:text="Galería"
-                android:textSize="@dimen/article_titles"
-                android:layout_marginBottom="@dimen/md_keylines"
-                android:layout_marginTop="@dimen/md_keylines" />
+                android:id="@+id/btnVerMapa"
+                android:text="Ver en mapa"/>
 
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytGaleria">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/blue"
+                    android:text="Galería de imágenes"
+                    android:textSize="@dimen/article_titles"
+                    android:layout_marginBottom="@dimen/md_keylines"
+                    android:layout_marginTop="@dimen/md_keylines" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytImagenesUsuarios">
+                <TextView
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/article_titles"
+                    android:layout_marginBottom="@dimen/md_keylines"
+                    android:layout_marginTop="@dimen/md_keylines"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Imágenes de los usuarios"/>
+
+            </LinearLayout>
 
         </LinearLayout>
+
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

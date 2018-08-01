@@ -56,7 +56,7 @@
         android:id="@+id/edEmail" />
 
     <TextView
-        android:text="Username"
+        android:text="Nombre de usuario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView6" />
@@ -93,6 +93,11 @@
         android:inputType="textPassword"
         android:ems="10"
         android:id="@+id/edConfContrasena" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edValidarContr"
+        android:textColor="@color/red"/>
 
     <Button
         android:text="Registrarse"

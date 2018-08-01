@@ -109,18 +109,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:id="@+id/edDescripcionImg" />
-        <TextView
-            android:text="Fecha de captura"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView9" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="date"
-            android:ems="10"
-            android:id="@+id/edFechaCaptura" />
 
         <Button
             android:text="Agregar Punto"

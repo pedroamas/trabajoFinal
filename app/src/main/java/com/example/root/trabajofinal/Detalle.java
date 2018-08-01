@@ -38,6 +38,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
@@ -73,7 +77,6 @@ public class Detalle extends AppCompatActivity  {
         // Set title of Detail page
         // collapsingToolbar.setTitle(getString(R.string.item_title));
         final GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
-        Log.e("Intent","Detalle");
 
         punto= gestorPuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
         Log.e("putExtra","id: "+punto.getFoto());
@@ -140,12 +143,15 @@ public class Detalle extends AppCompatActivity  {
                     ImageView imgGaleria=new ImageView(context);
                     linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-
-                    Picasso.with(context).load(imagen.getPath())
-                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop().into(imgGaleria);
-                    //imgGaleria.setScaleType(ImageView.ScaleType.FIT_START);
+                    //linLayoutParam.setMargins(0,10,0,0);
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
                     imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
                     layout.addView(imgGaleria);
                     imgGaleria.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -212,22 +218,7 @@ public class Detalle extends AppCompatActivity  {
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 Log.e("Imagenes","Trajo imagnes de usuarios"+imagenes.size());
                 final LinearLayout layout = (LinearLayout) findViewById(R.id.lytImagenesUsuarios);
-                /*
-                DisplayMetrics dm = getResources().getDisplayMetrics();
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.setMargins(0, convertDpToPx(16, dm), 0, convertDpToPx(16, dm));
 
-                TextView galeriaUsuarios=new TextView(context);
-                galeriaUsuarios.setLayoutParams(lp);
-
-                galeriaUsuarios.setText("Imagenes de los usuarios");
-                galeriaUsuarios.setTextSize(20);
-                galeriaUsuarios.setTextColor(getResources().getColor( R.color.blue));
-
-                if(imagenes.size()>0) {
-                    layout.addView(galeriaUsuarios);
-                }
-                */
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
 
@@ -237,11 +228,14 @@ public class Detalle extends AppCompatActivity  {
                     linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
 
-                    Picasso.with(context).load(imagen.getPath())
-                            .resize(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop().into(imgGaleria);
-                    //imgGaleria.setScaleType(ImageView.ScaleType.FIT_START);
+                    Glide.with(context).load(imagen.getPath())
+                            .placeholder(R.drawable.ic_image_box)
+                            .override(600, 200) // resizes the image to these dimensions (in pixel)
+                            .centerCrop()
+                            .crossFade()
+                            .into(imgGaleria);
                     imgGaleria.setLayoutParams(linLayoutParam);
+                    imgGaleria.setPadding(0,10,0,10);
                     layout.addView(imgGaleria);
                     imgGaleria.setOnClickListener(new View.OnClickListener() {
                         @Override

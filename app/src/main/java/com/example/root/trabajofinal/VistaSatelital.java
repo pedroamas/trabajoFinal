@@ -136,7 +136,6 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
             // Define a listener that responds to location updates
             LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
-                    // Called when a new location is found by the network location provider.
                     Log.e("Location updates",location.getLatitude()+" - "+location.getLongitude());
                     latitudUser=location.getLatitude();
                     longitudUser=location.getLongitude();

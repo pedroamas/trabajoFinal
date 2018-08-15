@@ -212,7 +212,7 @@ public class EditarImagenSec extends AppCompatActivity {
                 if(option[which] == "Tomar foto"){
                     openCamera();
 
-                }else if(option[which] == "Elegir de galeria"){
+                }else if(option[which] == "Elegir de galería"){
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
                     startActivityForResult(intent.createChooser(intent, "Selecciona app de imagen"), SELECT_PICTURE);

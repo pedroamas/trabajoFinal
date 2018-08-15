@@ -3,9 +3,11 @@ package com.example.root.trabajofinal;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -60,6 +62,8 @@ public class MenuAdmin extends AppCompatActivity {
 
         TextView txtUsuario=(TextView)findViewById(R.id.txtUsuario);
         txtUsuario.setText(gestorUsuarios.getUsuario().getUsername());
+        txtUsuario.setTypeface(null, Typeface.BOLD);
+        txtUsuario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         Button btnEditarPunto=(Button)findViewById(R.id.btnEditarPunto);
         btnEditarPunto.setOnClickListener(new View.OnClickListener() {
             @Override

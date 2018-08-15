@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
     >
     <LinearLayout
@@ -21,12 +22,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Imagen"
-                android:id="@+id/btnImagen"
-                style="@style/BotonPrimary"/>
+                android:textColor="@color/white"
+                app:backgroundTint="@color/button_material_dark"
+                android:id="@+id/btnImagen"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/imgFotoSec"/>
+                android:id="@+id/imgFotoSec"
+                />
         </LinearLayout>
 
         <TextView

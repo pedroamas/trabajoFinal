@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progress;
     private static int INICIAR_SESION = 100;
     private static int MENU_ADMIN = 200;
+    private static int PANTALLA_CUALQUIERA = 300;
     private GestorUsuarios gestorUsuarios;
 
     @Override
@@ -115,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), RealidadAumentada.class);
-                startActivity(intent);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
             }
         });
         Button btnVistaSatelital = (Button) findViewById(R.id.btnVistaSatelital);
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), VistaSatelital.class);
-                startActivity(intent);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
             }
         });
         Button btnLista = (Button) findViewById(R.id.btnLista);
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ListaMaterialDesign.class);
-                startActivity(intent);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
             }
         });
 
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PuntosMasCercanos.class);
-                startActivity(intent);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
 
                 //indiceRtree.consultar(-33.2913857,90,-66.3386996,90);
             }
@@ -153,37 +156,33 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Usuario usuario = gestorUsuarios.getUsuario();
+        FloatingActionButton btnIniciarSesion = (FloatingActionButton) findViewById(R.id.btnIniciarSesion);
+        FloatingActionButton btnCerrarSesion = (FloatingActionButton) findViewById(R.id.btnCerrarSesion);
 
-
-        if (requestCode == INICIAR_SESION||requestCode==MENU_ADMIN)  {
-            Log.e("","2");
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-
-                Usuario usuario = gestorUsuarios.getUsuario();
-                FloatingActionButton btnIniciarSesion = (FloatingActionButton) findViewById(R.id.btnIniciarSesion);
-                FloatingActionButton btnCerrarSesion = (FloatingActionButton) findViewById(R.id.btnCerrarSesion);
-
-                btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getApplicationContext(), Login.class);
-                        startActivityForResult(intent,INICIAR_SESION);
-                    }
-                });
-
-                btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        gestorUsuarios.cerrarSesion();
-                        visibilidadBotones(null);
-                    }
-                });
-
-                visibilidadBotones(usuario);
-
+        btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivityForResult(intent,INICIAR_SESION);
             }
-        }
+        });
+
+        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gestorUsuarios.cerrarSesion();
+                visibilidadBotones(null);
+            }
+        });
+
+        visibilidadBotones(usuario);
+
+
+
+
+
+
     }
 
     private void visibilidadBotones(Usuario usuario){
@@ -203,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
             btnCerrarSesion.setVisibility(View.VISIBLE);
             btnAdministracion.setVisibility(View.INVISIBLE);
             txtUsuario.setText(usuario.getUsername());
+            txtUsuario.setTypeface(null, Typeface.BOLD);
+            txtUsuario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
             txtUsuario.setVisibility(View.VISIBLE);
             if(usuario.isAdmin()){
                 btnAdministracion.setVisibility(View.VISIBLE);

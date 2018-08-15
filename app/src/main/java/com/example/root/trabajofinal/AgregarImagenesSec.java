@@ -265,7 +265,7 @@ public class AgregarImagenesSec extends AppCompatActivity {
 
 
     private void showOptions() {
-        final CharSequence[] option = {"Tomar foto", "Elegir de galeria", "Cancelar"};
+        final CharSequence[] option = {"Tomar foto", "Elegir de galería", "Cancelar"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(AgregarImagenesSec.this);
         builder.setTitle("Eleige una opción");
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -273,7 +273,7 @@ public class AgregarImagenesSec extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if(option[which] == "Tomar foto"){
                     openCamera();
-                }else if(option[which] == "Elegir de galeria"){
+                }else if(option[which] == "Elegir de galería"){
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
                     startActivityForResult(intent.createChooser(intent, "Selecciona app de imagen"), SELECT_PICTURE);

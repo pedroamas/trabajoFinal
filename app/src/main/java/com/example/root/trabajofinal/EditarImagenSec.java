@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,15 +34,19 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
+import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.example.root.trabajofinal.TiposEnumerados.TipoMultimedia;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,23 +112,58 @@ public class EditarImagenSec extends AppCompatActivity {
         btnEliminarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gestorMultimedia = GestorMultimedia.getInstance(context);
-                gestorMultimedia.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
-                    @Override
-                    public void onResponseEliminarImagenSecListener(String response) {
-                        if(response.equals("Ok")){
-                            Toast.makeText(context,"La imagen ha sido borrada correctamente",
-                                    Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(),R.style.AppTheme);
+                } else {
+                    builder = new AlertDialog.Builder(EditarImagenSec.this,R.style.Theme_AppCompat_Dialog);
+                }
+                builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el punto de interés?</font>"));
+                //builder.setTitle("Eliminar");
+                builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        gestorMultimedia = GestorMultimedia.getInstance(context);
+                        gestorMultimedia.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
+                            @Override
+                            public void onResponseEliminarImagenSecListener(String response) {
+                                if(response.equals("Ok")){
+                                    Toast.makeText(context,"La imagen ha sido borrada correctamente",
+                                            Toast.LENGTH_LONG).show();
 
-                            Intent returnIntent=new Intent();
-                            setResult(Activity.RESULT_OK,returnIntent);
-                            finish();
-                        }else{
-                            Toast.makeText(context,"Ocurrió un error al eliminar la imagen",
-                                    Toast.LENGTH_LONG).show();
-                        }
+                                    Intent returnIntent=new Intent();
+                                    setResult(Activity.RESULT_OK,returnIntent);
+                                    finish();
+                                }else{
+                                    Toast.makeText(context,"Ocurrió un error al eliminar la imagen",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
                     }
-                });
+                })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+
+                        .setIcon(R.drawable.ic_dialog_alert);
+
+                AlertDialog a=builder.create();
+                a.show();
+                Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+                bq.setBackgroundColor(Color.RED);
+                bq.setTextColor(getResources().getColor(R.color.white));
+
+
+
+
+
+
+
+
+
             }
         });
         Button btnEditarImagen=(Button)findViewById(R.id.btnEditarImagen);

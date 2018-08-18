@@ -2,16 +2,23 @@ package com.example.root.trabajofinal;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,6 +34,7 @@ import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EliminarCometarioListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
@@ -196,26 +204,54 @@ public class DetalleEliminarPunto extends AppCompatActivity {
         btnEliminarPunto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
-                gestorPuntos.eliminarPunto(punto.getId(), new EliminarPuntoListener() {
-                    @Override
-                    public void onResponseEliminarPunto(String response) {
 
-                        if (response.equals("Ok")){
-                            Toast.makeText(getApplicationContext(), "El punto se eliminó correctamente", Toast.LENGTH_LONG).show();
-                            gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
-                                @Override
-                                public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
-                                    Intent returnIntent=new Intent();
-                                    setResult(Activity.RESULT_OK,returnIntent);
-                                    finish();
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(),R.style.AppTheme);
+                } else {
+                    builder = new AlertDialog.Builder(DetalleEliminarPunto.this,R.style.Theme_AppCompat_Dialog);
+                }
+                builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el punto de interés?</font>"));
+                //builder.setTitle("Eliminar");
+                builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        final GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                        gestorPuntos.eliminarPunto(punto.getId(), new EliminarPuntoListener() {
+                            @Override
+                            public void onResponseEliminarPunto(String response) {
+
+                                if (response.equals("Ok")){
+                                    Toast.makeText(getApplicationContext(), "El punto se eliminó correctamente", Toast.LENGTH_LONG).show();
+                                    gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                                        @Override
+                                        public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+                                            Intent returnIntent=new Intent();
+                                            setResult(Activity.RESULT_OK,returnIntent);
+                                            finish();
+                                        }
+                                    });
+                                }else{
+                                    //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                                 }
-                            });
-                        }else{
-                            //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        }
+                            }
+                        });
+
                     }
-                });
+                })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+
+                        .setIcon(R.drawable.ic_dialog_alert);
+
+                AlertDialog a=builder.create();
+                a.show();
+                Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+                bq.setBackgroundColor(Color.RED);
+                bq.setTextColor(getResources().getColor(R.color.white));
+                Log.e("TEMA",""+getThemeName());
             }
         });
     }
@@ -223,6 +259,21 @@ public class DetalleEliminarPunto extends AppCompatActivity {
     private int convertDpToPx(int dp, DisplayMetrics displayMetrics) {
         float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
         return Math.round(pixels);
+    }
+
+    public String getThemeName()
+    {
+        PackageInfo packageInfo;
+        try
+        {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_META_DATA);
+            int themeResId = packageInfo.applicationInfo.theme;
+            return getResources().getResourceEntryName(themeResId);
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            return null;
+        }
     }
 
 }

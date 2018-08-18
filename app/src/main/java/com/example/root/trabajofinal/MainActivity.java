@@ -3,6 +3,8 @@ package com.example.root.trabajofinal;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         gestorUsuarios = GestorUsuarios.getInstance(this);
         Usuario usuario = gestorUsuarios.getUsuario();
+        Log.e("TEMA",""+this.getThemeName());
 
         progress = new ProgressDialog(this);
         progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -182,11 +185,6 @@ public class MainActivity extends AppCompatActivity {
 
         visibilidadBotones(usuario);
 
-
-
-
-
-
     }
 
     private void visibilidadBotones(Usuario usuario){
@@ -223,5 +221,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public String getThemeName()
+    {
+        PackageInfo packageInfo;
+        try
+        {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_META_DATA);
+            int themeResId = packageInfo.applicationInfo.theme;
+            return getResources().getResourceEntryName(themeResId);
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            return null;
+        }
+    }
 
 }

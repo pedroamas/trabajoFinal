@@ -3,6 +3,8 @@ package com.example.root.trabajofinal;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -51,7 +53,7 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mostrar_imagenes_sec_eliminar_comentario);
         Log.e("","eliminar comentarios siiii");
-
+        Log.e("TEMA",getTheme().toString());
         mostrarImagenesSecEliminarComentario=this;
         dt1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         dt2=new SimpleDateFormat("dd/MM/yyyy");
@@ -120,6 +122,20 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
         });
 
     }
+    public String getThemeName()
+    {
+        PackageInfo packageInfo;
+        try
+        {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_META_DATA);
+            int themeResId = packageInfo.applicationInfo.theme;
+            return getResources().getResourceEntryName(themeResId);
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            return null;
+        }
+    }
 
     private void llenarComentarios(){
 
@@ -144,6 +160,7 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
                         } else {
                             builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
                         }
+                        Log.e("TEMA",""+getThemeName());
                         builder.setTitle(Html.fromHtml("<font color='#3F51B5'>Comentario de "+comentario.getUsername()+"</font>"));
 
                         builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el mensaje?</font>"));
@@ -253,5 +270,7 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
             return v;
         }
+
+
     }
 }

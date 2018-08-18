@@ -252,7 +252,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
     private void showOptions() {
         final CharSequence[] option = {"Tomar foto", "Elegir de galería", "Cancelar"};
         final AlertDialog.Builder builder = new AlertDialog.Builder(DetalleEditarPunto.this);
-        builder.setTitle("Elige una opción");
+        builder.setTitle("Elegir una opción");
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

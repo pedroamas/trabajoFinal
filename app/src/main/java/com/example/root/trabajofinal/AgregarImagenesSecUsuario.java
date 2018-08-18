@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -76,15 +78,14 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     if (f == null) {
-                        Toast.makeText(context, "Ingrese una imagen", Toast.LENGTH_LONG);
-                    }else{
+                        Toast.makeText(context, "Ingrese una imagen", Toast.LENGTH_LONG).show();
+                    }else if (!AgregarImagenesSecUsuario.isOnline(AgregarImagenesSecUsuario.this)){
+                        Toast.makeText(context, "No hay conexión a internet", Toast.LENGTH_LONG).show();
+                    }else {
                         AlertDialog.Builder builder;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(), android.R.style.Theme_Material
-                            );
-                        } else {
-                            builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
-                        }
+
+                        builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
+
                         //builder.setTitle(Html.fromHtml("<font color='#3F51B5'>Comentario de</font>"));
 
                         builder.setMessage(Html.fromHtml("<font color='#000000'>La imagen debe ser aprobada por el administrador</font>"));
@@ -116,8 +117,11 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
                                         Log.e("Resp", response);
                                         progress.dismiss();
                                         if (response.equals("Ok")) {
-
-
+                                            runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    Toast.makeText(AgregarImagenesSecUsuario.this, "La imágen se subió correctamente", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
 
                                             //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
                                             Intent returnIntent = new Intent();
@@ -309,6 +313,14 @@ public class AgregarImagenesSecUsuario extends AppCompatActivity {
 
             builder.show();
         }
+
+    private static ConnectivityManager manager;
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+    }
 
     }
 

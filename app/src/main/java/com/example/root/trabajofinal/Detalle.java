@@ -63,6 +63,7 @@ public class Detalle extends AppCompatActivity  {
     private GestorMultimedia gestorMultimedia;
     private Context context;
     private Punto punto;
+    private static int LOGUEAR_USUARIO = 100;
     private LinearLayoutCompat.LayoutParams linLayoutParam;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,7 +96,7 @@ public class Detalle extends AppCompatActivity  {
                 GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
                 if(gestorUsuarios.getUsuario()==null){
                     Intent intent = new Intent(getApplicationContext(), Login.class);
-                    startActivity(intent);
+                    startActivityForResult(intent,LOGUEAR_USUARIO);
                 }else {
                     Intent intent = new Intent(context, AgregarImagenesSecUsuario.class);
                     intent.putExtra("id_punto", punto.getId());
@@ -269,5 +270,20 @@ public class Detalle extends AppCompatActivity  {
     private int convertDpToPx(int dp, DisplayMetrics displayMetrics) {
         float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
         return Math.round(pixels);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            if(requestCode==LOGUEAR_USUARIO ){
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(context);
+                if(gestorUsuarios.getUsuario()!=null){
+                    Intent intent = new Intent(context, AgregarImagenesSecUsuario.class);
+                    intent.putExtra("id_punto", punto.getId());
+                    startActivity(intent);
+                }
+
+            }
+        }
     }
 }

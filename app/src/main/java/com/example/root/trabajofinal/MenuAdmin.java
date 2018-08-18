@@ -3,7 +3,10 @@ package com.example.root.trabajofinal;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -63,7 +66,11 @@ public class MenuAdmin extends AppCompatActivity {
         TextView txtUsuario=(TextView)findViewById(R.id.txtUsuario);
         txtUsuario.setText(gestorUsuarios.getUsuario().getUsername());
         txtUsuario.setTypeface(null, Typeface.BOLD);
-        txtUsuario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+        Drawable dr = this.getResources().getDrawable(R.drawable.ic_perm_identity_black_24dp);
+        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+        Drawable d = new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(bitmap, 35, 35, true));
+
+        txtUsuario.setCompoundDrawablesWithIntrinsicBounds(d, null, null, null);
         Button btnEditarPunto=(Button)findViewById(R.id.btnEditarPunto);
         btnEditarPunto.setOnClickListener(new View.OnClickListener() {
             @Override

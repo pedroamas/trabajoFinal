@@ -3,8 +3,12 @@ package com.example.root.trabajofinal;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -203,12 +207,16 @@ public class MainActivity extends AppCompatActivity {
             btnAdministracion.setVisibility(View.INVISIBLE);
             txtUsuario.setText(usuario.getUsername());
             txtUsuario.setTypeface(null, Typeface.BOLD);
-            txtUsuario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+            Drawable dr = this.getResources().getDrawable(R.drawable.ic_perm_identity_black_24dp);
+            Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+            Drawable d = new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(bitmap, 35, 35, true));
+
+            txtUsuario.setCompoundDrawablesWithIntrinsicBounds(d, null, null, null);
             txtUsuario.setVisibility(View.VISIBLE);
             if(usuario.isAdmin()){
                 btnAdministracion.setVisibility(View.VISIBLE);
-                Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
-                startActivityForResult(intent,MENU_ADMIN);
+                //Intent intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                //startActivityForResult(intent,MENU_ADMIN);
             }
         }
     }

@@ -113,7 +113,6 @@ public class IndiceRtree {
                 "WHERE ("+(latitud-incrementoLatitud/Math.sqrt(2))+")<=latitud and latitud<=("+(latitud+incrementoLatitud/Math.sqrt(2))+") AND " +
                 "("+(longitud-incrementoLongitud/Math.sqrt(2))+")<=longitud and longitud<=("+(longitud+incrementoLongitud/Math.sqrt(2))+") ";
 
-        //Log.e("SQL area inf",sql);
         Cursor cursor = db.rawQuery(sql , null);
         int id = -1;
         if (cursor.moveToFirst()) {

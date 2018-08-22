@@ -128,41 +128,55 @@ public class Detalle extends AppCompatActivity  {
         }
 
         placePicutre.setImageBitmap(fotoPortada);
-
+        linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
 
         gestorMultimedia.getImagenes(punto.getId(), new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
-                Log.e("Imagenes","Trajo imagnes "+imagenes.size());
                 final LinearLayout layout = (LinearLayout) findViewById(R.id.lytGaleria);
-
+                layout.removeAllViews();
+                int count=0;
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
 
                     final Multimedia imagen =ite.next();
                     Log.e("Imagenes","path imagnes "+imagen.getPath());
-                    ImageView imgGaleria=new ImageView(context);
-                    linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-                    //linLayoutParam.setMargins(0,10,0,0);
-                    Glide.with(context).load(imagen.getPath())
-                            .placeholder(R.drawable.ic_image_box)
-                            .override(600, 200) // resizes the image to these dimensions (in pixel)
-                            .centerCrop()
-                            .crossFade()
-                            .into(imgGaleria);
-                    imgGaleria.setLayoutParams(linLayoutParam);
-                    imgGaleria.setPadding(0,10,0,10);
-                    layout.addView(imgGaleria);
-                    imgGaleria.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent=new Intent(context,MostrarImagenesSec.class);
-                            intent.putExtra("id_imagen",imagen.getId());
-                            startActivity(intent);
-                            //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    if(count==0){
+                        final ImageView image=(ImageView)findViewById(R.id.image);
+                        image.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent=new Intent(context,MostrarImagenesSec.class);
+                                intent.putExtra("id_imagen",imagen.getId());
+                                intent.putExtra("no_editar",1);
+                                startActivity(intent);
+                                //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }else {
+                        ImageView imgGaleria = new ImageView(context);
+
+                        Glide.with(context).load(imagen.getPath())
+                                .placeholder(R.drawable.ic_image_box)
+                                .override(600, 200) // resizes the image to these dimensions (in pixel)
+                                .centerCrop()
+                                .crossFade()
+                                .into(imgGaleria);
+                        imgGaleria.setLayoutParams(linLayoutParam);
+                        imgGaleria.setPadding(0, 10, 0, 10);
+                        layout.addView(imgGaleria);
+                        imgGaleria.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(context, MostrarImagenesSec.class);
+                                intent.putExtra("id_imagen", imagen.getId());
+                                startActivity(intent);
+                                //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                    count++;
                 }
 
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
@@ -226,8 +240,7 @@ public class Detalle extends AppCompatActivity  {
                     final Multimedia imagen =ite.next();
                     Log.e("Imagenes","path imagnes "+imagen.getPath());
                     ImageView imgGaleria=new ImageView(context);
-                    linLayoutParam = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    linLayoutParam.height=LinearLayout.LayoutParams.WRAP_CONTENT;
+
 
                     Glide.with(context).load(imagen.getPath())
                             .placeholder(R.drawable.ic_image_box)

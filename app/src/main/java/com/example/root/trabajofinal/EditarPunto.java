@@ -29,7 +29,7 @@ public class EditarPunto extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ListaMaterialDesign.Adapter adapter = new ListaMaterialDesign.Adapter(getSupportFragmentManager());
-        adapter.addFragment(new ContenidoListaEditar(), "List");
+        adapter.addFragment(new ContenidoListaAdmin(), "List");
         viewPager.setAdapter(adapter);
     }
 

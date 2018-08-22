@@ -1,5 +1,6 @@
 package com.example.root.trabajofinal;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -36,11 +37,10 @@ public class ValidarInfoUsuario extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("validar","tengo q entrar");
         if(resultCode == RESULT_OK){
-            Log.e("validar","entre");
-            finish();
             startActivity(getIntent());
+            setResult(Activity.RESULT_OK,getIntent());
+            finish();
         }
     }
 }

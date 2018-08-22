@@ -64,71 +64,159 @@ android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
     <LinearLayout
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/article_keylines"
-        android:paddingRight="@dimen/md_keylines"
-        android:paddingTop="@dimen/md_keylines">
-
-        <Button
-            android:text="Eliminar Punto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:backgroundTint="@color/red"
-            android:id="@+id/btnEliminarPunto" />
+            android:stretchColumns="0,2">
+            <TableRow>
 
-        <TextView
+                <Button
+                    android:drawableTop="@drawable/ic_menu_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:text="Editar"
+                    android:id="@+id/btnEditarPunto"
+                    app:backgroundTint="@color/wallet_holo_blue_light"/>
+                <Button
+                    android:id="@+id/btnEliminarPunto"
+                    android:layout_width="wrap_content"
+                    android:text="Eliminar"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:drawableTop="@drawable/ic_menu_delete2"
+                    app:backgroundTint="@color/red" />
+                <Button
+                    android:id="@+id/btnValidarInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:drawableTop="@drawable/validarimages"
+                    app:backgroundTint="@color/green"
+                    android:text="Validar" />
+
+
+            </TableRow>
+        </TableLayout>
+        <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:text="Descripción"
-            android:textSize="@dimen/article_titles"
-            android:layout_marginBottom="@dimen/md_keylines" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/article_keylines"
+            android:paddingRight="@dimen/md_keylines"
+            android:paddingTop="@dimen/md_keylines">
 
 
 
-        <TextView
-            android:id="@+id/place_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/detail_desc"
-            android:textColor="@color/black"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:text="Ubicación"
-            android:textSize="@dimen/article_titles"
-            android:layout_marginBottom="@dimen/md_keylines"
-            android:layout_marginTop="@dimen/md_keylines" />
-
-        <TextView
-            android:id="@+id/place_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/detail_location"
-            android:textColor="@color/black"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnVerMapa"
-            android:text="Ver en mapa"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:text="Galería de imágenes"
-            android:textSize="@dimen/article_titles"
-            android:layout_marginBottom="@dimen/md_keylines"
-            android:layout_marginTop="@dimen/md_keylines" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="Descripción"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines" />
 
 
+
+            <TextView
+                android:id="@+id/place_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/detail_desc"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="Ubicación"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines" />
+
+            <TextView
+                android:id="@+id/place_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/detail_location"
+                android:textColor="@color/black"/>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnVerMapa"
+                android:text="Ver en mapa"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="Galería de imágenes"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytGaleria">
+
+
+            </LinearLayout>
+            <Button
+                android:text="Agregar imagen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/BotonRojo"
+                android:id="@+id/btnAgregarImagen" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="Galería de videos"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytGaleriaVideos">
+
+
+            </LinearLayout>
+            <Button
+                android:text="Agregar video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/BotonRojo"
+                android:id="@+id/btnAgregarVideo" />
+            <TextView
+                android:textColor="@color/blue"
+                android:textSize="@dimen/article_titles"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Imágenes de los usuarios"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/lytImagenesUsuarios">
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
     </LinearLayout>
+
 </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

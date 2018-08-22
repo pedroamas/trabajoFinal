@@ -33,11 +33,9 @@ import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -52,7 +50,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
     private String titulo;
     private String descripcion;
     private String fechaCaptura;
-    private ImageView imagenPicasso;
+    private ImageView imagenGlide;
     private File f;
     private String mPath;
     private String pathImagen;
@@ -70,7 +68,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         context = getApplicationContext();
         idPunto = getIntent().getIntExtra("id_punto", 0);
-        imagenPicasso = (ImageView) findViewById(R.id.imagenPicasso);
+        imagenGlide = (ImageView) findViewById(R.id.imagenPicasso);
         mRlView = (LinearLayout) findViewById(R.id.rl_view);
         btnImagen = (Button) findViewById(R.id.btnImagen);
 
@@ -211,6 +209,24 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
     ProgressDialog progress;
 
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(progress!=null){
+            progress.dismiss();
+            progress=null;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(progress!=null){
+            progress.dismiss();
+            progress=null;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         if(resultCode == RESULT_OK){
@@ -229,7 +245,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
                     f=new File(mPath);
                     Glide.with(context)
                             .load("file:" + mPath)
-                            .into(imagenPicasso);
+                            .into(imagenGlide);
 
                     break;
                 case SELECT_PICTURE:
@@ -244,7 +260,7 @@ public class SubirPuntoAdmin extends AppCompatActivity {
 
                         Glide.with(context)
                                 .load("file:" + f.getAbsolutePath())
-                                .into(imagenPicasso);
+                                .into(imagenGlide);
                     }
                     break;
                 case BUSCAR_LOCALIZACION:

@@ -74,7 +74,7 @@ public class ContenidoListaEliminar extends Fragment {
                         idPunto=iterator.next().getId();
                         i++;
                     }
-                    intent = new Intent(context, DetalleEliminarPunto.class);
+                    intent = new Intent(context, DetalleAdmin.class);
                     intent.putExtra("id",idPunto);
 
                     getActivity().startActivityForResult(intent,ELIMINAR_PUNTO);

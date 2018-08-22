@@ -81,7 +81,7 @@
             android:name=".EliminarPunto"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".DetalleEliminarPunto"
+            android:name=".DetalleAdmin"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">

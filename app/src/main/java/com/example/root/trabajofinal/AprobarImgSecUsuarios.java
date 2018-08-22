@@ -37,7 +37,6 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aprobar_img_sec_usuarios);
-
         dt1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         dt2=new SimpleDateFormat("dd/MM/yyyy");
         context=getApplicationContext();
@@ -95,18 +94,6 @@ public class AprobarImgSecUsuarios extends AppCompatActivity {
                         txtTituloPunto.setText("Punto de referencia : "+multimedia.getTituloPunto());
                         txtTituloPunto.setLayoutParams(params);
                         linearLayout.addView(txtTituloPunto);
-                        Button btnVerPunto=new Button(getApplicationContext());
-                        btnVerPunto.setText("Ver punto de referencia");
-                        btnVerPunto.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(context, Detalle.class);
-                                Log.e("link punto","id"+multimedia.getIdPunto());
-                                intent.putExtra("id",multimedia.getIdPunto());
-                                startActivity(intent);
-                            }
-                        });
-                        linearLayout.addView(btnVerPunto);
                     }
 
                     Button btnAprobar=(Button)findViewById(R.id.btnAprobar);

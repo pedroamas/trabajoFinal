@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         visibilidadBotones(usuario);
 
+
     }
 
     private void visibilidadBotones(Usuario usuario){

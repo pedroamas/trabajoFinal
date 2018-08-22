@@ -77,7 +77,6 @@ public class EditarImagenSec extends AppCompatActivity {
     private ImageView imagenPicasso;
     private int rotacion;
     private int idImagen;
-    private int idPunto;
     private SimpleDateFormat dt1;
 
     @Override
@@ -85,7 +84,6 @@ public class EditarImagenSec extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_imagen_sec);
         idImagen=getIntent().getIntExtra("id_imagen", 0);
-        idPunto=getIntent().getIntExtra("id_punto", 0);
         context=getApplicationContext();
         imagenPicasso = (ImageView) findViewById(R.id.imgFotoSec);
         mOptionButton = (Button) findViewById(R.id.btnImagen);
@@ -108,64 +106,8 @@ public class EditarImagenSec extends AppCompatActivity {
 
         llenarCampos();
 
-        Button btnEliminarImagen=(Button)findViewById(R.id.btnEliminarImagen);
-        btnEliminarImagen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(),R.style.AppTheme);
-                } else {
-                    builder = new AlertDialog.Builder(EditarImagenSec.this,R.style.Theme_AppCompat_Dialog);
-                }
-                builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el punto de interés?</font>"));
-                //builder.setTitle("Eliminar");
-                builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        gestorMultimedia = GestorMultimedia.getInstance(context);
-                        gestorMultimedia.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
-                            @Override
-                            public void onResponseEliminarImagenSecListener(String response) {
-                                if(response.equals("Ok")){
-                                    Toast.makeText(context,"La imagen ha sido borrada correctamente",
-                                            Toast.LENGTH_LONG).show();
-
-                                    Intent returnIntent=new Intent();
-                                    setResult(Activity.RESULT_OK,returnIntent);
-                                    finish();
-                                }else{
-                                    Toast.makeText(context,"Ocurrió un error al eliminar la imagen",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-
-                    }
-                })
-                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-
-                        .setIcon(R.drawable.ic_dialog_alert);
-
-                AlertDialog a=builder.create();
-                a.show();
-                Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
-                bq.setBackgroundColor(Color.RED);
-                bq.setTextColor(getResources().getColor(R.color.white));
 
 
-
-
-
-
-
-
-
-            }
-        });
         Button btnEditarImagen=(Button)findViewById(R.id.btnEditarImagen);
         btnEditarImagen.setOnClickListener(new View.OnClickListener() {
             @Override

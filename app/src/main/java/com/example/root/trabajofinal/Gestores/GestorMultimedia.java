@@ -168,9 +168,9 @@ public class GestorMultimedia {
         gestorWebService.getImagenesUsuarios(idPunto,imagenesListener);
     }
 
-    public void getImagenesUsuariosPendientes(ImagenesListener imagenesListener){
+    public void getImagenesUsuariosPendientes(int idPunto,ImagenesListener imagenesListener){
         GestorWebService gestorWebService=GestorWebService.getInstance(context);
-        gestorWebService.getImagenesUsuariosPendientes(imagenesListener);
+        gestorWebService.getImagenesUsuariosPendientes(idPunto,imagenesListener);
     }
 
     public Bitmap rotarImagen(Bitmap img,int grados){
@@ -261,7 +261,7 @@ public class GestorMultimedia {
     }
 
     public File ajustarImagen(File f){
-        Bitmap imgAjustada=rotarImagen(BitmapFactory.decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
+        Bitmap imgAjustada=rotarImagen(decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
         try {
             FileOutputStream fOut = new FileOutputStream(f);
             imgAjustada.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
@@ -284,10 +284,7 @@ public class GestorMultimedia {
         gestorWebService.getVideos(idPunto,videosListener);
     }
 
-    public void getAudio(int idAudio,AudioListener audioListener){
-        GestorWebService gestorWebService=GestorWebService.getInstance(context);
-        gestorWebService.getAudio(idAudio,audioListener);
-    }
+
 
     public void descargarImagen(final String url, final String nombreImagen, final int idPunto, ActualizarPuntoListener actualizarPuntoListener) {
         new DownloadImage(nombreImagen,idPunto,actualizarPuntoListener).execute(url);
@@ -365,5 +362,33 @@ public class GestorMultimedia {
                 actualizarPuntoListener.onResponseActualizarPunto(null);
             }
         }
+    }
+
+    private Bitmap decodeFile(String imgPath)
+    {
+        Bitmap b = null;
+        int max_size = 1000;
+        File f = new File(imgPath);
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            FileInputStream fis = new FileInputStream(f);
+            BitmapFactory.decodeStream(fis, null, o);
+            fis.close();
+            int scale = 1;
+            if (o.outHeight > max_size || o.outWidth > max_size)
+            {
+                scale = (int) Math.pow(2, (int) Math.ceil(Math.log(max_size / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+            }
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            fis = new FileInputStream(f);
+            b = BitmapFactory.decodeStream(fis, null, o2);
+            fis.close();
+        }
+        catch (Exception e)
+        {
+        }
+        return b;
     }
 }

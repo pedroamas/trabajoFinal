@@ -31,6 +31,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMarkerClickListener,
         View.OnClickListener, OnMapReadyCallback {
@@ -49,6 +50,9 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private static LocationManager oLoc;
     private Location currentLoc;
     private GeoObject user;
+    private LocationListener listener;
+    private LocationManager locationManager;
+
 
 
     @Override
@@ -121,6 +125,78 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
                 .setLocationManager((LocationManager) getSystemService(Context.LOCATION_SERVICE));
         gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
         gestorPuntos.getPuntos();
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                String latitude = String.valueOf(location.getLatitude());
+                String longitud = String.valueOf(location.getLongitude());
+                Log.d("latitude", latitude);
+                Log.d("longitud", longitud);
+                double difLat=latitudUser-location.getLatitude();
+                double difLon=longitudUser-location.getLongitude();
+                Log.d("difLat", "dif lat "+valorAbsolutoNumero(difLat));
+                Log.d("difLon", "dif lon "+valorAbsolutoNumero(difLon));
+                if(valorAbsolutoNumero(difLat)>0.002 || valorAbsolutoNumero(difLon)>0.002){
+                    primeraVez=true;
+                }
+                latitudUser=location.getLatitude();
+                longitudUser=location.getLongitude();
+                if(primeraVez && mWorld!=null&& user!=null){
+                    LatLng userLocation = new LatLng(latitudUser, longitudUser);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(19), 2000, null);
+                    primeraVez=false;
+                }
+                if(mWorld!=null&& user!=null){
+                    user.setGeoPosition(latitudUser, longitudUser);
+                    mWorld.addBeyondarObject(user);
+                }
+
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Log.d("GPS", "ENABLE");
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Log.d("GPS", "DISABLE");
+            }
+
+        };
+
+
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
+
+
+        //noinspection MissingPermission
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
+        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
+        }
+
+        /*
         try {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -168,7 +244,7 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
             Log.e("Posicion","longitud: "+loc.getLongitude());
             latitudUser=loc.getLatitude();
             longitudUser=loc.getLongitude();
-        }catch (Exception e){}
+        }catch (Exception e){}*/
     }
 
     @Override
@@ -287,6 +363,8 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         }
     }
 
-
+    private static double valorAbsolutoNumero(double num){
+        return num>=0?num:-num;
+    }
 
 }

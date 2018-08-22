@@ -31,13 +31,13 @@
         android:stretchColumns="0,2">
         <TableRow>
             <android.support.design.widget.FloatingActionButton
-                android:id="@+id/btnIniciarSesion"
+                android:id="@+id/btnSubirPunto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
-                android:visibility="invisible"
+                android:visibility="visible"
                 app:backgroundTint="@color/wallet_holo_blue_light"
-                android:src="@drawable/ic_perm_identity_black_24dp" />
+                android:src="@drawable/ic_add" />
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btnActualizar"
                 android:layout_width="wrap_content"
@@ -55,38 +55,26 @@
         </TableRow>
     </TableLayout>
 
-    <Button
-        android:text="Subir punto de interés"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnSubirPunto"
-        style="@style/BotonRojo"/>
 
-    <Button
-        android:text="Eliminar punto de interés"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEliminarPunto"
-        style="@style/BotonRojo"/>
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-    <Button
-        android:text="Editar punto de interés"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEditarPunto"
-        style="@style/BotonRojo"/>
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/main_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <Button
-        android:text="Validar imágenes de los usuarios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnValidarInfo"
-        style="@style/BotonRojo"/>
 
-    <Button
-        android:text="Eliminar comentarios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEliminarComentarios"
-        style="@style/BotonPrimary"/>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </android.support.design.widget.CoordinatorLayout>
+    </android.support.v4.widget.DrawerLayout>
+
 </LinearLayout>

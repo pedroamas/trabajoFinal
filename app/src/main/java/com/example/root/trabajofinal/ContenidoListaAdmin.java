@@ -18,16 +18,17 @@ import android.widget.TextView;
 
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Listeners.CantValidarListener;
 import com.example.root.trabajofinal.Objetos.Punto;
 
 import java.util.Iterator;
 
 
-public class ContenidoListaEditar extends Fragment {
+public class ContenidoListaAdmin extends Fragment {
 
     private GestorPuntos gestorPuntos;
     private GestorMultimedia gestorMultimedia;
-    private static int EDITAR_INFO=300;
+    private static int EDITAR_PUNTO=6000;
 
 
     @Override
@@ -38,7 +39,7 @@ public class ContenidoListaEditar extends Fragment {
         gestorPuntos = GestorPuntos.getInstance(getActivity().getApplicationContext());
         gestorPuntos.getPuntos();
         //if(gestorPuntos.size()>0) {
-        ContenidoListaEditar.ContentAdapter adapter = new ContenidoListaEditar.ContentAdapter(recyclerView.getContext());
+        ContenidoListaAdmin.ContentAdapter adapter = new ContenidoListaAdmin.ContentAdapter(recyclerView.getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -71,10 +72,10 @@ public class ContenidoListaEditar extends Fragment {
                         idPunto=iterator.next().getId();
                         i++;
                     }
-                    intent = new Intent(context, DetalleEditarPunto.class);
+                    intent = new Intent(context, DetalleAdmin.class);
 
                     intent.putExtra("id",idPunto);
-                    getActivity().startActivityForResult(intent,EDITAR_INFO);
+                    getActivity().startActivityForResult(intent,EDITAR_PUNTO);
 
 
 
@@ -85,11 +86,11 @@ public class ContenidoListaEditar extends Fragment {
     /**
      * Adapter to display recycler view.
      */
-    public  class ContentAdapter extends RecyclerView.Adapter<ContenidoListaEditar.ViewHolder> {
+    public  class ContentAdapter extends RecyclerView.Adapter<ContenidoListaAdmin.ViewHolder> {
         // Set numbers of List in RecyclerView.
         private final int LENGTH ;
         private final String[] mPlaces;
-        //private final String[] mPlaceDesc;
+        private final int mPlaceIdPunto[];
         private final String[] mPlaceAvators;
         private GestorMultimedia gestorMultimedia;
         public ContentAdapter(Context context) {
@@ -101,12 +102,17 @@ public class ContenidoListaEditar extends Fragment {
             int cantidad= gestorPuntos.getPuntos().size();
             mPlaces=new String[cantidad];
             mPlaceAvators=new String[cantidad];
+            mPlaceIdPunto=new int[cantidad];
 
             LENGTH= gestorPuntos.getPuntos().size();
             int i=0;
             while (iterator.hasNext()){
+                final int count=i;
                 Punto punto=iterator.next();
-                mPlaces[i]=punto.getTitulo();
+                mPlaces[count]=punto.getTitulo();
+                mPlaceIdPunto[count]=punto.getId();
+
+
                 Log.e("Lista",punto.getFoto());
                 mPlaceAvators[i]=punto.getFoto() ;
                 i++;
@@ -115,19 +121,28 @@ public class ContenidoListaEditar extends Fragment {
         }
 
         @Override
-        public ContenidoListaEditar.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ContenidoListaEditar.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+        public ContenidoListaAdmin.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ContenidoListaAdmin.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
         }
 
         @Override
-        public void onBindViewHolder(ContenidoListaEditar.ViewHolder holder, int position) {
+        public void onBindViewHolder(final ContenidoListaAdmin.ViewHolder holder, int position) {
             //holder.avator.setImageDrawable(mPlaceAvators[position % mPlaceAvators.length]);
             // holder.avator.setImageBitmap(
             //        loadImage("/Pictures/testing123.jpg")
             //);
             if(position>=0) {
+                final int count=position % mPlaces.length;
                 holder.name.setText(mPlaces[position % mPlaces.length]);
-
+                GestorPuntos gestorPuntos=GestorPuntos.getInstance(getContext());
+                gestorPuntos.getCantValidar(mPlaceIdPunto[position % mPlaces.length], new CantValidarListener() {
+                    @Override
+                    public void onResponseCantValidar(int cantidad) {
+                        if(cantidad>0) {
+                            holder.name.setText(mPlaces[count] + " (" + cantidad + ")");
+                        }
+                    }
+                });
                 //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);
                 if(bitmap!=null) {

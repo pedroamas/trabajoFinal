@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.example.root.trabajofinal.Gestores.GestorBD;
 import com.example.root.trabajofinal.Objetos.IndiceRtree;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,7 +35,9 @@ public class PuntosMasCercanos extends AppCompatActivity {
     private double latitudUser=0;
     private double longitudUser=0;
     AlertDialog alert = null;
-    LocationManager manager;
+
+    private LocationListener listener;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +51,8 @@ public class PuntosMasCercanos extends AppCompatActivity {
                 requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
             } else {
-                manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     AlertNoGps();
                     finish();
                 } else {
@@ -56,8 +60,8 @@ public class PuntosMasCercanos extends AppCompatActivity {
                 }
             }
         } else {
-            manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 AlertNoGps();
 
             } else {
@@ -67,7 +71,62 @@ public class PuntosMasCercanos extends AppCompatActivity {
 
     }
     private void permissionGranted(){
-        try {
+
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                String latitude = String.valueOf(location.getLatitude());
+                String longitud = String.valueOf(location.getLongitude());
+                Log.d("latitude", latitude);
+                Log.d("longitud", longitud);
+                latitudUser=location.getLatitude();
+                longitudUser=location.getLongitude();
+
+
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Log.d("GPS", "ENABLE");
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Log.d("GPS", "DISABLE");
+            }
+
+        };
+
+
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
+
+
+        //noinspection MissingPermission
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
+        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
+        }
+        /*try {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
@@ -76,6 +135,7 @@ public class PuntosMasCercanos extends AppCompatActivity {
                     return;
                 }
             }
+
             // Acquire a reference to the system Location Manager
             LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -106,6 +166,7 @@ public class PuntosMasCercanos extends AppCompatActivity {
             latitudUser=loc.getLatitude();
             longitudUser=loc.getLongitude();
         }catch (Exception e){}
+        */
         Button btnCalcularDistancia=(Button)findViewById(R.id.btnCalcularDistancia);
         btnCalcularDistancia.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -96,7 +96,10 @@ public class AgregarImagenesSec extends AppCompatActivity {
                         @Override
                         public void onResponseAgregarImagenSecListener(String response) {
                             Log.e("Resp", response);
-                            progress.dismiss();
+                            if(progress!=null) {
+                                progress.dismiss();
+                                progress = null;
+                            }
                             if (response.equals("Ok")) {
                                 //Toast.makeText(context,"La imagen se subió correctamente",Toast.LENGTH_LONG).show();
                                 Intent returnIntent = new Intent();
@@ -120,6 +123,23 @@ public class AgregarImagenesSec extends AppCompatActivity {
         }
 
         enable_button();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(progress!=null){
+            progress.dismiss();
+            progress=null;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(progress!=null){
+            progress.dismiss();
+            progress=null;
+        }
     }
 
     private void enable_button() {

@@ -1,8 +1,10 @@
 package com.example.root.trabajofinal;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -28,11 +30,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarCometarioListener;
+import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Objetos.Comentario;
 import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -46,14 +52,15 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
     public MostrarImagenesSecEliminarComentario mostrarImagenesSecEliminarComentario;
     private SimpleDateFormat dt1,dt2;
     private int idImagen;
+    public static int EDITAR_MULTIMEDIA=5000;
+    public int noEditar;
     MostrarImagenesSecEliminarComentario.AdapterComentarios adaptador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mostrar_imagenes_sec_eliminar_comentario);
-        Log.e("","eliminar comentarios siiii");
-        Log.e("TEMA",getTheme().toString());
+
         mostrarImagenesSecEliminarComentario=this;
         dt1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         dt2=new SimpleDateFormat("dd/MM/yyyy");
@@ -62,7 +69,8 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
         gestorComentarios=GestorComentarios.obtenerGestorComentarios(context);
         idImagen=getIntent().getIntExtra(EXTRA_POSITION,0);
-        GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
+        noEditar=getIntent().getIntExtra("no_editar",0);
+        final GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         gestorMultimedia.getImagen(idImagen, new ImagenListener() {
             @Override
             public void onResponseImagen(Multimedia multimedia) {
@@ -120,6 +128,70 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
 
             }
         });
+
+        Button btnEditarImagen=(Button)findViewById(R.id.btnEditarImagen);
+        btnEditarImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EditarImagenSec.class);
+                intent.putExtra("id_imagen", idImagen);
+                startActivityForResult(intent, EDITAR_MULTIMEDIA);
+            }
+        });
+        Button btnEliminarImagen=(Button)findViewById(R.id.btnEliminarImagen);
+        btnEliminarImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(),R.style.AppTheme);
+                } else {
+                    builder = new AlertDialog.Builder(MostrarImagenesSecEliminarComentario.this,R.style.Theme_AppCompat_Dialog);
+                }
+                builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el punto de interés?</font>"));
+                //builder.setTitle("Eliminar");
+                builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        gestorMultimedia.eliminarImagenSec(idImagen, new EliminarImagenSecListener() {
+                            @Override
+                            public void onResponseEliminarImagenSecListener(String response) {
+                                if(response.equals("Ok")){
+                                    Toast.makeText(context,"La imagen ha sido borrada correctamente",
+                                            Toast.LENGTH_LONG).show();
+
+                                    Intent returnIntent=new Intent();
+                                    setResult(Activity.RESULT_OK,returnIntent);
+                                    finish();
+                                }else{
+                                    Toast.makeText(context,"Ocurrió un error al eliminar la imagen",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
+                    }
+                })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+
+                        .setIcon(R.drawable.ic_dialog_alert);
+
+                AlertDialog a=builder.create();
+                a.show();
+                Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+                bq.setBackgroundColor(Color.RED);
+                bq.setTextColor(getResources().getColor(R.color.white));
+
+            }
+        });
+
+        if(noEditar==1){
+            btnEditarImagen.setVisibility(View.GONE);
+            btnEliminarImagen.setVisibility(View.GONE);
+        }
 
     }
     public String getThemeName()
@@ -204,6 +276,30 @@ public class MostrarImagenesSecEliminarComentario extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            if(requestCode==EDITAR_MULTIMEDIA ){
+                final ProgressDialog progress;
+                progress = new ProgressDialog(MostrarImagenesSecEliminarComentario.this);
+                progress.setTitle("Actualizando");
+                progress.setMessage("Espere un momento...");
+                progress.show();
+                GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+                gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                    @Override
+                    public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+                        progress.dismiss();
+                        setResult(Activity.RESULT_OK,getIntent());
+                        startActivity(getIntent());
+                        finish();
+                    }
+                });
+
+            }
+        }
     }
 
 

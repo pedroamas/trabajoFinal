@@ -11,16 +11,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,8 +36,9 @@ public class MenuAdmin extends AppCompatActivity {
 
     private static int SUBIR_PUNTO =150;
     private static int ELIMINAR_PUNTO =250;
-    private static int EDITAR_PUNTO =350;
+    private static int EDITAR_PUNTO=6000;
     private ProgressDialog progress;
+    private ViewPager viewPager;
 
     private GestorUsuarios gestorUsuarios;
     @Override
@@ -48,7 +48,10 @@ public class MenuAdmin extends AppCompatActivity {
         setContentView(R.layout.activity_menu_admin);
 
         //Para la lista
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
 
+        setupViewPager(viewPager);
+        //
 
         FloatingActionButton btnCerrarSesion=(FloatingActionButton) findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +76,8 @@ public class MenuAdmin extends AppCompatActivity {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();
+                        startActivity(getIntent());
+                        finish();
                     }
                 });
             }
@@ -84,18 +89,8 @@ public class MenuAdmin extends AppCompatActivity {
         Drawable dr = this.getResources().getDrawable(R.drawable.ic_perm_identity_black_24dp);
         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
         Drawable d = new BitmapDrawable(this.getResources(), Bitmap.createScaledBitmap(bitmap, 35, 35, true));
-
         txtUsuario.setCompoundDrawablesWithIntrinsicBounds(d, null, null, null);
-        Button btnEditarPunto=(Button)findViewById(R.id.btnEditarPunto);
-        btnEditarPunto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),MenuEditarPunto.class);
-                startActivity(intent);
-            }
-        });
-
-        Button btnSubirPunto=(Button)findViewById(R.id.btnSubirPunto);
+        FloatingActionButton btnSubirPunto=(FloatingActionButton) findViewById(R.id.btnSubirPunto);
         btnSubirPunto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,33 +98,7 @@ public class MenuAdmin extends AppCompatActivity {
                 startActivityForResult(intent,SUBIR_PUNTO);
             }
         });
-        Button btnEliminarPunto=(Button)findViewById(R.id.btnEliminarPunto);
-        btnEliminarPunto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),EliminarPunto.class);
-                startActivity(intent);
-            }
-        });
 
-        Button btnEliminarComentarios=(Button)findViewById(R.id.btnEliminarComentarios);
-        btnEliminarComentarios.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),EliminarComentarios.class);
-                startActivity(intent);
-            }
-        });
-
-
-        Button btnValidarInfo=(Button)findViewById(R.id.btnValidarInfo);
-        btnValidarInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),ValidarInfoUsuario.class);
-                startActivity(intent);
-            }
-        });
 
 
     }
@@ -149,6 +118,7 @@ public class MenuAdmin extends AppCompatActivity {
                     @Override
                     public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
                         progress.dismiss();
+                        setupViewPager(viewPager);
                     }
                 });
 
@@ -261,5 +231,20 @@ public class MenuAdmin extends AppCompatActivity {
         public int getItemCount() {
             return LENGTH;
         }
+    }
+
+    //para lista
+    private void setupViewPager(ViewPager viewPager) {
+        viewPager.removeAllViews();
+        ListaMaterialDesign.Adapter adapter = new ListaMaterialDesign.Adapter(getSupportFragmentManager());
+        adapter.addFragment(new ContenidoListaAdmin(), "List");
+        viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 }

@@ -14,6 +14,16 @@ public class Punto {
     private Multimedia imagen;
     private String fechaUltMod;
 
+    public int getCantValidar() {
+        return cantValidar;
+    }
+
+    public void setCantValidar(int cantValidar) {
+        this.cantValidar = cantValidar;
+    }
+
+    private int cantValidar=0;
+
     public String getFechaUltMod() {
         return fechaUltMod;
     }

@@ -29,14 +29,17 @@ public class ContenidoValidarInfoUsuario extends Fragment {
     private GestorMultimedia gestorMultimedia;
     private RecyclerView recyclerView;
     private ArrayList<Multimedia> imagenesPendientes;
+    public static final String EXTRA_POSITION = "id";
+    private int idPunto;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
+        idPunto=getActivity().getIntent().getIntExtra(EXTRA_POSITION,0);
         gestorMultimedia = GestorMultimedia.getInstance(getActivity().getApplicationContext());
         Log.e("Procesame","esto");
-        gestorMultimedia.getImagenesUsuariosPendientes(new ImagenesListener() {
+        gestorMultimedia.getImagenesUsuariosPendientes(idPunto,new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 //gestorDePuntos.getPuntos();

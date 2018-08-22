@@ -6,6 +6,7 @@ import android.util.Log;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.CantValidarListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
 import com.example.root.trabajofinal.Listeners.SetPuntoListener;
@@ -15,10 +16,6 @@ import com.example.root.trabajofinal.R;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-/**
- * Created by root on 26/08/17.
- */
 
 public class GestorPuntos {
 
@@ -104,6 +101,13 @@ public class GestorPuntos {
         gestorWebService.agregarPunto(punto,setPuntoListener);
 
     }
+    public void getCantValidar(int idPunto, CantValidarListener cantValidarListener){
+        GestorWebService gestorWebService=GestorWebService.getInstance(context);
+        gestorWebService.getCantValidar(idPunto,cantValidarListener);
+
+    }
+
+
 
     public ArrayList<Punto> getPuntos(){
         GestorBD gestorBD=GestorBD.getInstance(context);

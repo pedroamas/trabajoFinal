@@ -55,11 +55,6 @@
             android:text="Editar imagen secundaria"
             android:id="@+id/btnEditarImagen"
             style="@style/BotonPrimary"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:backgroundTint="@color/red"
-            android:text="Eliminar imagen"
-            android:id="@+id/btnEliminarImagen"/>
+
     </LinearLayout>
 </ScrollView>

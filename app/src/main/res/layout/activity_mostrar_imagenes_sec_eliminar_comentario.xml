@@ -17,6 +17,17 @@
             android:layout_height="wrap_content"
             android:id="@+id/imgFoto"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnEditarImagen"
+            android:text="Editar"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnEliminarImagen"
+            android:text="Eliminar"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

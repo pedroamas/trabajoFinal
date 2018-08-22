@@ -20,6 +20,7 @@ import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.AgregarImagenSecListener;
 import com.example.root.trabajofinal.Listeners.AudioListener;
 import com.example.root.trabajofinal.Listeners.AudiosListener;
+import com.example.root.trabajofinal.Listeners.CantValidarListener;
 import com.example.root.trabajofinal.Listeners.EditarMultimediaListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EliminarCometarioListener;
@@ -211,7 +212,7 @@ public class GestorWebService {
                                                         0                                 //estado_foto
                                                 );
                                                 puntoWB.setFechaUltMod(puntoJSON.getString(6));
-
+                                                puntoWB.setCantValidar(puntoJSON.getInt(7));
                                                 puntos.add(puntoWB);
 
                                             }
@@ -618,39 +619,29 @@ public class GestorWebService {
                 );
     }
 
-    public void getAudio(int idAudio, final AudioListener audioListener){
+    public void getCantValidar(int idPunto, final CantValidarListener cantValidarListener){
         VolleySingleton.
                 getInstance(context).
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "http://www.pedroamas.xyz/get_audio.php?" +
-                                        "id_audio="+idAudio,
+                                "http://www.pedroamas.xyz/cant_validar.php?" +
+                                        "id="+idPunto,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
                                     public void onResponse(JSONArray response) {
 
-                                        Multimedia audio=null;
+                                        int cant=0;
                                         try {
                                             if(response.length()>0){
-                                                JSONArray audioJSON=response;
-                                                audio=new Multimedia(
-                                                        audioJSON.getInt(0),
-                                                        audioJSON.getString(1),
-                                                        audioJSON.getString(2),
-                                                        audioJSON.getString(3),
-                                                        dt1.parse(audioJSON.getString(4)),
-                                                        dt1.parse(audioJSON.getString(5)),
-                                                        audioJSON.getInt(6),
-                                                        TipoMultimedia.audio
-                                                );
-
-                                            }
+                                                JSONArray cantJSON=response;
+                                                cant=cantJSON.getInt(0);
+                                                                                            }
                                         }catch (Exception e){
                                             Log.d(TAG, "Error Volley: " );
                                         }
-                                        audioListener.onResponseAudioListener(audio);
+                                        cantValidarListener.onResponseCantValidar(cant);
 
 
                                     }
@@ -659,7 +650,7 @@ public class GestorWebService {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
-                                        audioListener.onResponseAudioListener(null);
+                                        cantValidarListener.onResponseCantValidar(0);
                                     }
                                 }
 
@@ -785,13 +776,13 @@ public class GestorWebService {
                 );
     }
 
-    public void getImagenesUsuariosPendientes(final ImagenesListener imagenesListener){
+    public void getImagenesUsuariosPendientes(int idPunto, final ImagenesListener imagenesListener){
         VolleySingleton.
                 getInstance(context).
                 addToRequestQueue(
                         new JsonArrayRequest(
                                 Request.Method.GET,
-                                "http://www.pedroamas.xyz/get_imagenes_sec_usuarios_no_apr.php",
+                                "http://www.pedroamas.xyz/get_imagenes_sec_usuarios_no_apr.php?id_punto="+idPunto,
                                 new Response.Listener<JSONArray>() {
 
                                     @Override
@@ -897,65 +888,6 @@ public class GestorWebService {
                                     public void onErrorResponse(VolleyError error) {
                                         Log.d(TAG, "Error Volley: " + error.getMessage());
                                         videosListener.onResponseVideos(new ArrayList<Multimedia>());
-                                    }
-                                }
-
-                        )
-                );
-    }
-
-    public void getAudios(int idPunto, final AudiosListener audiosListener){
-        VolleySingleton.
-                getInstance(context).
-                addToRequestQueue(
-                        new JsonArrayRequest(
-                                Request.Method.GET,
-                                "http://www.pedroamas.xyz/get_audios.php?"+
-                                        "id_punto="+idPunto,
-                                new Response.Listener<JSONArray>() {
-
-                                    @Override
-                                    public void onResponse(JSONArray response) {
-
-                                        ArrayList<Multimedia> audios=new ArrayList<Multimedia>();
-                                        Multimedia audio=null;
-                                        try {
-                                            int i;
-                                            SimpleDateFormat dt1=new SimpleDateFormat("yyyy-MM-dd");
-                                            for(i=0;i<response.length();i++){
-
-                                                JSONArray audioJSON=response.getJSONArray(i);
-                                                Log.e(TAG,"path de audio: "+audioJSON.getString(4));
-                                                Log.e(TAG,"path de audio: "+audioJSON.getString(5));
-                                                audio=new Multimedia(
-                                                        audioJSON.getInt(0),
-                                                        audioJSON.getString(1),
-                                                        audioJSON.getString(2),
-                                                        audioJSON.getString(3),
-                                                        dt1.parse(audioJSON.getString(4)),
-                                                        dt1.parse(audioJSON.getString(5)),
-                                                        audioJSON.getInt(6),
-                                                        TipoMultimedia.audio
-                                                );
-                                                audios.add(audio);
-                                                Log.e(TAG,"path de video: "+audioJSON.getString(4));
-                                                Log.e(TAG,"path de video: "+audioJSON.getString(5));
-
-                                            }
-
-
-                                        }catch (Exception e){
-                                            Log.e(TAG, "Error Volley: " );
-                                        }
-                                        audiosListener.onResponseAudiosListener(audios);
-
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Log.d(TAG, "Error Volley: " + error.getMessage());
-                                        audiosListener.onResponseAudiosListener(new ArrayList<Multimedia>());
                                     }
                                 }
 

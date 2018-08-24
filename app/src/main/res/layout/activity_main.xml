@@ -56,44 +56,119 @@
     </TableLayout>
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="260dp"
         android:background="@drawable/ic_lavia"/>
-    <Button
-        android:text="Realidad aumentada"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnRealidadAumentada"
-        style="@style/BotonPrimary" />
 
-    <Button
-        android:text="Vista satelital"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnVistaSatelital"
-        style="@style/BotonPrimary" />
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical">
+        <LinearLayout
 
-    <Button
-        android:text="Lista"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnLista"
-        style="@style/BotonPrimary" />
+            android:layout_width="match_parent"
+            android:layout_marginLeft="0dip"
+            android:layout_marginRight="0dip"
+            android:layout_marginTop="-5dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" android:orientation="horizontal">
 
-    <Button
-        android:text="Puntos más cercanos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnPuntosCercanos"
-        style="@style/BotonPrimary" />
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="0dp"
+                android:layout_marginLeft="-5dip"
+                android:layout_marginRight="-5dip"
+                android:layout_marginTop="-5dip"
+                android:layout_marginBottom="-5dip"
+                app:backgroundTint="@color/colorPrimary"
+                android:text="Realidad aumentada"
+                android:id="@+id/btnRealidadAumentada"/>
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="-5dip"
+                android:layout_marginRight="-5dip"
+                android:layout_marginTop="-5dip"
+                android:layout_marginBottom="-5dip"
+                android:layout_weight="1"
+                app:backgroundTint="@color/wallet_holo_blue_light"
+                android:padding="0dp"
+                android:text="Vista satelital"
+                android:id="@+id/btnVistaSatelital" />
+
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_marginLeft="0dip"
+            android:layout_weight="1"
+            android:layout_marginRight="0dip"
+            android:layout_marginTop="-5dip"
+            android:layout_height="wrap_content" android:orientation="horizontal">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="0dp"
+                android:layout_marginLeft="-5dip"
+                android:layout_marginRight="-5dip"
+                android:layout_marginTop="-5dip"
+                android:layout_marginBottom="-5dip"
+                app:backgroundTint="@color/wallet_holo_blue_light"
+                android:text="Lista"
+                android:id="@+id/btnLista" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="-5dip"
+                android:layout_marginRight="-5dip"
+                android:layout_marginTop="-5dip"
+                android:layout_marginBottom="-5dip"
+                app:backgroundTint="@color/colorPrimary"
+                android:layout_weight="1"
+                android:padding="0dp"
+                android:text="Puntos más cercanos"
+                android:id="@+id/btnPuntosCercanos"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_marginLeft="0dip"
+            android:layout_marginRight="0dip"
+            android:layout_marginTop="-5dip"
+            android:layout_weight="1"
+
+            android:layout_height="wrap_content" android:orientation="horizontal">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="0dp"
+                android:layout_marginLeft="-5dip"
+                android:layout_marginRight="-5dip"
+                android:layout_marginTop="-5dip"
+                app:backgroundTint="@color/button_grey"
+                android:layout_marginBottom="-5dip"
+                android:visibility="invisible"
+                android:text="Administración"
+                android:id="@+id/btnAdministracion"/>
 
 
-    <Button
-        android:text="Administración"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnAdministracion"
-        android:visibility="invisible"
-        app:backgroundTint="@color/wallet_holo_blue_light" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
 
 </LinearLayout>

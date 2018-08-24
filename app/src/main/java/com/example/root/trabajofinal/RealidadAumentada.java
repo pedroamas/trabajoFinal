@@ -65,6 +65,62 @@ public class RealidadAumentada extends FragmentActivity implements
         context=getApplicationContext();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        setContentView(R.layout.camera_with_google_maps);
+        mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(
+                R.id.beyondarFragment);
+        mBeyondarFragment.setOnClickBeyondarObjectListener(this);
+        user = new GeoObject(1000l);
+        //user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
+        user.setImageResource(R.drawable.flag);
+        user.setName("Posición actual");
+
+        mShowMap = (Button) findViewById(R.id.showMapButton);
+        mShowMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v == mShowMap) {
+                    Intent intent = new Intent(context, VistaSatelital.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                latitudUser=location.getLatitude();
+                longitudUser=location.getLongitude();
+                if(mWorld!=null&& user!=null){
+                    user.setGeoPosition(latitudUser, longitudUser);
+                    mWorld.addBeyondarObject(user);
+                    mWorld.setLocation(location);
+                }
+
+                TextView txtLocalizacion=(TextView)findViewById(R.id.txtLocalizacion);
+                txtLocalizacion.setText(location.getLatitude()+" - "+location.getLongitude());
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Log.d("GPS", "ENABLE");
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Log.d("GPS", "DISABLE");
+            }
+
+        };
+
+        cargarPuntos();
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED ||
                     ActivityCompat.checkSelfPermission(this, permissions[1]) != PackageManager.PERMISSION_GRANTED) {
@@ -77,9 +133,6 @@ public class RealidadAumentada extends FragmentActivity implements
         }else {
             controlGPS();
         }
-
-
-
 
     }
 
@@ -112,179 +165,41 @@ public class RealidadAumentada extends FragmentActivity implements
         locationManager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !locationManager.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ) {
             AlertNoGps();
-
         }
         else {
-            try {
-            gestorPuntos = GestorPuntos.getInstance(context);
-            setContentView(R.layout.camera_with_google_maps);
-
-            user = new GeoObject(1000l);
-            //user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
-            user.setImageResource(R.drawable.flag);
-            user.setName("Posición actual");
-            mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(
-                    R.id.beyondarFragment);
-                listener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        String latitude = String.valueOf(location.getLatitude());
-                        String longitud = String.valueOf(location.getLongitude());
-                        Log.d("latitude", latitude);
-                        Log.d("longitud", longitud);
-                        // Called when a new location is found by the network location provider.
-                        Log.e("Location updates",location.getLatitude()+" - "+location.getLongitude());
-                        latitudUser=location.getLatitude();
-                        longitudUser=location.getLongitude();
-                        if(mWorld!=null&& user!=null){
-                            user.setGeoPosition(latitudUser, longitudUser);
-                            mWorld.addBeyondarObject(user);
-                            mWorld.setLocation(location);
-                        }
-
-                        TextView txtLocalizacion=(TextView)findViewById(R.id.txtLocalizacion);
-                        txtLocalizacion.setText(location.getLatitude()+" - "+location.getLongitude());
-
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String s) {
-                        Log.d("GPS", "ENABLE");
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String s) {
-                        Log.d("GPS", "DISABLE");
-                    }
-
-                };
-
-
-                locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
-
-
-                //noinspection MissingPermission
-                //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
-                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
-                if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
                 }
-/*
-                try {
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-                            //startActivity(getIntent());
-                            //finish();
-                            return;
-                        }
-                    }
-                    // Acquire a reference to the system Location Manager
-                    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-                    // Define a listener that responds to location updates
-                    LocationListener locationListener = new LocationListener() {
-                        public void onLocationChanged(Location location) {
-                            // Called when a new location is found by the network location provider.
-                            Log.e("Location updates",location.getLatitude()+" - "+location.getLongitude());
-                            latitudUser=location.getLatitude();
-                            longitudUser=location.getLongitude();
-                            if(mWorld!=null&& user!=null){
-                                user.setGeoPosition(latitudUser, longitudUser);
-                                mWorld.addBeyondarObject(user);
-                                mWorld.setLocation(location);
-                            }
-                        }
-
-                        public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-                        public void onProviderEnabled(String provider) {}
-
-                        public void onProviderDisabled(String provider) {
-                            AlertNoGps();
-                        }
-                    };
-
-                    // Register the listener with the Location Manager to receive location updates
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-                    loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    Log.e("Posicion","latitud: "+loc.getLatitude());
-                    Log.e("Posicion","longitud: "+loc.getLongitude());
-                    latitudUser=loc.getLatitude();
-                    longitudUser=loc.getLongitude();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }*/
-
-            mShowMap = (Button) findViewById(R.id.showMapButton);
-            mShowMap.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (v == mShowMap) {
-                        Intent intent = new Intent(context, VistaSatelital.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            });
-
-            // We create the world and fill it
-            mWorld = gestorPuntos.generarMundo(this);
-
-            mBeyondarFragment.setWorld(mWorld);
-
-            //enableLocationUpdates();          //habilita la localizacion
-            mBeyondarFragment.setOnClickBeyondarObjectListener(this);
-
-            //BeyondarLocationManager.addWorldLocationUpdate(mWorld);
-            // Lets add the user position to the map
-
-            //mWorld.addBeyondarObject(user);
-
-            //BeyondarLocationManager.addGeoObjectLocationUpdate(user);
-        }catch (Exception e){
-                TextView txtAviso=new TextView(context);
-                FrameLayout frameLayout=(FrameLayout)findViewById(R.id.content);
-                txtAviso.setText("Es posible que su dispositivo no tenga giroscopio");
-                frameLayout.addView(txtAviso);
-
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
+            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
             }
         }
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        // When the activity is resumed it is time to enable the
-        // BeyondarLocationManager
-        BeyondarLocationManager.enable();
+        if(locationManager!=null && listener!=null) {
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
+            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
+            }
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // To avoid unnecessary battery usage disable BeyondarLocationManager
-        // when the activity goes on pause.
-        BeyondarLocationManager.disable();
+        if(locationManager!=null && listener!=null) {
+            locationManager.removeUpdates(listener);
+        }
     }
 
     @Override
@@ -315,9 +230,6 @@ public class RealidadAumentada extends FragmentActivity implements
                 }
                 break;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
@@ -343,20 +255,28 @@ public class RealidadAumentada extends FragmentActivity implements
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         dialog.cancel();
-                        finish();
                     }
                 });
         alert = builder.create();
         alert.show();
     }
 
-    private static double valorAbsolutoNumero(double num){
-        return num>=0?num:-num;
+    private void cargarPuntos(){
+        gestorPuntos = GestorPuntos.getInstance(context);
+        try{
+        mWorld = gestorPuntos.generarMundo(this);
+        mBeyondarFragment.setWorld(mWorld);
+        }catch (Exception e){
+            e.printStackTrace();
+            TextView txtAviso=new TextView(context);
+            FrameLayout frameLayout=(FrameLayout)findViewById(R.id.content);
+            txtAviso.setText("Es posible que su dispositivo no tenga giroscopio");
+            frameLayout.addView(txtAviso);
+        }
     }
 }

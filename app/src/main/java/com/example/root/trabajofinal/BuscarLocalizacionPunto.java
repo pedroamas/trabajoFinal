@@ -41,7 +41,6 @@ import com.google.android.gms.maps.model.Marker;
         private TextView txtInfo;
         private GestorPuntos gestorPuntos;
         private Context context;
-        private Location loc;
         private boolean primeraVez=true;
         private double latitudUser=0;
         private double longitudUser=0;
@@ -218,17 +217,24 @@ import com.google.android.gms.maps.model.Marker;
         @Override
         protected void onResume() {
             super.onResume();
-            // When the activity is resumed it is time to enable the
-            // BeyondarLocationManager
-            BeyondarLocationManager.enable();
+            if(locationManager!=null && listener!=null) {
+                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 12000, 0, listener);}
+                if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 12000, 0, listener);
+                }
+            }
         }
 
         @Override
         protected void onPause() {
             super.onPause();
-            // To avoid unnecessary battery usage disable BeyondarLocationManager
-            // when the activity goes on pause.
-            BeyondarLocationManager.disable();
+            if(locationManager!=null && listener!=null) {
+                locationManager.removeUpdates(listener);
+            }
         }
 
         @Override

@@ -68,40 +68,40 @@ android:fitsSystemWindows="true"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stretchColumns="0,2">
-            <TableRow>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
                 <Button
                     android:drawableTop="@drawable/ic_menu_edit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center"
                     android:text="Editar"
+                    android:layout_weight="1"
                     android:id="@+id/btnEditarPunto"
                     app:backgroundTint="@color/wallet_holo_blue_light"/>
                 <Button
                     android:id="@+id/btnEliminarPunto"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:text="Eliminar"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|start"
+                    android:layout_weight="1"
                     android:drawableTop="@drawable/ic_menu_delete2"
                     app:backgroundTint="@color/red" />
                 <Button
                     android:id="@+id/btnValidarInfo"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
                     android:drawableTop="@drawable/validarimages"
                     app:backgroundTint="@color/green"
+                    android:layout_weight="1"
                     android:text="Validar" />
+    </LinearLayout>
 
-
-            </TableRow>
-        </TableLayout>
         <LinearLayout
             android:id="@+id/content"
             android:layout_width="match_parent"

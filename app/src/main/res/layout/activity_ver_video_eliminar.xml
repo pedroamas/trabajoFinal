@@ -1,5 +1,5 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,6 +24,17 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/divider_horizontal_bright"
             android:scaleType="fitXY"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Editar"
+            android:id="@+id/btnEditarVideo"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/red"
+            android:text="Eliminar"
+            android:id="@+id/btnEliminarVideo"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

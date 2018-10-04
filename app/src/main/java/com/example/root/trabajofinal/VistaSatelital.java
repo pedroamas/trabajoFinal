@@ -1,6 +1,7 @@
 package com.example.root.trabajofinal;
 
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,9 +10,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +25,8 @@ import com.beyondar.android.plugin.googlemap.GoogleMapWorldPlugin;
 import com.beyondar.android.world.GeoObject;
 import com.beyondar.android.world.World;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
+import com.example.root.trabajofinal.Listeners.EliminarImagenSecListener;
 import com.example.root.trabajofinal.Objetos.Punto;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +35,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMarkerClickListener,
+import java.util.ArrayList;
+
+public class VistaSatelital extends AppCompatActivity implements GoogleMap.OnMarkerClickListener,
         View.OnClickListener, OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -40,9 +48,10 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
     private boolean primeraVez=true;
     private double latitudUser=0;
     private double longitudUser=0;
-    AlertDialog alert = null;
+    AlertDialog a;
     private GeoObject user;
     private LocationListener listener;
+    private static int CODE_GPS=8000;
     private LocationManager locationManager;
 
 
@@ -102,48 +111,36 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
-            } else {
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    AlertNoGps();
-                    finish();
-                } else {
-                    obtenerUbicacion();
-                }
-            }
-        } else {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                AlertNoGps();
-
-            } else {
-                obtenerUbicacion();
-            }
-        }
 
 
     }
 
     private void AlertNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
-                .setCancelable(false)
-                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(VistaSatelital.this);
+
+        builder.setMessage(Html.fromHtml("<font color='#000000'>El sistema GPS esta desactivado, ¿Desea activarlo?</font>"));
+        builder.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),CODE_GPS);
+
+            }
+        })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        alert = builder.create();
-        alert.show();
+
+                .setIcon(R.drawable.ic_dialog_alert);
+
+        a=builder.create();
+        a.show();
+        Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+        bq.setTextColor(getResources().getColor(R.color.colorPrimary));
+
     }
 
     private void obtenerUbicacion() {
@@ -163,8 +160,9 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        GestorPuntos gestorPuntos=GestorPuntos.getInstance(context);
         GeoObject geoObject = mGoogleMapPlugin.getGeoObjectOwner(marker);
-        if (geoObject != null) {
+        if (geoObject != null && !geoObject.getName().equals("Posición actual")) {
             Punto punto = gestorPuntos.getPunto(geoObject.getName());
             Intent intent = new Intent(getApplicationContext(), Detalle.class);
             intent.putExtra(Detalle.EXTRA_POSITION, punto.getId());
@@ -174,9 +172,13 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         return false;
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
+        if(a!=null){
+            a.dismiss();
+        }
         if(locationManager!=null && listener!=null) {
             if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -213,6 +215,27 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
         mMap = googleMap;
         if (mMap == null) {
             return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+
+            } else {
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    AlertNoGps();
+                } else {
+                    obtenerUbicacion();
+                }
+            }
+        } else {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                AlertNoGps();
+
+            } else {
+                obtenerUbicacion();
+            }
         }
         GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
         gestorPuntos.getPuntos();
@@ -256,6 +279,35 @@ public class VistaSatelital extends FragmentActivity implements GoogleMap.OnMark
 
     private static double valorAbsolutoNumero(double num){
         return num>=0?num:-num;
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+            if(requestCode==CODE_GPS ){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+
+                    } else {
+                        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                            AlertNoGps();
+                        } else {
+                            obtenerUbicacion();
+                        }
+                    }
+                } else {
+                    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        AlertNoGps();
+
+                    } else {
+                        obtenerUbicacion();
+                    }
+                }
+
+            }
+
     }
 
 }

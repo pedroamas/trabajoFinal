@@ -1,7 +1,7 @@
 package com.example.root.trabajofinal;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -35,11 +37,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-public class RealidadAumentada extends FragmentActivity implements
+public class RealidadAumentada extends AppCompatActivity implements
 
         OnClickBeyondarObjectListener
 {
 
+    private static int CODE_GPS=8000;
     private BeyondarFragmentSupport mBeyondarFragment;
     private World mWorld;
     private Button mShowMap;
@@ -47,7 +50,7 @@ public class RealidadAumentada extends FragmentActivity implements
     private Context context;
     private static final int MULTIPLE_PERMISSIONS_REQUEST_CODE = 3;
     private String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA};
-    AlertDialog alert = null;
+    AlertDialog a = null;
     private boolean primeraVez=true;
     private double latitudUser=0;
     private double longitudUser=0;
@@ -69,8 +72,11 @@ public class RealidadAumentada extends FragmentActivity implements
         mBeyondarFragment = (BeyondarFragmentSupport) getSupportFragmentManager().findFragmentById(
                 R.id.beyondarFragment);
         mBeyondarFragment.setOnClickBeyondarObjectListener(this);
+
+        this.mBeyondarFragment.setMaxDistanceToRender(100);
+        this.mBeyondarFragment.setPullCloserDistance(0);
+
         user = new GeoObject(1000l);
-        //user.setGeoPosition(mWorld.getLatitude(), mWorld.getLongitude());
         user.setImageResource(R.drawable.flag);
         user.setName("Posición actual");
 
@@ -145,7 +151,6 @@ public class RealidadAumentada extends FragmentActivity implements
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     AlertNoGps();
-                    finish();
                 } else {
                     permisionGranted();
                 }
@@ -249,21 +254,30 @@ public class RealidadAumentada extends FragmentActivity implements
         return allGranted;
     }
     private void AlertNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("El sistema GPS esta desactivado, ¿Desea activarlo?")
-                .setCancelable(false)
-                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(RealidadAumentada.this);
+
+        builder.setMessage(Html.fromHtml("<font color='#000000'>El sistema GPS esta desactivado, ¿Desea activarlo?</font>"));
+        builder.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),CODE_GPS);
+
+            }
+        })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        alert = builder.create();
-        alert.show();
+
+                .setIcon(R.drawable.ic_dialog_alert);
+
+        a=builder.create();
+        a.show();
+        Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
+        bq.setTextColor(getResources().getColor(R.color.colorPrimary));
+
     }
 
     private void cargarPuntos(){
@@ -275,7 +289,7 @@ public class RealidadAumentada extends FragmentActivity implements
             e.printStackTrace();
             TextView txtAviso=new TextView(context);
             FrameLayout frameLayout=(FrameLayout)findViewById(R.id.content);
-            txtAviso.setText("Es posible que su dispositivo no tenga giroscopio");
+            txtAviso.setText("Su dispositivo debe poseer acelerómetro y sensor magnético");
             frameLayout.addView(txtAviso);
         }
     }

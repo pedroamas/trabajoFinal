@@ -15,32 +15,48 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.EditarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.example.root.trabajofinal.Objetos.Usuario;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.text.ParseException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +64,8 @@ import java.util.regex.Pattern;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class DetalleEditarPunto extends AppCompatActivity {
+public class DetalleEditarPunto extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     public static final String EXTRA_POSITION = "id";
     private Punto punto,puntoEditado;
@@ -62,6 +79,10 @@ public class DetalleEditarPunto extends AppCompatActivity {
     private final int SELECT_PICTURE = 300;
     private final int BUSCAR_LOCALIZACION = 400;
     //private ImageView mSetImage;
+    private NavigationView navigationView;
+    private ProgressDialog progress;
+    private static int PANTALLA_CUALQUIERA = 3000;
+
     private Button mOptionButton;
     private LinearLayout mRlView;
     private String mPath;
@@ -75,10 +96,24 @@ public class DetalleEditarPunto extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detalle_editar_punto);
+        setContentView(R.layout.barra_menu);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        LinearLayout contenido=(LinearLayout) findViewById(R.id.contenido);
+        contenido.addView(getLayoutInflater().inflate(R.layout.activity_detalle_editar_punto, null));
+        configurarMenu();
         context=getApplicationContext();
         imagenPicasso=(ImageView)findViewById(R.id.imagenPicasso);
-        //mSetImage = (ImageView) findViewById(R.id.set_picture);
         mOptionButton = (Button) findViewById(R.id.show_options_button);
         mRlView = (LinearLayout) findViewById(R.id.rl_view);
         if(mayRequestStoragePermission())
@@ -165,6 +200,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
                 progress = new ProgressDialog(DetalleEditarPunto.this);
                 progress.setTitle("Subiendo");
                 progress.setMessage("Espere un momento...");
+                progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 progress.show();
                 gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
                 gestorPuntos.editarPunto(puntoEditado, new EditarPuntoListener() {
@@ -176,7 +212,11 @@ public class DetalleEditarPunto extends AppCompatActivity {
                             setResult(Activity.RESULT_OK,returnIntent);
                             finish();
                         }else {
-                            Toast.makeText(context,"El punto no se cargó correctamente",Toast.LENGTH_LONG).show();
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context,"Ha ocurrido un error. Intente nuevamente",Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     }
                 });
@@ -198,7 +238,7 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
         File imgFile = new  File(punto.getFoto());
         if(imgFile.exists()){
-            Picasso.with(context).load("file:"+punto.getFoto())
+            Glide.with(context).load("file:"+punto.getFoto())
                     .into(imagenPicasso);
         }
         GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
@@ -273,6 +313,28 @@ public class DetalleEditarPunto extends AppCompatActivity {
     }
 
     private void openCamera() {
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{android.Manifest.permission.CAMERA},100);
+                return;
+            }
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},100);
+                return;
+            }
+        }
+        if(Build.VERSION.SDK_INT>=24){
+            try{
+                Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
+                m.invoke(null);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
         File file = new File(Environment.getExternalStorageDirectory(), MEDIA_DIRECTORY);
         boolean isDirectoryCreated = file.exists();
 
@@ -295,7 +357,6 @@ public class DetalleEditarPunto extends AppCompatActivity {
             startActivityForResult(intent, PHOTO_CODE);
         }
     }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -312,7 +373,15 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+        Usuario usuario=gestorUsuarios.getUsuario();
+        if(usuario==null){
+            finish();
+            return;
+        }else if(!usuario.isAdmin()){
+            finish();
+            return;
+        }
 
         GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(getApplicationContext());
         if(resultCode == RESULT_OK){
@@ -324,7 +393,6 @@ public class DetalleEditarPunto extends AppCompatActivity {
                                 @Override
                                 public void onScanCompleted(String path, Uri uri) {
                                     Log.i("ExternalStorage", "Scanned " + path + ":");
-                                    Log.i("ExternalStorage", "-> Uri = " + uri);
                                 }
                             });
 
@@ -341,14 +409,8 @@ public class DetalleEditarPunto extends AppCompatActivity {
 
                     Log.e("Subir punto","path "+getRealPathFromDocumentUri(this,path));
 
-                    /*mSetImage.setImageBitmap(
-                            //gestorMultimedia.rotarImagen(
-                                    gestorMultimedia.cargarImagen(getRealPathFromDocumentUri(this,path))
-                      //)
-                    );*/
-                    Log.e("","file:"+path);
 
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load("file:"+getRealPathFromDocumentUri(this,path))
                             .into(imagenPicasso);
                     pathImagen=getRealPathFromDocumentUri(this,path);
@@ -461,6 +523,138 @@ public class DetalleEditarPunto extends AppCompatActivity {
             e.printStackTrace();
         }
         return rotate;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(progress!=null){
+            progress.dismiss();
+            progress=null;
+        }
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        invalidateOptionsMenu();
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.btnActualizar) {
+
+            progress = new ProgressDialog(DetalleEditarPunto.this);
+            progress.setTitle("Actualizando");
+            progress.setCancelable(false);
+            progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            progress.setMessage("Espere un momento...");
+            progress.show();
+            GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+            gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                @Override
+                public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+                    progress.dismiss();
+                }
+            });
+            return true;
+        }else if(id == R.id.navRealidadAumentada){
+
+            Toast.makeText(getApplicationContext(),"RA",Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        else {
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Intent intent;
+        switch (id){
+            case R.id.navRealidadAumentada:
+                intent = new Intent(getApplicationContext(), RealidadAumentada.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navVistaSatelital:
+                intent = new Intent(getApplicationContext(), VistaSatelital.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navLista:
+                intent = new Intent(getApplicationContext(), ListaMaterialDesign.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navPuntosCercanos:
+                intent = new Intent(getApplicationContext(), PuntosCercanos.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navCerrarSesion:
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+                gestorUsuarios.cerrarSesion();
+                finish();
+                break;
+            case R.id.navAgregarPunto:
+                intent = new Intent(getApplicationContext(), SubirPuntoAdmin.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navEdicion:
+                intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.itm_iniciar_sesion:
+                intent = new Intent(getApplicationContext(), Login.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void configurarMenu(){
+        GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+        Usuario usuario=gestorUsuarios.getUsuario();
+        TextView txtUsername=(TextView)navigationView.getHeaderView(0).findViewById(R.id.txtUsernameMain);
+        if(navigationView!=null) {
+            Menu navMenu = navigationView.getMenu();
+            if (usuario == null) {
+                navMenu.getItem(0).setVisible(true);
+                navMenu.getItem(1).setVisible(false);
+                navMenu.getItem(3).setVisible(false);
+            }else if(usuario.isAdmin()){
+                txtUsername.setText(usuario.getUsername());
+                navMenu.getItem(0).setVisible(false);
+                navMenu.getItem(1).setVisible(true);
+                navMenu.getItem(3).setVisible(true);
+            }else{
+                txtUsername.setText(usuario.getUsername());
+                navMenu.getItem(0).setVisible(false);
+                navMenu.getItem(1).setVisible(true);
+                navMenu.getItem(3).setVisible(false);
+            }
+        }
     }
 }
 

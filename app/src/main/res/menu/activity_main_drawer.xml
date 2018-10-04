@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/itm_iniciar_sesion"
+
+            android:title="@string/iniciaSesion" /><!--android:icon="@drawable/ic_perm_identity_black_24dp"-->
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navCerrarSesion"
+
+
+            android:title="@string/cerrar_sesion" /> <!--android:icon="@drawable/ic_perm_identity_black_24dp"-->
+    </group>
+
+    <item android:title="@string/funcionalidades">
+        <menu>
+            <item
+                android:id="@+id/navRealidadAumentada"
+                android:title="@string/realidad_aumentada" />
+            <item
+                android:id="@+id/navVistaSatelital"
+                android:title="@string/vista_satelital" />
+            <item
+                android:id="@+id/navLista"
+                android:title="@string/lista" />
+            <item
+                android:id="@+id/navPuntosCercanos"
+                android:title="@string/puntos_cercanos" />
+
+        </menu>
+    </item>
+
+    <item android:title="@string/administracion">
+        <menu>
+            <item
+                android:id="@+id/navAgregarPunto"
+                android:title="@string/agregar_punto" />
+            <item
+                android:id="@+id/navEdicion"
+                android:title="@string/edicion_punto" />
+
+        </menu>
+    </item>
+
+</menu>

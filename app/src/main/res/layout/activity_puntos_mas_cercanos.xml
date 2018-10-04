@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.root.trabajofinal.PuntosMasCercanos">
+    tools:context="com.example.root.trabajofinal.PuntosCercanos">
 
     <TextView
         android:layout_width="match_parent"
@@ -22,6 +22,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnCalcularDistancia"
         style="@style/BotonPrimary"
-        android:text="Obtener puntos más cercanos"/>
+        android:text="Obtener puntos cercanos"/>
 
 </LinearLayout>

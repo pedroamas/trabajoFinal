@@ -4,19 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
@@ -45,7 +47,7 @@ public class ContenidoListaPMC extends Fragment {
         latitud=getActivity().getIntent().getDoubleExtra("latitud", 0);
         longitud=getActivity().getIntent().getDoubleExtra("longitud", 0);
         distanciaKm=getActivity().getIntent().getDoubleExtra("distanciaKm", 0);
-        puntosMasCercanos=rtree.getPuntosMasCercanos(latitud,longitud,distanciaKm);
+        puntosMasCercanos=rtree.getPuntosCercanos(latitud,longitud,distanciaKm);
         //if(gestorPuntos.size()>0) {
 
         ContenidoListaPMC.ContentAdapter adapter = new ContenidoListaPMC.ContentAdapter(recyclerView.getContext());
@@ -54,7 +56,14 @@ public class ContenidoListaPMC extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         if(puntosMasCercanos.size()==0){
-            Toast.makeText(getContext(),"No se han encontrado puntos cercanos dentro del radio",Toast.LENGTH_LONG).show();
+            CoordinatorLayout coordinatorLayout=(CoordinatorLayout) getActivity().findViewById(R.id.main_content);
+            TextView txtPMC=new TextView(getActivity().getApplicationContext());
+            txtPMC.setText("No se han encontrado puntos cercanos dentro del radio");
+            txtPMC.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            txtPMC.setTypeface(txtPMC.getTypeface(), Typeface.BOLD);
+            txtPMC.setTextColor(Color.BLACK);
+            txtPMC.setPadding(30,30,0,0);
+            coordinatorLayout.addView(txtPMC);
         }
         return recyclerView;
 
@@ -124,7 +133,7 @@ public class ContenidoListaPMC extends Fragment {
                 Punto punto=iterator.next();
                 mPlaces[i]=punto.getTitulo();
                 DecimalFormat formato = new DecimalFormat("0.00");
-                mPlaceDesc[i]=formato.format(IndiceRtree.distance(latitud,longitud,punto.getLatitud(),punto.getLongitud())*1000.0)+" metros";
+                mPlaceDesc[i]=formato.format(IndiceRtree.distancia(latitud,longitud,punto.getLatitud(),punto.getLongitud())*1000.0)+" metros";
                 Log.e("Lista",punto.getFoto());
                 mPlaceAvators[i]=punto.getFoto() ;
                 i++;

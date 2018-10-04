@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -261,10 +262,28 @@ public class GestorMultimedia {
     }
 
     public File ajustarImagen(File f){
-        Bitmap imgAjustada=rotarImagen(decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
+        Bitmap bitmapOriginal=decodeFile(f.getAbsolutePath());
+        Bitmap imgAjustada=rotarImagen(
+                bitmapOriginal,
+                getRotacionNecesaria(f.getAbsolutePath()));
         try {
             FileOutputStream fOut = new FileOutputStream(f);
-            imgAjustada.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            imgAjustada.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return f;
+    }
+
+    public File ajustarImagen2(File f){
+        Bitmap imgAjustada=rotarImagen(decodeFile(f.getAbsolutePath()),getRotacionNecesaria(f.getAbsolutePath()));
+
+        try {
+            FileOutputStream fOut = new FileOutputStream(f);
+            imgAjustada.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
             fOut.close();
         }
@@ -364,10 +383,31 @@ public class GestorMultimedia {
         }
     }
 
+    private Bitmap downloadImageBitmap(String sUrl) {
+        Bitmap bitmap = null;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            for (options.inSampleSize = 1; options.inSampleSize <= 32; options.inSampleSize++) {
+                InputStream inputStream = new URL(sUrl).openStream();
+                try {
+                    bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+                    inputStream.close();
+                    break;
+                } catch (OutOfMemoryError outOfMemoryError) {
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
     private Bitmap decodeFile(String imgPath)
     {
+
         Bitmap b = null;
-        int max_size = 1000;
+        int max_size = 1500;
         File f = new File(imgPath);
         try {
             BitmapFactory.Options o = new BitmapFactory.Options();
@@ -378,8 +418,10 @@ public class GestorMultimedia {
             int scale = 1;
             if (o.outHeight > max_size || o.outWidth > max_size)
             {
-                scale = (int) Math.pow(2, (int) Math.ceil(Math.log(max_size / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
-            }
+                scale = (int) Math.max(
+                        Math.ceil(o.outWidth / max_size),
+                        Math.ceil(o.outHeight / max_size));
+               }
             BitmapFactory.Options o2 = new BitmapFactory.Options();
             o2.inSampleSize = scale;
             fis = new FileInputStream(f);
@@ -390,5 +432,28 @@ public class GestorMultimedia {
         {
         }
         return b;
+    }
+
+    public static Bitmap reduceBitmap(Context contexto, String uri) {
+        int maxAncho=900;
+        int maxAlto=1280;
+        try {
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(contexto.getContentResolver()
+                    .openInputStream(Uri.parse(uri)), null, options);
+            options.inSampleSize = (int) Math.max(
+                    Math.ceil(options.outWidth / maxAncho),
+                    Math.ceil(options.outHeight / maxAlto));
+            options.inJustDecodeBounds = false;
+            return BitmapFactory.decodeStream(contexto.getContentResolver()
+                    .openInputStream(Uri.parse(uri)), null, options);
+        } catch (FileNotFoundException e) {
+            Toast.makeText(contexto, "Fichero/recurso no encontrado",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return null;
+
+        }
     }
 }

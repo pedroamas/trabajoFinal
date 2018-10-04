@@ -21,9 +21,10 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Imagen"
+                android:text="Seleccionar imagen"
                 android:id="@+id/btnImagen"
-                style="@style/BotonPrimary"/>
+                android:textColor="@color/white"
+                app:backgroundTint="@color/button_material_dark"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

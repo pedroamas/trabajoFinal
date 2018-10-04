@@ -24,6 +24,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.CantValidarListener;
 import com.example.root.trabajofinal.Listeners.EliminarPuntoListener;
@@ -40,6 +42,7 @@ import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.example.root.trabajofinal.Objetos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,8 +54,6 @@ public class DetalleAdmin extends AppCompatActivity {
     public static int EDICION_IMAGENES = 2000;
     public static int EDICION_VIDEOS = 3000;
     public static int EDICION_USUARIOS = 4000;
-    private android.support.v4.app.FragmentManager manager = null;
-    private android.support.v4.app.FragmentTransaction ft;
     private GestorMultimedia gestorMultimedia;
     private Context context;
     private Punto punto;
@@ -80,6 +81,9 @@ public class DetalleAdmin extends AppCompatActivity {
 
         //String[] places = resources.getStringArray(R.array.places);
         collapsingToolbar.setTitle(punto.getTitulo());
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(android.R.color.white));
+
 
 
         //String[] placeDetails = resources.getStringArray(R.array.place_details);
@@ -120,15 +124,8 @@ public class DetalleAdmin extends AppCompatActivity {
         });
 
 
-        Button btnValidarInfo=(Button)findViewById(R.id.btnValidarInfo);
-        btnValidarInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),ValidarInfoUsuario.class);
-                intent.putExtra("id",punto.getId());
-                startActivityForResult(intent,EDICION_USUARIOS);
-            }
-        });
+
+
 
         cargarImagenes();
         cargarVideos();
@@ -172,11 +169,9 @@ public class DetalleAdmin extends AppCompatActivity {
             public void onClick(View v) {
 
                 AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext(),R.style.AppTheme);
-                } else {
-                    builder = new AlertDialog.Builder(DetalleAdmin.this,R.style.Theme_AppCompat_Dialog);
-                }
+
+                builder = new AlertDialog.Builder(DetalleAdmin.this);
+
                 builder.setMessage(Html.fromHtml("<font color='#000000'>¿Desea eliminar el punto de interés?</font>"));
                 //builder.setTitle("Eliminar");
                 builder.setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
@@ -215,8 +210,7 @@ public class DetalleAdmin extends AppCompatActivity {
                 AlertDialog a=builder.create();
                 a.show();
                 Button bq = a.getButton(DialogInterface.BUTTON_POSITIVE);
-                bq.setBackgroundColor(Color.RED);
-                bq.setTextColor(getResources().getColor(R.color.white));
+                bq.setTextColor(getResources().getColor(R.color.red));
                 Log.e("TEMA",""+getThemeName());
             }
         });
@@ -224,11 +218,24 @@ public class DetalleAdmin extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+        Usuario usuario=gestorUsuarios.getUsuario();
+        if(usuario==null){
+            finish();
+            return;
+        }else if(!usuario.isAdmin()){
+            finish();
+            return;
+        }
+
         if(resultCode == RESULT_OK){
             if(requestCode==EDICION ){
                 final ProgressDialog progress;
                 progress = new ProgressDialog(DetalleAdmin.this);
                 progress.setTitle("Actualizando");
+            progress.setCancelable(false);
+            progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
                 progress.setMessage("Espere un momento...");
                 progress.show();
                 GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
@@ -354,7 +361,7 @@ public class DetalleAdmin extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent intent = new Intent(getApplicationContext(), VerVideoEliminarComentario.class);
                             intent.putExtra("id_video",video.getId());
-                            startActivity(intent);
+                            startActivityForResult(intent,EDICION_VIDEOS);
                         }
                     });
                     Log.e("",video.getTitulo());
@@ -374,6 +381,23 @@ public class DetalleAdmin extends AppCompatActivity {
             public void onResponseCantValidar(int cantidad) {
                 Button btnValidarInfo=(Button)findViewById(R.id.btnValidarInfo);
                 btnValidarInfo.setText("Validar ("+cantidad+")");
+                if(cantidad==0){
+                    btnValidarInfo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(context,"No hay imágenes para validar",Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else{
+                    btnValidarInfo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent=new Intent(getApplicationContext(),ValidarInfoUsuario.class);
+                            intent.putExtra("id",punto.getId());
+                            startActivityForResult(intent,EDICION_USUARIOS);
+                        }
+                    });
+                }
             }
         });
         gestorMultimedia.getImagenesUsuarios(punto.getId(), new ImagenesListener() {

@@ -40,11 +40,13 @@
         android:id="@+id/edPath"/>
     <TextView
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:text="Fecha de filmación"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:textEditPasteWindowLayout="@style/BotonPrimary"
         android:id="@+id/edFechaCaptura"/>
     <Button
@@ -60,9 +62,9 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Subir video"
+        android:text="Editar video"
         style="@style/BotonPrimary"
-        android:id="@+id/btnSubir"/>
+        android:id="@+id/btnEditarVideo"/>
 
 </LinearLayout>
 </ScrollView>

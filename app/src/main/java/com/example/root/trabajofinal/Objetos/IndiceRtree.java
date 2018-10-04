@@ -4,10 +4,7 @@ package com.example.root.trabajofinal.Objetos;
  * Created by pedro on 26/03/18.
  */
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
-import android.widget.TextView;
 
 import org.sqlite.database.sqlite.SQLiteDatabase;
 import org.sqlite.database.sqlite.SQLiteStatement;
@@ -20,7 +17,7 @@ public class IndiceRtree {
     private SQLiteDatabase db;
     private SQLiteStatement st;
     private ArrayList<Punto> puntos;
-    private ArrayList<Punto> puntosMasCercanos;
+    private ArrayList<Punto> puntosCercanos;
 
     public IndiceRtree(ArrayList<Punto> puntos){
         System.loadLibrary("sqliteX");
@@ -53,23 +50,26 @@ public class IndiceRtree {
         }
     }
 
-    public ArrayList<Punto> getPuntosMasCercanos( double latitud,double longitud,double distanciaKm){
-        puntosMasCercanos=new ArrayList<Punto>();
+    public ArrayList<Punto> getPuntosCercanos(double latitud, double longitud, double distanciaKm){
+        puntosCercanos =new ArrayList<Punto>();
         ArrayList<Punto> puntosSuperiores;
 
-        puntosMasCercanos=consultarAreaInferior(latitud,calculoIncrementoLatitud(distanciaKm),longitud,calculoIncrementoLongitud(latitud,distanciaKm));
+        puntosCercanos =consultarAreaInferior(latitud,calculoIncrementoLatitud(distanciaKm),longitud,calculoIncrementoLongitud(latitud,distanciaKm));
         puntosSuperiores=consultarAreaSuperior(latitud,calculoIncrementoLatitud(distanciaKm),longitud,calculoIncrementoLongitud(latitud,distanciaKm));
+        fuerzaBruta(latitud,longitud,distanciaKm,puntosSuperiores);
+        return puntosCercanos;
+
+
+
+    }
+    public void fuerzaBruta(double latitud, double longitud, double distanciaKm,ArrayList<Punto> puntosSuperiores){
         Iterator<Punto> ite=puntosSuperiores.iterator();
         while (ite.hasNext()){
             Punto puntoTemp=ite.next();
-            if(distance(latitud,longitud,puntoTemp.getLatitud(),puntoTemp.getLongitud())<=distanciaKm){
-                puntosMasCercanos.add(puntoTemp);
+            if(distancia(latitud,longitud,puntoTemp.getLatitud(),puntoTemp.getLongitud())<=distanciaKm){
+                puntosCercanos.add(puntoTemp);
             }
         }
-        return puntosMasCercanos;
-
-
-
     }
     public Punto buscarPunto(int idPunto){
         Punto puntoTemp;
@@ -100,7 +100,7 @@ public class IndiceRtree {
             do {
                 id = cursor.getInt(0);
                 puntosSuperiores.add(buscarPunto(id));
-                //Log.e("Consulta Rtree Area sup"," : "+id+" - "+cursor.getDouble(1)+" - "+cursor.getDouble(2)+" - distancia: "+distance(latitud,longitud,cursor.getDouble(1),cursor.getDouble(2)));
+                //Log.e("Consulta Rtree Area sup"," : "+id+" - "+cursor.getDouble(1)+" - "+cursor.getDouble(2)+" - distancia: "+distancia(latitud,longitud,cursor.getDouble(1),cursor.getDouble(2)));
             } while (cursor.moveToNext());
         }
         return puntosSuperiores;
@@ -119,15 +119,15 @@ public class IndiceRtree {
             do {
                 id = cursor.getInt(0);
                 puntosInferiores.add(buscarPunto(id));
-                //Log.e("Consulta Rtree Area inf"," : "+id+" - "+cursor.getDouble(1)+" - "+cursor.getDouble(2)+" - distancia: "+distance(latitud,longitud,cursor.getDouble(1),cursor.getDouble(2)));
+                //Log.e("Consulta Rtree Area inf"," : "+id+" - "+cursor.getDouble(1)+" - "+cursor.getDouble(2)+" - distancia: "+distancia(latitud,longitud,cursor.getDouble(1),cursor.getDouble(2)));
             } while (cursor.moveToNext());
         }
         return puntosInferiores;
     }
 
     private static final int EARTH_RADIUS = 6371; // Approx Earth radius in KM
-    public static double distance(double startLat, double startLong,
-                                  double endLat, double endLong) {
+    public static double distancia(double startLat, double startLong,
+                                   double endLat, double endLong) {
 
         double dLat  = Math.toRadians((endLat - startLat));
         double dLong = Math.toRadians((endLong - startLong));

@@ -16,6 +16,7 @@
 
 package com.example.root.trabajofinal;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -24,12 +25,18 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -45,16 +52,18 @@ import com.bumptech.glide.request.target.Target;
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.ImagenesListener;
 import com.example.root.trabajofinal.Listeners.VideosListener;
 import com.example.root.trabajofinal.Objetos.Multimedia;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.example.root.trabajofinal.Objetos.Usuario;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Detalle extends AppCompatActivity  {
+public class Detalle extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "id";
 
@@ -65,6 +74,8 @@ public class Detalle extends AppCompatActivity  {
     private Punto punto;
     private static int LOGUEAR_USUARIO = 100;
     private LinearLayoutCompat.LayoutParams linLayoutParam;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,15 +91,10 @@ public class Detalle extends AppCompatActivity  {
         final GestorPuntos gestorPuntos = GestorPuntos.getInstance(context);
 
         punto= gestorPuntos.getPunto(getIntent().getIntExtra(EXTRA_POSITION, 0));
-        Log.e("putExtra","id: "+punto.getFoto());
-        int postion= 1;
-
-        Resources resources = getResources();
-
-        //String[] places = resources.getStringArray(R.array.places);
         collapsingToolbar.setTitle(punto.getTitulo());
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(android.R.color.white));
 
-        //Click de agregar imagenes del usuario
         Button btnAgregarImagen=(Button)findViewById(R.id.btnAgregarImagen);
         btnAgregarImagen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,13 +111,8 @@ public class Detalle extends AppCompatActivity  {
             }
         });
 
-        //String[] placeDetails = resources.getStringArray(R.array.place_details);
         TextView placeDetail = (TextView) findViewById(R.id.place_detail);
         placeDetail.setText(punto.getDescripcion());
-        //GestorWebService.getInstance(getApplicationContext()).obtenerDescripcion(punto.getId(),placeDetail);
-        //gestorPuntos.getDescripcion(punto.getId(),placeDetail);
-
-        //String[] placeLocations = resources.getStringArray(R.array.place_locations);
         TextView placeLocation =  (TextView) findViewById(R.id.place_location);
         placeLocation.setText("Latitud "+punto.getLatitud()+"\nLongitud "+punto.getLongitud());
 
@@ -119,9 +120,7 @@ public class Detalle extends AppCompatActivity  {
         Log.e("<img>","path foto: "+punto.getFoto());
 
         ImageView placePicutre = (ImageView) findViewById(R.id.image);
-        //placePicutre.setImageDrawable(placePictures.getDrawable(postion % placePictures.length()));
         Bitmap fotoPortada= gestorMultimedia.cargarImagen(punto.getFoto());
-        //InputStream si1=fotoPortada.;
         Log.e("Foto","Foto: "+punto.getFoto());
         if(fotoPortada==null){
             Log.e("Foto","Esta nulooo la foto");
@@ -136,12 +135,26 @@ public class Detalle extends AppCompatActivity  {
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
                 final LinearLayout layout = (LinearLayout) findViewById(R.id.lytGaleria);
                 layout.removeAllViews();
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(0, convertDpToPx(16, dm), 0, convertDpToPx(16, dm));
+
+                TextView galeriaImagenes=new TextView(context);
+                galeriaImagenes.setLayoutParams(lp);
+
+
+                galeriaImagenes.setText("Galería de imágenes");
+                galeriaImagenes.setTextSize(20);
+                galeriaImagenes.setTextColor(getResources().getColor( R.color.blue));
+
+                if(imagenes.size()>1) {
+                    layout.addView(galeriaImagenes);
+                }
                 int count=0;
                 Iterator<Multimedia> ite=imagenes.iterator();
                 while (ite.hasNext()){
 
                     final Multimedia imagen =ite.next();
-                    Log.e("Imagenes","path imagnes "+imagen.getPath());
                     if(count==0){
                         final ImageView image=(ImageView)findViewById(R.id.image);
                         image.setOnClickListener(new View.OnClickListener() {
@@ -172,7 +185,6 @@ public class Detalle extends AppCompatActivity  {
                                 Intent intent = new Intent(context, MostrarImagenesSec.class);
                                 intent.putExtra("id_imagen", imagen.getId());
                                 startActivity(intent);
-                                //Toast.makeText(getApplicationContext(),imagen.getId(),Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -284,6 +296,8 @@ public class Detalle extends AppCompatActivity  {
         float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
         return Math.round(pixels);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

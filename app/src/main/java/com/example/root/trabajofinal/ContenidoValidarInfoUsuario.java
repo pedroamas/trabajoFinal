@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
@@ -42,7 +43,11 @@ public class ContenidoValidarInfoUsuario extends Fragment {
         gestorMultimedia.getImagenesUsuariosPendientes(idPunto,new ImagenesListener() {
             @Override
             public void onResponseImagenes(ArrayList<Multimedia> imagenes) {
-                //gestorDePuntos.getPuntos();
+                if(imagenes.size()==0){
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "No hay imágenes para validar",Toast.LENGTH_LONG).show();
+                    getActivity().finish();
+                }
                 imagenesPendientes=imagenes;
                 Log.e("Procesame","esto");
 
@@ -137,6 +142,8 @@ public class ContenidoValidarInfoUsuario extends Fragment {
 
                 Glide.with(getContext())
                         .load(mPlaceAvators[position % mPlaceAvators.length])
+                        .placeholder(R.drawable.ic_image_box)
+                        .crossFade()
                         .into(holder.avator);
                 //Bitmap bitmap=gestorMultimedia.cargarImagen(mPlaceAvators[position % mPlaceAvators.length]);
                 /*Bitmap bitmap= ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(mPlaceAvators[position % mPlaceAvators.length]),50,50);

@@ -179,7 +179,7 @@ public class GestorBD {
         SQLiteDatabase bd = admin.getWritableDatabase();
         Cursor fila = bd.rawQuery(
                 "select id,latitud, longitud, titulo,foto,descripcion,foto_web,fecha_ult_mod from puntos " +
-                        "WHERE estado_foto=1 ORDER BY titulo", null);
+                        "WHERE estado_foto=1 ORDER BY upper(titulo)", null);
 
         puntosBD=new ArrayList<Punto>();
         if (fila.moveToFirst()) {
@@ -224,7 +224,7 @@ public class GestorBD {
         SQLiteDatabase bd = admin.getWritableDatabase();
         Cursor fila = bd.rawQuery(
                 "select id,latitud, longitud, titulo,foto,descripcion,foto_web,fecha_ult_mod from puntos " +
-                        "WHERE estado_foto=0  ORDER BY titulo", null);
+                        "WHERE estado_foto=0  ORDER BY upper(titulo)", null);
 
         ArrayList<Punto> puntosMalCargados=new ArrayList<Punto>();
         if (fila.moveToFirst()) {

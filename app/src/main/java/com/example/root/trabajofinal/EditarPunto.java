@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.view.Menu;
 
 import com.example.root.trabajofinal.Gestores.GestorPuntos;
+import com.example.root.trabajofinal.Gestores.GestorUsuarios;
 import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Objetos.Punto;
+import com.example.root.trabajofinal.Objetos.Usuario;
 
 import java.util.ArrayList;
 
@@ -41,11 +43,20 @@ public class EditarPunto extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+        Usuario usuario=gestorUsuarios.getUsuario();
+        if(usuario==null){
+            finish();
+            return;
+        }else if(!usuario.isAdmin()){
+            finish();
+            return;
+        }
         if(resultCode == RESULT_OK){
             if(requestCode==EDITAR_INFO ){
                 final ProgressDialog progress;

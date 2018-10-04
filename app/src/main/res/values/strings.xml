@@ -17,4 +17,59 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="navigation_drawer_open">Abrir menú</string>
+    <string name="navigation_drawer_close">Cerrar menú</string>
+
+    <!--Menu item texts -->
+    <string name="action_search">Search</string>
+    <string name="btnActualizar">Actualizar</string>
+    <string name="action_notifications">Notifications</string>
+
+    <string name="realidad_aumentada">Realidad aumentada</string>
+    <string name="vista_satelital">Vista satelital</string>
+    <string name="lista">Lista</string>
+    <string name="puntos_cercanos">Puntos cercanos</string>
+    <string name="item_5">Books \u0026 More</string>
+    <string name="item_6">More</string>
+
+    <string name="funcionalidades">Principal</string>
+    <string name="my_rewards">My Rewards</string>
+    <string name="my_orders">My Orders</string>
+    <string name="my_cart">My Cart</string>
+    <string name="my_wishlist">My Wishlist</string>
+    <string name="iniciaSesion">Iniciar sesión</string>
+
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="administracion">Administración</string>
+    <string name="agregar_punto">Agregar punto</string>
+    <string name="edicion_punto">Editar puntos</string>
+
+    <string name="search_hint">Search for Products, Brands and More</string>
+
+
+    <!--Intro slider texts -->
+    <string name="title_activity_welcome">Home Screen</string>
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+
+    <string name="slide_1_title">Hello Food!</string>
+    <string name="slide_1_desc">The easiest way to order food from your favourite restaurant!
+    </string>
+
+    <string name="slide_2_title">Movie Tickets</string>
+    <string name="slide_2_desc">Book movie tickets for your family and friends!</string>
+
+    <string name="slide_3_title">Great Discounts</string>
+    <string name="slide_3_desc">Best discounts on every single service we offer!</string>
+
+    <string name="slide_4_title">World Travel</string>
+    <string name="slide_4_desc">Book tickets of any transportation and travel the world!</string>
+
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome
+        slider -> clear data
+    </string>
+    <string name="play_again">Play Again</string>
 </resources>

@@ -1,12 +1,18 @@
 package com.example.root.trabajofinal;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,34 +20,37 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.example.root.trabajofinal.Gestores.GestorComentarios;
 import com.example.root.trabajofinal.Gestores.GestorMultimedia;
+import com.example.root.trabajofinal.Gestores.GestorPuntos;
 import com.example.root.trabajofinal.Gestores.GestorUsuarios;
+import com.example.root.trabajofinal.Listeners.ActualizarPuntoListener;
 import com.example.root.trabajofinal.Listeners.GetComentariosListener;
 import com.example.root.trabajofinal.Listeners.SetComentarioListener;
 import com.example.root.trabajofinal.Listeners.VideoListener;
 import com.example.root.trabajofinal.Objetos.Comentario;
 import com.example.root.trabajofinal.Objetos.Multimedia;
+import com.example.root.trabajofinal.Objetos.Punto;
+import com.example.root.trabajofinal.Objetos.Usuario;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
-import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class VerVideo extends Activity {
+public class VerVideo extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String EXTRA_POSITION = "id_video";
     private int idVideo=-1;
@@ -54,10 +63,29 @@ public class VerVideo extends Activity {
     private YouTubePlayer youTubePlayer;
     private YouTubePlayerFragment youTubePlayerFragment;
 
+    private NavigationView navigationView;
+    private ProgressDialog progress;
+    private static int PANTALLA_CUALQUIERA = 3000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ver_video);
+        setContentView(R.layout.barra_menu);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        LinearLayout contenido=(LinearLayout) findViewById(R.id.contenido);
+        contenido.addView(getLayoutInflater().inflate(R.layout.activity_ver_video, null));
+        configurarMenu();
 
         context = getApplicationContext();
         verVideo = this;
@@ -208,26 +236,137 @@ public class VerVideo extends Activity {
 
         }
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        invalidateOptionsMenu();
+        return super.onPrepareOptionsMenu(menu);
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.btnActualizar) {
+
+            progress = new ProgressDialog(VerVideo.this);
+            progress.setTitle("Actualizando");
+            progress.setCancelable(false);
+            progress.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            progress.setMessage("Espere un momento...");
+            progress.show();
+            GestorPuntos gestorPuntos = GestorPuntos.getInstance(getApplicationContext());
+            gestorPuntos.actualizarPuntos(new ActualizarPuntoListener() {
+                @Override
+                public void onResponseActualizarPunto(ArrayList<Punto> puntos) {
+                    progress.dismiss();
+                    startActivity(getIntent());
+                    finish();
+                }
+            });
+            return true;
+        }else if(id == R.id.navRealidadAumentada){
+
+            Toast.makeText(getApplicationContext(),"RA",Toast.LENGTH_LONG).show();
             return true;
         }
 
+        else {
+
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Intent intent;
+        switch (id){
+            case R.id.navRealidadAumentada:
+                intent = new Intent(getApplicationContext(), RealidadAumentada.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navVistaSatelital:
+                intent = new Intent(getApplicationContext(), VistaSatelital.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navLista:
+                intent = new Intent(getApplicationContext(), ListaMaterialDesign.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navPuntosCercanos:
+                intent = new Intent(getApplicationContext(), PuntosCercanos.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navCerrarSesion:
+                GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+                gestorUsuarios.cerrarSesion();
+                startActivity(getIntent());
+                finish();
+                break;
+            case R.id.navAgregarPunto:
+                intent = new Intent(getApplicationContext(), SubirPuntoAdmin.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.navEdicion:
+                intent = new Intent(getApplicationContext(), MenuAdmin.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+            case R.id.itm_iniciar_sesion:
+                intent = new Intent(getApplicationContext(), Login.class);
+                startActivityForResult(intent,PANTALLA_CUALQUIERA);
+                break;
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void configurarMenu(){
+        GestorUsuarios gestorUsuarios=GestorUsuarios.getInstance(getApplicationContext());
+        Usuario usuario=gestorUsuarios.getUsuario();
+        TextView txtUsername=(TextView)navigationView.getHeaderView(0).findViewById(R.id.txtUsernameMain);
+        if(navigationView!=null) {
+            Menu navMenu = navigationView.getMenu();
+            if (usuario == null) {
+                navMenu.getItem(0).setVisible(true);
+                navMenu.getItem(1).setVisible(false);
+                navMenu.getItem(3).setVisible(false);
+            }else if(usuario.isAdmin()){
+                txtUsername.setText(usuario.getUsername());
+                navMenu.getItem(0).setVisible(false);
+                navMenu.getItem(1).setVisible(true);
+                navMenu.getItem(3).setVisible(true);
+            }else{
+                txtUsername.setText(usuario.getUsername());
+                navMenu.getItem(0).setVisible(false);
+                navMenu.getItem(1).setVisible(true);
+                navMenu.getItem(3).setVisible(false);
+            }
+        }
     }
 
 

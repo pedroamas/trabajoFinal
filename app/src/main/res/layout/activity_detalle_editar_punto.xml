@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_subir_punto_admin"
 
     >
@@ -82,7 +83,9 @@
             android:id="@+id/show_options_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Editar foto"/>
+            app:backgroundTint="@color/button_material_dark"
+            android:textColor="@color/white"
+            android:text="Seleccionar imagen"/>
         <ImageView
             android:id="@+id/set_picture"
             android:layout_width="match_parent"

@@ -431,7 +431,13 @@ public class GestorWebService {
 
                 File f=new File(punto.getFoto());
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                f= gestorMultimedia.ajustarImagen(f);
+                try {
+                    f= gestorMultimedia.ajustarImagen(f);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return;
+                }
+
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -500,7 +506,12 @@ public class GestorWebService {
 
                     File f = new File(punto.getImagen().getPath());
                     GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                    f = gestorMultimedia.ajustarImagen(f);
+                    try {
+                        f= gestorMultimedia.ajustarImagen(f);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return;
+                    }
 
                     RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
 
@@ -908,7 +919,12 @@ public class GestorWebService {
 
                 File f=new File(imagen.getPath());
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                f= gestorMultimedia.ajustarImagen(f);
+                try {
+                    f= gestorMultimedia.ajustarImagen(f);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return;
+                }
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -970,7 +986,12 @@ public class GestorWebService {
 
                 File f=new File(imagen.getPath());
                 GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                f= gestorMultimedia.ajustarImagen(f);
+                try {
+                    f= gestorMultimedia.ajustarImagen(f);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return;
+                }
                 OkHttpClient client = new OkHttpClient();
                 RequestBody file_body = RequestBody.create(MediaType.parse(content_type),f);
 
@@ -1036,7 +1057,12 @@ public class GestorWebService {
 
                     File f = new File(multimedia.getPath());
                     GestorMultimedia gestorMultimedia = GestorMultimedia.getInstance(context);
-                    f = gestorMultimedia.ajustarImagen(f);
+                    try {
+                        f= gestorMultimedia.ajustarImagen(f);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return;
+                    }
 
                     RequestBody file_body = RequestBody.create(MediaType.parse(content_type), f);
                     request_body= new MultipartBody.Builder()
@@ -1429,6 +1455,70 @@ public class GestorWebService {
 
         };
         requestQueue.add(postRequest);
+
+    }
+
+    public void editarVideo(final Multimedia multimedia, final EditarMultimediaListener editarMultimediaListener){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //obtiene la extension
+                OkHttpClient client = new OkHttpClient();
+                RequestBody request_body;
+                if(multimedia.getFechaCaptura()==null) {
+                    request_body = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_video", "" + multimedia.getId())
+                            .addFormDataPart("titulo", multimedia.getTitulo())
+                            .addFormDataPart("descripcion", multimedia.getDescripcion())
+                            .addFormDataPart("path", multimedia.getPath())
+                            .build();
+                }else{
+                    request_body = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("id_video", "" + multimedia.getId())
+                            .addFormDataPart("titulo", multimedia.getTitulo())
+                            .addFormDataPart("descripcion", multimedia.getDescripcion())
+                            .addFormDataPart("path", multimedia.getPath())
+                            .addFormDataPart("fecha_captura", "" + dt1.format(multimedia.getFechaCaptura()))
+                            .build();
+                }
+            okhttp3.Request request = new okhttp3.Request.Builder()
+                    .url("http://pedroamas.xyz/editar_video.php")
+                    .post(request_body)
+                    .build();
+
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+
+                    Log.e("Body response",response.body().string());
+                    Log.e("Body response2",response.body().toString());
+                    if(!response.isSuccessful()){
+
+                        editarMultimediaListener.onResponseEditarMultimedia("Error");
+                        throw new IOException("Error : "+response);
+                    }else{
+                        Log.e("Resp de ws",response.message());
+                        editarMultimediaListener.onResponseEditarMultimedia("Ok");
+                    }
+
+                    Log.e("","Correcto");
+
+                    return;
+
+                } catch (IOException e) {
+                    Log.e("","incorrecto");
+                    e.printStackTrace();
+                    editarMultimediaListener.onResponseEditarMultimedia("Error");
+                }
+
+
+            }
+        });
+
+        t.start();
+
 
     }
 }
